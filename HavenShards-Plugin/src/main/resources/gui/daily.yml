@@ -1,0 +1,51 @@
+# ==============================================================================
+#                 HavenShards Daily Login Rewards GUI Configuration
+# ==============================================================================
+
+title: "&#00E5FF&lHavenShards &#888888» Daily Rewards"
+rows: 4
+
+background:
+  material: AIR
+  name: " "
+
+items:
+  claim-available:
+    slot: 13
+    material: NETHER_STAR
+    custom-model-data: 0
+    name: "&a&l✨ CLAIM DAILY REWARD"
+    lore:
+      - "&7Claim your daily shards & maintain your streak!"
+      - ""
+      - "&7Current Streak: &e%streak% Days"
+      - "&7Base Reward: &a+%base_reward% %symbol%"
+      - "&7Streak Bonus: &a+%streak_bonus% %symbol%"
+      - "&7Total Multiplier: &d%multiplier%x"
+      - ""
+      - "&eClick here to claim!"
+
+  claim-claimed:
+    slot: 13
+    material: CLOCK
+    custom-model-data: 0
+    name: "&c&lALREADY CLAIMED TODAY"
+    lore:
+      - "&7You have already claimed your daily reward."
+      - ""
+      - "&7Current Streak: &e%streak% Days"
+      - "&7Next Claim In: &e%remaining%"
+      - ""
+      - "&7Come back tomorrow to keep your streak!"
+
+buttons:
+  back:
+    slot: 27
+    material: SPECTRAL_ARROW
+    custom-model-data: 0
+    name: "&c&l« Back to Dashboard"
+  close:
+    slot: 31
+    material: RED_STAINED_GLASS_PANE
+    custom-model-data: 0
+    name: "&c&lClose"

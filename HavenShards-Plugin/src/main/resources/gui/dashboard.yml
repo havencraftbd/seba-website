@@ -1,0 +1,100 @@
+﻿# ==============================================================================
+#                  HavenShards Main Dashboard GUI Configuration
+# ==============================================================================
+
+title: "&#00E5FF&lHavenShards &#888888» Dashboard"
+rows: 4
+
+background:
+  material: AIR
+  name: " "
+
+items:
+  profile:
+    slot: 13
+    name: "&a&l%player%'s Profile"
+    lore:
+      - "&7Balance: &a%symbol% %balance% %currency%"
+      - " "
+      - "&b&lNext Playtime Reward:"
+      - "&7Progress: &e%progress_bar% &7(%progress_percent%%)"
+      - "&7Time Remaining: &f%remaining_mins% mins"
+      - "&7Reward: &a+%reward_amount% %symbol%"
+
+  daily-rewards:
+    enabled: true
+    slot: 10
+    material: CHEST
+    custom-model-data: 0
+    name: "&e&lDaily Login Rewards"
+    lore:
+      - "&7Claim your daily bonus Shards"
+      - "&7and build your daily streak!"
+      - ""
+      - "&eClick &7to open &eDaily Rewards&7!"
+
+  quests:
+    enabled: true
+    slot: 11
+    material: BOOK
+    custom-model-data: 0
+    name: "&6&lDaily Quests"
+    lore:
+      - "&7Complete daily tasks to earn"
+      - "&7extra bonus Shards every day!"
+      - ""
+      - "&eClick &7to open &6Daily Quests&7!"
+
+  withdraw:
+    enabled: true
+    slot: 12
+    material: AMETHYST_SHARD
+    custom-model-data: 0
+    name: "&b&lCustom Withdraw"
+    lore:
+      - "&7Convert your virtual Shards into a"
+      - "&7physical item to trade or store."
+      - ""
+      - "&eClick &7to type custom amount in chat!"
+
+  history:
+    enabled: true
+    slot: 14
+    material: PAPER
+    custom-model-data: 0
+    name: "&d&lTransaction History"
+    lore:
+      - "&7View your recent earnings,"
+      - "&7withdrawals, transfers & rewards log."
+      - ""
+      - "&eClick &7to view &dTransaction Log&7!"
+
+  top:
+    enabled: true
+    slot: 15
+    material: GOLD_BLOCK
+    custom-model-data: 0
+    name: "&a&lRich Leaderboard"
+    lore:
+      - "&7View the richest players"
+      - "&7on the server economy!"
+      - ""
+      - "&eClick &7to view &aLeaderboard&7!"
+
+  booster:
+    enabled: true
+    slot: 16
+    material: NETHER_STAR
+    custom-model-data: 0
+    name: "&e&lServer Booster Status"
+    lore-active:
+      - "&7Status: &a&lACTIVE (%multiplier%x Multiplier)"
+      - "&7Remaining Time: &b%remaining_time%"
+    lore-inactive:
+      - "&7Status: &cNo Active Booster"
+      - "&7Standard Earning Rate (1.0x)"
+
+  close:
+    slot: 31
+    material: BARRIER
+    name: "&c&lClose Menu"

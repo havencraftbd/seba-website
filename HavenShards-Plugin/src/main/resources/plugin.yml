@@ -1,0 +1,46 @@
+name: HavenShards
+version: 1.0.0
+main: com.haven.shards.HavenShards
+api-version: 1.20
+author: HavenTeam
+description: Ultra-optimized Shards & Coins economy plugin with playtime rewards and HavenShop integration
+softdepend: [HavenShop, PlaceholderAPI, Vault, floodgate, Geyser-Spigot, Essentials]
+
+commands:
+  shards:
+    description: Primary command for HavenShards economy system
+    aliases: [havencoin, hccoin, coin, shard]
+    permission: havenshards.use
+    usage: /<command> [balance|pay|withdraw|top|give|take|set|reload]
+
+permissions:
+  havenshards.use:
+    description: Allows players to access player commands (balance, pay, withdraw, daily, quests, menu)
+    default: true
+  havenshards.admin:
+    description: Full administrative access to economy (give, take, set, booster, check other players history)
+    default: op
+  havenshards.reload:
+    description: Administrative access to reload plugin configuration
+    default: op
+  havenshards.multiplier.elite:
+    description: Grants Elite rank shard earning multiplier
+    default: false
+  havenshards.multiplier.mvp:
+    description: Grants MVP rank shard earning multiplier
+    default: false
+  havenshards.multiplier.vip:
+    description: Grants VIP rank shard earning multiplier
+    default: false
+  havenshards.pay.notax:
+    description: Bypasses the transaction tax on payments
+    default: op
+  havenshards.pay.limit.bypass:
+    description: Bypasses daily payment amount and transaction count limits
+    default: op
+  havenshards.withdraw.notax:
+    description: Bypasses the minting fee/tax on physical withdrawals
+    default: op
+  havenshards.withdraw.limit.bypass:
+    description: Bypasses daily withdrawal amount and count limits
+    default: op

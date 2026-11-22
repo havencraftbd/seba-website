@@ -1,0 +1,168 @@
+================================================================================
+                      ✨ HavenShards - Complete Plugin Guide ✨
+================================================================================
+
+Welcome to HavenShards! This guide contains a complete breakdown of all commands,
+permissions, placeholders, security features, Discord webhooks, GUI editing, and API usage.
+
+--------------------------------------------------------------------------------
+1. ⌨️ COMMANDS & ALIASES
+--------------------------------------------------------------------------------
+Command                             | Permission          | Description
+------------------------------------|---------------------|-----------------------------------
+/shards                             | havenshards.use     | Opens main Dashboard GUI.
+/shards menu                        | havenshards.use     | Opens main Dashboard GUI.
+/shards balance [player]            | havenshards.use     | Check virtual shard balance.
+/shards pay <player> <amount>       | havenshards.use     | Transfer shards to another player.
+/shards withdraw <amount>           | havenshards.use     | Convert virtual shards to physical item.
+/shards deposit                     | havenshards.use     | Deposit physical shard item held in hand.
+/shards daily                         | havenshards.use     | Claim daily login reward & view streak GUI.
+/shards history [player] [limit]    | havenshards.use/admin| Opens multi-page transaction log GUI.
+/shards top                         | havenshards.use     | View top 10 richest players.
+/shards give <player> <amount>      | havenshards.admin   | Add shards to player balance.
+/shards take <player> <amount>      | havenshards.admin   | Deduct shards from player balance.
+/shards set <player> <amount>       | havenshards.admin   | Set exact shard balance for player.
+/shards booster <mult> <30m/1h/1d>  | havenshards.admin   | Start global shard multiplier.
+/shards booster off                 | havenshards.admin   | Turn off active global booster.
+/shards reload                      | havenshards.reload  | Reload all configs & GUI yml files.
+
+Command Aliases: /shard, /shards, /havenshards
+
+--------------------------------------------------------------------------------
+2. 🔑 PERMISSIONS
+--------------------------------------------------------------------------------
+Permission                       | Default | Description
+---------------------------------|---------|------------------------------------
+havenshards.use                  | true    | Allows access to basic player commands.
+havenshards.admin                | op      | Grants admin economy command access (give, take, set, booster, history).
+havenshards.reload               | op      | Grants plugin config reload access.
+havenshards.multiplier.vip       | op      | Gives 1.2x rank multiplier bonus.
+havenshards.multiplier.mvp       | op      | Gives 1.5x rank multiplier bonus.
+havenshards.multiplier.elite     | op      | Gives 2.0x rank multiplier bonus.
+
+--------------------------------------------------------------------------------
+3. 📊 PLACEHOLDERAPI (PAPI) PLACEHOLDERS
+--------------------------------------------------------------------------------
+Economy Placeholders:
+%havenshards_balance%                 | Raw numeric balance (e.g. 1250.0)
+%havenshards_balance_formatted%       | Formatted balance (compact 13.5k/15M if compact-formatted: true, or 13,538)
+%havenshards_balance_compact%         | Always compact balance like Vault (e.g. 13.5k, 15M, 1.2B)
+%havenshards_balance_comma%           | Always comma-grouped balance (e.g. 13,538.45)
+%havenshards_currency_name%           | Currency name (e.g. Shards)
+%havenshards_currency_symbol%         | Currency symbol (e.g. ✨)
+
+Booster Placeholders:
+%havenshards_booster_multiplier%      | Active global booster multiplier (e.g. 2.0)
+%havenshards_booster_active%          | Global booster active state (true / false)
+%havenshards_booster_remaining%       | Remaining time formatted (e.g. 30m 15s)
+
+Rank & Total Multipliers:
+%havenshards_rank_multiplier%         | Player's rank multiplier (e.g. 1.5)
+%havenshards_total_multiplier%        | Total multiplier = Global * Rank (e.g. 3.0)
+
+Playtime Progress Placeholders:
+%havenshards_playtime_minutes%        | Active playtime minutes
+%havenshards_playtime_remaining%      | Minutes left for next playtime reward
+%havenshards_playtime_progress_percent%| Progress percentage (e.g. 70)
+%havenshards_playtime_progress_bar%   | Visual progress bar (e.g. ■■■■■■■□□□)
+
+Daily Login Reward Placeholders:
+%havenshards_daily_streak%            | Current daily login streak (e.g. 5)
+%havenshards_daily_can_claim%         | Claim availability (true / false)
+%havenshards_daily_remaining%         | Cooldown time remaining (e.g. 14h 25m)
+
+Leaderboard Top 10 Placeholders:
+%havenshards_top_name_1% to 10        | Name of #1 to #10 richest player
+%havenshards_top_balance_1% to 10     | Raw balance of #1 to #10 richest player
+%havenshards_top_balance_formatted_1% | Formatted balance of #1 to #10 richest player
+%havenshards_top_balance_compact_1%   | Compact balance of #1 to #10 richest player (e.g. 15M, 13.5k)
+%havenshards_top_balance_comma_1%     | Comma-grouped balance of #1 to #10 richest player
+
+Short Identifiers Also Supported: %shards_...% and %eco_shards%
+
+--------------------------------------------------------------------------------
+4. 🛡️ SECURITY & ANTI-DUPE SYSTEM
+--------------------------------------------------------------------------------
+- Persistent Item Fingerprinting: Every physical shard item has a unique Item UUID 
+  stored in its PersistentDataContainer (PDC).
+- Database Single-Use Ledger: Once an item is claimed into virtual balance, its UUID 
+  is saved in SQLite database. Re-claiming a duped item is 100% blocked.
+- Creative Mode Protection: Creative mode players cannot withdraw or claim physical items.
+- Anvil & Crafting Grid Protection: Shard items cannot be placed in Anvil or Crafting grid.
+- Admin Alerts: Online OP admins and Discord channels receive immediate alerts on dupe attempts.
+
+--------------------------------------------------------------------------------
+5. 🤖 DISCORD WEBHOOK INTEGRATION
+--------------------------------------------------------------------------------
+Configure your Discord Webhook URL in `config.yml` under `discord`:
+  discord:
+    enabled: true
+    webhook-url: "YOUR_DISCORD_WEBHOOK_URL_HERE"
+    notify-withdraw: true
+    notify-deposit: true
+    notify-pay: true
+    notify-admin: true
+    notify-dupe-attempt: true
+
+--------------------------------------------------------------------------------
+6. 🎨 GUI CUSTOMIZATION
+--------------------------------------------------------------------------------
+All GUIs are 100% editable without restarting the server!
+- `plugins/HavenShards/gui/dashboard.yml` -> Dashboard GUI title, rows, slots, lore, materials.
+- `plugins/HavenShards/gui/history.yml`   -> History GUI pagination, icons, slots, lore.
+- Set `material: AIR` or `material: NONE` for transparent empty glass backgrounds.
+- Execute `/shards reload` to apply GUI changes live!
+
+--------------------------------------------------------------------------------
+7. 🛒 HAVENSHOP INTEGRATION
+--------------------------------------------------------------------------------
+HavenShards automatically hooks into HavenShop!
+Simply set `currency: SHARDS` in `HavenShop` item configurations to allow players to 
+purchase items, ranks, and commands using Shards.
+
+--------------------------------------------------------------------------------
+8. 💻 DEVELOPER API
+--------------------------------------------------------------------------------
+Java Developers can interact with HavenShards directly:
+  double balance = HavenShardsAPI.getBalance(player);
+  HavenShardsAPI.addBalance(player, 500.0);
+  HavenShardsAPI.removeBalance(player, 200.0);
+  double totalMultiplier = HavenShardsAPI.getTotalMultiplier(player);
+
+--------------------------------------------------------------------------------
+9. 🎮 GAMEPLAY & ADVANCEMENT REWARDS
+--------------------------------------------------------------------------------
+Players can earn Shards by playing the game! All sources respect rank/global multipliers:
+- Mob Kills: Chance per hostile mob kill.
+- PvP Defeats: Bonus shards for defeating rival players.
+- Mining: Bonus shards when mining ores (Diamond, Ancient Debris, Emerald, etc.).
+- Fishing: Shards awarded on catching fish.
+- Farming: Shards awarded for harvesting fully grown crops (Wheat, Carrots, Potatoes, etc.).
+- Achievements: Bonus shards when unlocking Minecraft advancements (Dragon Kill, Nether, etc.).
+
+--------------------------------------------------------------------------------
+10. 🗄️ DATABASE STORAGE (SQLite & MySQL)
+--------------------------------------------------------------------------------
+HavenShards supports dual storage modes in `config.yml`:
+- `SQLITE` (Default): Zero setup required, local database file (`shards.db`).
+- `MYSQL`: For BungeeCord / Velocity networks with cross-server balance synchronization.
+
+--------------------------------------------------------------------------------
+11. 📱 GEYSERMC & BEDROCK PLAYER COMPATIBILITY
+--------------------------------------------------------------------------------
+HavenShards automatically hooks into Floodgate!
+Bedrock / Mobile players running `/shards` receive native Bedrock Form UI (UI Buttons) 
+for effortless navigation on touchscreens, with automatic fallback to chest GUI.
+
+--------------------------------------------------------------------------------
+12. 🎨 MINIMESSAGE & ADVENTURE API SUPPORT
+--------------------------------------------------------------------------------
+Full support for modern Paper MiniMessage formatting alongside legacy colors:
+- Gradients: `<gradient:#00E5FF:#0077FF><bold>HavenShards</gradient>`
+- Rainbows:  `<rainbow>Rainbow Text</rainbow>`
+- Hex Codes: `<#00E5FF>` and `&#00E5FF`
+- Legacy:    `&a`, `&b`, `&e`, `&l`
+
+================================================================================
+                  Thank you for using HavenShards!
+================================================================================
