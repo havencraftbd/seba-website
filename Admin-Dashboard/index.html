@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — HavenCraft Admin</title>
+  <link rel="icon" href="logo/logo.svg" type="image/svg+xml">
+
+  <!-- Bootstrap Icons CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous">
+
+  <!-- HavenCraft Admin Theme -->
+  <script src="assets/js/theme.js?v=3.9"></script>
+  <link rel="stylesheet" href="assets/css/admin.css?v=3.8">
+
+  <!-- Anti-FOUC Auth Guard (Zero-Flash Route Shield) -->
+  <script>
+    (function () {
+      var isFile = window.location.protocol === 'file:';
+      var rawPath = (window.location.pathname || '').replace(/\\/g, '/').toLowerCase();
+      var isSub = rawPath.includes('/users') || rawPath.includes('/tickets') ||
+        rawPath.includes('/orders') || rawPath.includes('/settings') ||
+        rawPath.includes('/shop') || rawPath.includes('/gallery') ||
+        rawPath.includes('/logs') || rawPath.includes('/profile') ||
+        rawPath.includes('/server') || rawPath.includes('/finance');
+      var pfx = isSub ? '../' : './';
+
+
+      var hasSession = false;
+      try {
+        for (var i = 0; i < localStorage.length; i++) {
+          var k = localStorage.key(i);
+          if (k && ((k.indexOf('sb-') === 0 && k.indexOf('-auth-token') !== -1) || k === 'supabase.auth.token')) {
+            var val = localStorage.getItem(k);
+            if (val && val !== 'null' && val !== 'undefined') {
+              var parsed = JSON.parse(val);
+              if (parsed && (parsed.access_token || parsed.user || (parsed.currentSession && parsed.currentSession.access_token))) {
+                hasSession = true;
+                break;
+              }
+            }
+          }
+        }
+      } catch (e) { }
+
+      if (!hasSession) {
+        window.location.replace(isFile ? pfx + 'login/index.html' : '/login');
+      }
+    })();
+  </script>
+</head>
+
+<body>
+
+  <div id="app-layout">
+    <!-- Header Hero Banner -->
+    <div class="dash-hero-glass">
+      <div>
+        <div
+          style="font-size: 0.74rem; font-weight: 500; color: var(--primary); margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+          <i class="bi bi-hdd-network"></i> HavenCraft SMP telemetry control
+        </div>
+        <h1 class="dash-hero-title">
+          System Overview
+        </h1>
+        <p class="dash-hero-sub">
+          Live telemetry, store revenue settlement, and support traffic
+        </p>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+        <div class="badge"
+          style="background: var(--bg-surface); border: 1px solid var(--border); padding: 6px 12px; font-size: 0.8rem; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; font-family: var(--font-mono);">
+          <i class="bi bi-calendar3" style="color: var(--text-muted);"></i>
+          <span id="dashLiveDate">--</span>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="loadDashboardData()"
+          title="Refresh dashboard telemetry" style="padding: 6px 10px;">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Top 4 Stat Cards -->
+    <div class="dash-stat-grid">
+      <!-- Card 1: Revenue -->
+      <div class="glass-card crm-stat-card">
+        <div class="crm-stat-top">
+          <div class="crm-stat-label">Total store revenue</div>
+          <span class="crm-stat-trend trend-up" id="dashRevTrendBadge">
+            <i class="bi bi-graph-up-arrow"></i> Revenue
+          </span>
+        </div>
+        <div class="crm-stat-bottom">
+          <div class="crm-stat-number hvn-skeleton" id="dashRevenueVal">৳0</div>
+          <div class="crm-stat-sub-row">
+            <span id="dashRevenueSub">Unified store &amp; sales</span>
+            <span>Rate: <strong id="dashPaidRate" style="color: var(--text-secondary); font-weight: 500;">--</strong></span>
+          </div>
+          <div id="dashRevSpark" style="display: none;"></div>
+          <div class="crm-stat-progress-track">
+            <div class="crm-stat-progress-bar" id="dashPaidBar" style="width: 0%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Processed Orders -->
+      <div class="glass-card crm-stat-card">
+        <div class="crm-stat-top">
+          <div class="crm-stat-label">Processed orders</div>
+          <span class="crm-stat-trend trend-up" id="dashOrdersTrendBadge">
+            <i class="bi bi-arrow-up-right"></i> Settled
+          </span>
+        </div>
+        <div class="crm-stat-bottom">
+          <div class="crm-stat-number hvn-skeleton" id="dashOrdersCount">0 transactions</div>
+          <div class="crm-stat-sub-row">
+            <span id="dashOrdersSub">All channels</span>
+            <span>Settlement: <strong id="dashCompletedRatio" style="color: var(--text-secondary); font-weight: 500;">--</strong></span>
+          </div>
+          <div id="dashOrdSpark" style="display: none;"></div>
+          <div class="crm-stat-progress-track">
+            <div class="crm-stat-progress-bar" id="dashCompletedBar" style="width: 0%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Live SMP Players -->
+      <div class="glass-card crm-stat-card">
+        <div class="crm-stat-top">
+          <div class="crm-stat-label">Online Minecraft players</div>
+          <span class="crm-stat-trend trend-neutral" id="dashServerPingBadge">
+            <span class="pulse-dot"></span> Live ping
+          </span>
+        </div>
+        <div class="crm-stat-bottom">
+          <div class="crm-stat-number hvn-skeleton" id="dashPlayersCount">-- / --</div>
+          <div class="crm-stat-sub-row">
+            <span id="dashPlayersSub" data-config="serverTarget">Connecting...</span>
+            <span>Capacity: <strong id="dashCapacityText" style="color: var(--text-secondary); font-weight: 500;">--</strong></span>
+          </div>
+          <div class="crm-stat-progress-track">
+            <div class="crm-stat-progress-bar" id="dashCapacityBar" style="width: 0%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4: Support Inquiries -->
+      <div class="glass-card crm-stat-card">
+        <div class="crm-stat-top">
+          <div class="crm-stat-label">Player support tickets</div>
+          <span class="crm-stat-trend trend-amber" id="dashTicketsTrendBadge">
+            <i class="bi bi-clock-history"></i> Support
+          </span>
+        </div>
+        <div class="crm-stat-bottom">
+          <div class="crm-stat-number hvn-skeleton" id="dashTicketsCount">0 inquiries</div>
+          <div class="crm-stat-sub-row">
+            <span id="dashTicketsSub">Syncing tickets...</span>
+            <span>Resolved: <strong id="dashTicketResolveRate" style="color: var(--text-secondary); font-weight: 500;">--</strong></span>
+          </div>
+          <div class="crm-stat-progress-track">
+            <div class="crm-stat-progress-bar" id="dashTicketResolveBar" style="width: 0%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analytics & Telemetry Grid (Bar Chart + Circular Gauge) -->
+    <div class="crm-analytics-grid">
+      <!-- Left: Interactive Revenue & Transactions Chart -->
+      <div class="glass-card card" style="padding: 24px;">
+        <div
+          style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <h2
+              style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+              <i class="bi bi-bar-chart-line" style="color: var(--primary);"></i> Revenue &amp; Activity Trajectory
+            </h2>
+            <div style="font-size: 0.78rem; color: var(--text-muted);" id="dashChartSubtitle">Weekly store revenue performance (bKash &amp; Nagad payments)</div>
+          </div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end;">
+            <button type="button" class="badge" id="btnChart7d" onclick="setChartRange(7)"
+              style="background: rgba(var(--primary-rgb), 0.15); color: var(--primary); border: 1px solid var(--border-primary); cursor: pointer; padding: 5px 10px; border-radius: var(--radius-sm); font-weight: 500; font-family: var(--font-mono); font-size: 0.75rem;">7 days</button>
+            <button type="button" class="badge" id="btnChart30d" onclick="setChartRange(30)"
+              style="background: var(--bg-surface); color: var(--text-muted); border: 1px solid var(--border); cursor: pointer; padding: 5px 10px; border-radius: var(--radius-sm); font-weight: 500; font-family: var(--font-mono); font-size: 0.75rem;">30 days</button>
+            <button type="button" class="badge" id="btnChartBars" onclick="setChartMode('bars')"
+              style="background: rgba(var(--primary-rgb), 0.15); color: var(--primary); border: 1px solid var(--border-primary); cursor: pointer; padding: 5px 10px; border-radius: var(--radius-sm); font-weight: 500; font-family: var(--font-mono); font-size: 0.75rem;"><i class="bi bi-bar-chart"></i> Bars</button>
+            <button type="button" class="badge" id="btnChartTrend" onclick="setChartMode('trend')"
+              style="background: var(--bg-surface); color: var(--text-muted); border: 1px solid var(--border); cursor: pointer; padding: 5px 10px; border-radius: var(--radius-sm); font-weight: 500; font-family: var(--font-mono); font-size: 0.75rem;"><i class="bi bi-graph-up"></i> Trend</button>
+          </div>
+        </div>
+
+        <!-- Dynamic Glowing Animated Bar Chart -->
+        <div class="crm-bar-chart-wrap" id="dashBarChartWrap">
+          <div style="display: flex; align-items: flex-end; justify-content: space-between; width: 100%; height: 100%; gap: 12px; padding: 10px 4px 0;">
+            <div style="flex: 1; height: 35%; border-radius: 6px 6px 0 0;" class="hvn-skeleton"></div>
+            <div style="flex: 1; height: 60%; border-radius: 6px 6px 0 0;" class="hvn-skeleton"></div>
+            <div style="flex: 1; height: 45%; border-radius: 6px 6px 0 0;" class="hvn-skeleton"></div>
+            <div style="flex: 1; height: 85%; border-radius: 6px 6px 0 0;" class="hvn-skeleton"></div>
+            <div style="flex: 1; height: 50%; border-radius: 6px 6px 0 0;" class="hvn-skeleton"></div>
+            <div style="flex: 1; height: 70%; border-radius: 6px 6px 0 0;" class="hvn-skeleton"></div>
+            <div style="flex: 1; height: 90%; border-radius: 6px 6px 0 0;" class="hvn-skeleton"></div>
+          </div>
+        </div>
+
+        <!-- Metric Footer Cards (Live Calculated Metrics) -->
+        <div
+          style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);">
+          <div
+            style="background: var(--bg-surface); padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border); text-align: center;">
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;">
+              Daily average</div>
+            <div
+              style="font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 1.15rem; font-weight: 600; color: var(--text-main); margin-top: 4px;"
+              id="dashDailyAvg">৳0</div>
+          </div>
+          <div
+            style="background: var(--bg-surface); padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border); text-align: center;">
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;">
+              Monthly revenue</div>
+            <div
+              style="font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 1.15rem; font-weight: 600; color: var(--primary); margin-top: 4px;"
+              id="dashMonthRevenue">৳0</div>
+          </div>
+          <div
+            style="background: var(--bg-surface); padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border); text-align: center;">
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;">
+              Net treasury</div>
+            <div
+              style="font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 1.15rem; font-weight: 600; color: var(--text-main); margin-top: 4px;"
+              id="dashNetTreasury">৳0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Server TPS Telemetry & Ranks Distribution -->
+      <div class="glass-card card"
+        style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+            <h2
+              style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+              <i class="bi bi-hdd-network" style="color: var(--primary);"></i> Server telemetry
+            </h2>
+          </div>
+
+          <!-- Circular Gauge for Live CPU Utilization (Pterodactyl) -->
+          <div class="crm-gauge-container">
+            <svg class="crm-gauge-svg" viewBox="0 0 160 160">
+              <circle class="crm-gauge-bg" cx="80" cy="80" r="70"></circle>
+              <circle class="crm-gauge-val" cx="80" cy="80" r="70" id="dashCpuGauge" style="stroke-dashoffset: 440;"></circle>
+            </svg>
+            <div class="crm-gauge-center">
+              <div class="crm-gauge-tps" id="dashCpuNumber" style="font-family: var(--font-mono); font-variant-numeric: tabular-nums;">--%</div>
+              <div class="crm-gauge-sub" id="dashCpuSub" style="text-transform: none; letter-spacing: normal; font-size: 0.72rem;">Cpu utilization</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic Popular Store Items Breakdown -->
+        <div>
+          <div
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div
+              style="font-size: 0.78rem; font-weight: 500; color: var(--text-muted);">
+              Popular store items
+            </div>
+            <div id="dashTotalItemsSold" style="font-size: 0.72rem; color: var(--text-secondary); font-family: var(--font-mono);">-- units sold</div>
+          </div>
+          <div class="rank-dist-list" id="dashPopularItemsList">
+            <div class="rank-dist-item" style="gap: 6px;">
+              <div class="rank-dist-header">
+                <span class="hvn-skeleton" style="width: 110px; height: 12px; display: inline-block;"></span>
+                <span class="hvn-skeleton" style="width: 32px; height: 12px; display: inline-block;"></span>
+              </div>
+              <div class="hvn-skeleton" style="width: 100%; height: 6px; border-radius: 999px;"></div>
+            </div>
+            <div class="rank-dist-item" style="gap: 6px;">
+              <div class="rank-dist-header">
+                <span class="hvn-skeleton" style="width: 90px; height: 12px; display: inline-block;"></span>
+                <span class="hvn-skeleton" style="width: 32px; height: 12px; display: inline-block;"></span>
+              </div>
+              <div class="hvn-skeleton" style="width: 100%; height: 6px; border-radius: 999px;"></div>
+            </div>
+            <div class="rank-dist-item" style="gap: 6px;">
+              <div class="rank-dist-header">
+                <span class="hvn-skeleton" style="width: 130px; height: 12px; display: inline-block;"></span>
+                <span class="hvn-skeleton" style="width: 32px; height: 12px; display: inline-block;"></span>
+              </div>
+              <div class="hvn-skeleton" style="width: 100%; height: 6px; border-radius: 999px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Data Feeds (Recent Orders + Support Tickets) -->
+    <div class="dash-feeds-grid">
+
+      <!-- Recent Orders & Sales Card -->
+      <div class="glass-card card">
+        <div class="card-header">
+          <div class="card-title">
+            <i class="bi bi-cart-check"></i>
+            <span>Recent orders &amp; transactions</span>
+          </div>
+          <div class="card-tools">
+            <a href="finance/index.html" class="btn btn-secondary btn-sm" id="dashViewAllOrdersBtn">
+              <i class="bi bi-arrow-right"></i>
+              <span>View all</span>
+            </a>
+          </div>
+        </div>
+        <div class="card-body" style="padding: 0;">
+          <div class="table-responsive dash-table-desktop">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th style="width: 21%;">Order / SL</th>
+                  <th style="width: 24%;">Player</th>
+                  <th style="width: 23%;">Item</th>
+                  <th style="width: 13%;">Amount</th>
+                  <th style="width: 19%;">Status</th>
+                </tr>
+              </thead>
+              <tbody id="dashOrderTableBody">
+                <tr>
+                  <td><span class="hvn-skeleton" style="width: 68px; height: 14px; display: inline-block;"></span></td>
+                  <td><div style="display: flex; align-items: center; gap: 8px;"><span class="hvn-skeleton" style="width: 20px; height: 20px; border-radius: 5px; flex-shrink: 0; min-width: 20px;"></span><span class="hvn-skeleton" style="width: 80px; height: 14px; display: inline-block;"></span></div></td>
+                  <td><span class="hvn-skeleton" style="width: 110px; height: 14px; display: inline-block;"></span></td>
+                  <td><span class="hvn-skeleton" style="width: 48px; height: 14px; display: inline-block;"></span></td>
+                  <td><span class="hvn-skeleton" style="width: 58px; height: 22px; border-radius: 6px; display: inline-block;"></span></td>
+                </tr>
+                <tr>
+                  <td><span class="hvn-skeleton" style="width: 76px; height: 14px; display: inline-block;"></span></td>
+                  <td><div style="display: flex; align-items: center; gap: 8px;"><span class="hvn-skeleton" style="width: 20px; height: 20px; border-radius: 5px; flex-shrink: 0; min-width: 20px;"></span><span class="hvn-skeleton" style="width: 95px; height: 14px; display: inline-block;"></span></div></td>
+                  <td><span class="hvn-skeleton" style="width: 90px; height: 14px; display: inline-block;"></span></td>
+                  <td><span class="hvn-skeleton" style="width: 52px; height: 14px; display: inline-block;"></span></td>
+                  <td><span class="hvn-skeleton" style="width: 58px; height: 22px; border-radius: 6px; display: inline-block;"></span></td>
+                </tr>
+                <tr>
+                  <td><span class="hvn-skeleton" style="width: 60px; height: 14px; display: inline-block;"></span></td>
+                  <td><div style="display: flex; align-items: center; gap: 8px;"><span class="hvn-skeleton" style="width: 20px; height: 20px; border-radius: 5px; flex-shrink: 0; min-width: 20px;"></span><span class="hvn-skeleton" style="width: 70px; height: 14px; display: inline-block;"></span></div></td>
+                  <td><span class="hvn-skeleton" style="width: 125px; height: 14px; display: inline-block;"></span></td>
+                  <td><span class="hvn-skeleton" style="width: 42px; height: 14px; display: inline-block;"></span></td>
+                  <td><span class="hvn-skeleton" style="width: 58px; height: 22px; border-radius: 6px; display: inline-block;"></span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="dash-mobile-transactions" id="dashOrderMobileList">
+            <div style="padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+              <div class="hvn-skeleton" style="height: 52px; border-radius: 8px;"></div>
+              <div class="hvn-skeleton" style="height: 52px; border-radius: 8px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Tickets Card -->
+      <div class="glass-card card">
+        <div class="card-header">
+          <div class="card-title">
+            <i class="bi bi-ticket-detailed"></i>
+            <span>Recent support tickets</span>
+          </div>
+          <div class="card-tools">
+            <a href="tickets/index.html" class="btn btn-secondary btn-sm" id="dashViewAllTicketsBtn">
+              <i class="bi bi-arrow-right"></i>
+              <span>View all</span>
+            </a>
+          </div>
+        </div>
+        <div class="card-body" style="padding: 0;">
+          <div class="table-responsive dash-table-desktop">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th style="width: 20%;">Ticket</th>
+                  <th style="width: 26%;">Player</th>
+                  <th style="width: 35%;">Subject</th>
+                  <th style="width: 19%;">Status</th>
+                </tr>
+              </thead>
+              <tbody id="dashTicketTableBody">
+                <tr>
+                  <td><span class="hvn-skeleton" style="width: 65px; height: 14px; display: inline-block;"></span></td>
+                  <td><div style="display: flex; align-items: center; gap: 8px;"><span class="hvn-skeleton" style="width: 20px; height: 20px; border-radius: 5px; flex-shrink: 0; min-width: 20px;"></span><span class="hvn-skeleton" style="width: 75px; height: 14px; display: inline-block;"></span></div></td>
+                  <td><span class="hvn-skeleton" style="width: 130px; height: 14px; display: inline-block;"></span></td>
+                  <td><span class="hvn-skeleton" style="width: 58px; height: 22px; border-radius: 6px; display: inline-block;"></span></td>
+                </tr>
+                <tr>
+                  <td><span class="hvn-skeleton" style="width: 70px; height: 14px; display: inline-block;"></span></td>
+                  <td><div style="display: flex; align-items: center; gap: 8px;"><span class="hvn-skeleton" style="width: 20px; height: 20px; border-radius: 5px; flex-shrink: 0; min-width: 20px;"></span><span class="hvn-skeleton" style="width: 85px; height: 14px; display: inline-block;"></span></div></td>
+                  <td><span class="hvn-skeleton" style="width: 110px; height: 14px; display: inline-block;"></span></td>
+                  <td><span class="hvn-skeleton" style="width: 58px; height: 22px; border-radius: 6px; display: inline-block;"></span></td>
+                </tr>
+                <tr>
+                  <td><span class="hvn-skeleton" style="width: 65px; height: 14px; display: inline-block;"></span></td>
+                  <td><div style="display: flex; align-items: center; gap: 8px;"><span class="hvn-skeleton" style="width: 20px; height: 20px; border-radius: 5px; flex-shrink: 0; min-width: 20px;"></span><span class="hvn-skeleton" style="width: 70px; height: 14px; display: inline-block;"></span></div></td>
+                  <td><span class="hvn-skeleton" style="width: 140px; height: 14px; display: inline-block;"></span></td>
+                  <td><span class="hvn-skeleton" style="width: 58px; height: 22px; border-radius: 6px; display: inline-block;"></span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="dash-mobile-transactions" id="dashTicketMobileList">
+            <div style="padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+              <div class="hvn-skeleton" style="height: 52px; border-radius: 8px;"></div>
+              <div class="hvn-skeleton" style="height: 52px; border-radius: 8px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="assets/js/config.js?v=3.4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1" integrity="sha384-YieCqqg9gQufX7+5HcFvCEg/n3KUEdl8/Jb+A6J0npf1mB740VayvwKjTrtCeUoy" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4" crossorigin="anonymous"></script>
+  <script src="assets/js/supabase.js?v=3.4"></script>
+  <script src="assets/js/utils.js?v=3.4"></script>
+  <script src="assets/js/auth.js?v=3.5"></script>
+  <script src="assets/js/layout.js?v=3.8"></script>
+
+  <script>
+    // Global cached state for range toggle
+    let currentChartDays = 7;
+    let currentChartMode = 'bars';
+    let dashTrendChart = null;
+    let cachedSalesData = [];
+    let cachedOrdersData = [];
+
+    window.setChartMode = function (mode) {
+      currentChartMode = mode;
+      const btnB = document.getElementById('btnChartBars');
+      const btnT = document.getElementById('btnChartTrend');
+      const active = 'background: rgba(var(--primary-rgb), 0.15); color: var(--primary); border: 1px solid var(--border-primary); cursor: pointer; padding: 5px 10px; border-radius: var(--radius-sm); font-weight: 500; font-family: var(--font-mono); font-size: 0.75rem;';
+      const idle = 'background: var(--bg-surface); color: var(--text-muted); border: 1px solid var(--border); cursor: pointer; padding: 5px 10px; border-radius: var(--radius-sm); font-weight: 500; font-family: var(--font-mono); font-size: 0.75rem;';
+      if (btnB) btnB.style.cssText = mode === 'bars' ? active : idle;
+      if (btnT) btnT.style.cssText = mode === 'trend' ? active : idle;
+      const p = window.hvnAuth && window.hvnAuth.getCurrentProfile ? window.hvnAuth.getCurrentProfile() : null;
+      const canView = Boolean(p && (p.isOwner || p.permissions?.finance || p.permissions?.orders));
+      if (!canView) return;
+      renderRevenueChart(cachedSalesData, cachedOrdersData, currentChartDays);
+    };
+
+    function renderDashSparklines() {
+      const revEl = document.getElementById('dashRevSpark');
+      const ordEl = document.getElementById('dashOrdSpark');
+      if (revEl && typeof window.hvnSparkline === 'function') {
+        revEl.innerHTML = window.hvnSparkline(window.__dashSparkRev || []);
+      }
+      if (ordEl && typeof window.hvnSparkline === 'function') {
+        ordEl.innerHTML = window.hvnSparkline(window.__dashSparkOrd || []);
+      }
+    }
+
+    window.setChartRange = function (days) {
+      currentChartDays = days;
+      const btn7 = document.getElementById('btnChart7d');
+      const btn30 = document.getElementById('btnChart30d');
+      const sub = document.getElementById('dashChartSubtitle');
+      const active = 'background: rgba(var(--primary-rgb), 0.15); color: var(--primary); border: 1px solid var(--border-primary); cursor: pointer; padding: 5px 10px; border-radius: var(--radius-sm); font-weight: 500; font-family: var(--font-mono); font-size: 0.75rem;';
+      const idle = 'background: var(--bg-surface); color: var(--text-muted); border: 1px solid var(--border); cursor: pointer; padding: 5px 10px; border-radius: var(--radius-sm); font-weight: 500; font-family: var(--font-mono); font-size: 0.75rem;';
+      if (btn7 && btn30) {
+        if (days === 7) {
+          btn7.style.cssText = active;
+          btn30.style.cssText = idle;
+          if (sub) sub.textContent = 'Weekly store revenue performance (bKash & Nagad payments)';
+        } else {
+          btn30.style.cssText = active;
+          btn7.style.cssText = idle;
+          if (sub) sub.textContent = '30-day store revenue trajectory (bKash & Nagad payments)';
+        }
+      }
+      const p = window.hvnAuth && window.hvnAuth.getCurrentProfile ? window.hvnAuth.getCurrentProfile() : null;
+      const canView = Boolean(p && (p.isOwner || p.permissions?.finance || p.permissions?.orders));
+      if (!canView) return;
+      renderRevenueChart(cachedSalesData, cachedOrdersData, currentChartDays);
+    };
+
+    function renderRevenueChart(sales, orders, days) {
+      const chartWrap = document.getElementById('dashBarChartWrap');
+      if (!chartWrap) return;
+
+      const dayLabels = [];
+      const dailyRevenue = [];
+      const dailyOrders = [];
+      const today = new Date();
+
+      for (let i = days - 1; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const dayNum = String(d.getDate()).padStart(2, '0');
+        const dateStr = `${y}-${m}-${dayNum}`;
+        const shortDay = (days <= 7)
+          ? d.toLocaleDateString('en-US', { weekday: 'short' })
+          : `${d.getDate()}/${d.getMonth() + 1}`;
+
+        dayLabels.push({
+          dateStr: dateStr,
+          shortDay: shortDay,
+          isToday: i === 0
+        });
+        dailyRevenue.push(0);
+        dailyOrders.push(0);
+      }
+
+      // Aggregate manual sales (Using local timezone date key)
+      (sales || []).forEach(s => {
+        if (!s.sale_date) return;
+        const paidNum = parseFloat(String(s.paid_amount || '0')) || 0;
+        if (paidNum <= 0) return;
+        const sDate = window.hvnFormatLocalDateKey ? window.hvnFormatLocalDateKey(s.sale_date) : s.sale_date.split('T')[0];
+        const idx = dayLabels.findIndex(l => l.dateStr === sDate);
+        if (idx !== -1) {
+          dailyRevenue[idx] += paidNum;
+          dailyOrders[idx] += 1;
+        }
+      });
+
+      // Aggregate delivered web orders (Using local timezone date key)
+      (orders || []).forEach(o => {
+        const isDelivered = (o.status === 'delivered' || o.status === 'verified');
+        if (!isDelivered || !o.created_at) return;
+        const numPrice = parseFloat(String(o.price || '0').replace(/[^0-9.]/g, '')) || 0;
+        if (numPrice <= 0) return;
+        const orderDateStr = window.hvnFormatLocalDateKey ? window.hvnFormatLocalDateKey(o.created_at) : o.created_at.split('T')[0];
+        const idx = dayLabels.findIndex(l => l.dateStr === orderDateStr);
+        if (idx !== -1) {
+          dailyRevenue[idx] += numPrice;
+          dailyOrders[idx] += 1;
+        }
+      });
+
+      const maxRev = Math.max(...dailyRevenue, 500);
+
+      // Sparklines feed (last 7 days) for the revenue & orders stat cards
+      window.__dashSparkRev = dailyRevenue.slice(-7);
+      window.__dashSparkOrd = dailyOrders.slice(-7);
+      renderDashSparklines();
+
+      const totalPeriodRev = dailyRevenue.reduce((a, b) => a + b, 0);
+      const avg = Math.round(totalPeriodRev / days);
+      const dailyAvgEl = document.getElementById('dashDailyAvg');
+      if (dailyAvgEl) {
+        dailyAvgEl.textContent = `৳${avg.toLocaleString()}`;
+      }
+
+      // Trend mode: smooth Chart.js area chart
+      if (currentChartMode === 'trend' && typeof window.Chart !== 'undefined') {
+        chartWrap.innerHTML = '<div style="height: 240px; position: relative;"><canvas id="dashTrendCanvas"></canvas></div>';
+        const canvas = document.getElementById('dashTrendCanvas');
+        if (!canvas) return;
+        const css = getComputedStyle(document.documentElement);
+        const primaryColor = (css.getPropertyValue('--primary') || '').trim() || '#00c896';
+        const rgbStr = (css.getPropertyValue('--primary-rgb') || '0, 200, 150').trim();
+        const mutedColor = (css.getPropertyValue('--text-muted') || '#647087').trim();
+        const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+        const gridColor = isLight ? 'rgba(15, 23, 42, 0.07)' : 'rgba(255, 255, 255, 0.05)';
+        const ctx = canvas.getContext('2d');
+        const grad = ctx.createLinearGradient(0, 0, 0, 240);
+        grad.addColorStop(0, `rgba(${rgbStr}, 0.35)`);
+        grad.addColorStop(1, `rgba(${rgbStr}, 0.02)`);
+
+        if (dashTrendChart) {
+          dashTrendChart.destroy();
+          dashTrendChart = null;
+        }
+        dashTrendChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: dayLabels.map(l => l.shortDay),
+            datasets: [{
+              data: dailyRevenue,
+              borderColor: primaryColor,
+              backgroundColor: grad,
+              fill: true,
+              tension: 0.4,
+              borderWidth: 2.4,
+              pointRadius: days > 14 ? 0 : 2.5,
+              pointBackgroundColor: primaryColor,
+              pointHoverRadius: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: 'rgba(10, 14, 24, 0.92)',
+                callbacks: { label: (c) => 'Revenue: ৳' + Number(c.parsed.y).toLocaleString() }
+              }
+            },
+            scales: {
+              x: { ticks: { color: mutedColor, font: { size: 10 }, maxRotation: 0, autoSkip: true }, grid: { display: false } },
+              y: {
+                ticks: { color: mutedColor, font: { size: 10 }, callback: (v) => '৳' + (v >= 1000 ? (v / 1000) + 'k' : v) },
+                grid: { color: gridColor },
+                beginAtZero: true
+              }
+            }
+          }
+        });
+        return;
+      }
+
+      chartWrap.innerHTML = dayLabels.map((lbl, idx) => {
+        const rev = dailyRevenue[idx];
+        const pct = Math.max(6, Math.min(100, Math.round((rev / maxRev) * 100)));
+        const isPeak = (rev === Math.max(...dailyRevenue) && rev > 0);
+
+        return `
+          <div class="crm-bar-col ${lbl.isToday || isPeak ? 'accent' : ''}" style="${days > 14 ? 'flex: 1; min-width: 0;' : ''}">
+            <div class="crm-bar-tooltip">৳${rev.toLocaleString()} • ${lbl.shortDay}</div>
+            <div class="crm-bar-track">
+              <div class="crm-bar-fill" style="height: ${pct}%;"></div>
+            </div>
+            <div class="crm-bar-label" style="${lbl.isToday || isPeak ? 'color: var(--primary); font-weight: 700;' : ''}; ${days > 14 ? 'font-size: 0.65rem;' : ''}">${lbl.shortDay}</div>
+          </div>
+        `;
+      }).join('');
+
+      // Update Daily Average
+      const avgBarsEl = document.getElementById('dashDailyAvg');
+      if (avgBarsEl && !avgBarsEl.textContent) {
+        const totalRevBars = dailyRevenue.reduce((a, b) => a + b, 0);
+        avgBarsEl.textContent = `৳${Math.round(totalRevBars / days).toLocaleString()}`;
+      }
+    }
+
+    function renderPopularItems(sales, orders) {
+      const listEl = document.getElementById('dashPopularItemsList');
+      const totalUnitsEl = document.getElementById('dashTotalItemsSold');
+      if (!listEl) return;
+
+      const itemMap = {};
+
+      (sales || []).forEach(s => {
+        let name = s.purchased_item || 'Item';
+        if (s.spawner_type) {
+          name = `${s.spawner_type} Spawner`;
+        } else if (name.toUpperCase() === 'ELITE RANK') {
+          name = 'Elite Rank';
+        }
+        name = name.trim();
+        const qty = Number(s.quantity) || 1;
+        itemMap[name] = (itemMap[name] || 0) + qty;
+      });
+
+      (orders || []).forEach(o => {
+        const isDelivered = (o.status === 'delivered' || o.status === 'verified');
+        if (isDelivered && o.item_name) {
+          const name = o.item_name.trim();
+          itemMap[name] = (itemMap[name] || 0) + 1;
+        }
+      });
+
+      const sorted = Object.entries(itemMap).sort((a, b) => b[1] - a[1]);
+      const grandTotalUnits = sorted.reduce((sum, [, count]) => sum + count, 0);
+
+      if (totalUnitsEl) {
+        totalUnitsEl.textContent = `${grandTotalUnits.toLocaleString()} Units Sold`;
+      }
+
+      if (sorted.length === 0) {
+        listEl.innerHTML = `
+          <div style="text-align: center; color: var(--text-muted); padding: 24px 0; font-size: 0.82rem;">
+            No item sales recorded yet
+          </div>
+        `;
+        return;
+      }
+
+      const top4 = sorted.slice(0, 4);
+      const colorSchemes = [
+        { icon: 'bi-stars', color: 'var(--warning)', bg: 'linear-gradient(90deg, #b45309, var(--warning))' },
+        { icon: 'bi-shield-shaded', color: 'var(--info)', bg: 'linear-gradient(90deg, #0284c7, var(--info))' },
+        { icon: 'bi-gem', color: 'var(--primary)', bg: 'linear-gradient(90deg, #059669, var(--primary))' },
+        { icon: 'bi-box-seam', color: 'var(--pink)', bg: 'linear-gradient(90deg, #db2777, var(--pink))' }
+      ];
+
+      listEl.innerHTML = top4.map(([name, count], idx) => {
+        const pct = grandTotalUnits > 0 ? Math.round((count / grandTotalUnits) * 100) : 0;
+        const scheme = colorSchemes[idx % colorSchemes.length];
+
+        return `
+          <div class="rank-dist-item">
+            <div class="rank-dist-header">
+              <span class="rank-dist-title">
+                <i class="bi ${scheme.icon}" style="color: ${scheme.color};"></i>
+                ${window.hvnEscapeHtml ? window.hvnEscapeHtml(name) : name}
+                <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal; margin-left: 2px;">(${count} sold)</span>
+              </span>
+              <span class="rank-dist-percent">${pct}%</span>
+            </div>
+            <div class="rank-dist-bar">
+              <div class="rank-dist-fill" style="width: ${pct}%; background: ${scheme.bg};"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderRecentTransactions(sales, orders) {
+      const tbody = document.getElementById('dashOrderTableBody');
+      const mobileList = document.getElementById('dashOrderMobileList');
+      if (!tbody && !mobileList) return;
+
+      const combined = [];
+
+      (sales || []).forEach(s => {
+        const dueNum = Number(s.due_amount) || 0;
+        const totalNum = Number(s.total_price) || (Number(s.paid_amount) || 0);
+        const isPaid = (dueNum <= 0);
+        let itemText = s.purchased_item || 'Item';
+        if (s.spawner_type) {
+          itemText = `${s.spawner_type} Spawner`;
+        } else if (itemText.toUpperCase() === 'ELITE RANK') {
+          itemText = 'Elite Rank';
+        }
+
+        combined.push({
+          type: 'sale',
+          id: s.id,
+          code: `#${s.sl_no || s.id}`,
+          username: s.gamer_tag || s.player_name || 'Player',
+          item: itemText,
+          amount: `৳${totalNum.toLocaleString()}`,
+          statusText: isPaid ? 'Paid' : `৳${dueNum.toLocaleString()} Due`,
+          badgeClass: isPaid ? 'badge-open' : 'badge-pending',
+          badgeIcon: isPaid ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill',
+          date: s.sale_date || s.created_at || ''
+        });
+      });
+
+      (orders || []).forEach(o => {
+        const st = String(o.status || '').toLowerCase();
+        if (st === 'rejected') return; // Exclude rejected orders from dashboard financial transactions
+        const isDelivered = (st === 'delivered' || st === 'verified');
+        const numPrice = parseFloat(String(o.price || '0').replace(/[^0-9.]/g, '')) || 0;
+        let ordItem = String(o.item_name || 'Web Order').trim();
+        if (/^custom\s+spawners?/i.test(ordItem)) {
+          const qm = ordItem.match(/\((\d+)\s*pcs\)/i);
+          const qn = qm ? (parseInt(qm[1], 10) || 1) : 1;
+          const up = qn > 0 ? Math.round(numPrice / qn) : numPrice;
+          if (up === 25) ordItem = qn > 1 ? `Pig Spawner (x${qn})` : 'Pig Spawner';
+          else if (up === 35) ordItem = qn > 1 ? `Combat Spawner (x${qn})` : 'Combat Spawner';
+          else if (up === 45) ordItem = qn > 1 ? `Advanced Spawner (x${qn})` : 'Advanced Spawner';
+          else if (up === 55) ordItem = qn > 1 ? `Special Spawner (x${qn})` : 'Special Spawner';
+        }
+
+        combined.push({
+          type: 'order',
+          id: o.id,
+          code: o.order_code || `#ORD-${String(o.id).slice(0, 6)}`,
+          username: o.username || 'Player',
+          item: ordItem,
+          amount: `৳${numPrice.toLocaleString()}`,
+          statusText: isDelivered ? 'Paid' : (o.status || 'pending'),
+          badgeClass: isDelivered ? 'badge-open' : 'badge-pending',
+          badgeIcon: isDelivered ? 'bi-check-circle-fill' : 'bi-hourglass-split',
+          targetHref: isDelivered ? 'finance/index.html' : 'orders/index.html',
+          date: o.created_at || ''
+        });
+      });
+
+      combined.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+      const recent = combined.slice(0, 5);
+
+      if (recent.length === 0) {
+        if (tbody) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="5" style="text-align: center; padding: 36px 16px;">
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
+                  <div style="width: 42px; height: 42px; border-radius: 50%; background: var(--chip-bg); display: flex; align-items: center; justify-content: center; border: 1px solid var(--border);">
+                    <i class="bi bi-inbox" style="font-size: 1.25rem; color: var(--text-muted);"></i>
+                  </div>
+                  <div style="font-weight: 600; color: var(--text-main); font-size: 0.85rem;">No recent orders or transactions</div>
+                  <div style="font-size: 0.74rem; color: var(--text-muted);">New customer transactions will appear here automatically.</div>
+                </div>
+              </td>
+            </tr>
+          `;
+        }
+        if (mobileList) {
+          mobileList.innerHTML = `
+            <div style="text-align: center; padding: 28px 16px;">
+              <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--chip-bg); display: flex; align-items: center; justify-content: center; border: 1px solid var(--border);">
+                  <i class="bi bi-inbox" style="font-size: 1.2rem; color: var(--text-muted);"></i>
+                </div>
+                <div style="font-weight: 600; color: var(--text-main); font-size: 0.82rem;">No recent orders or transactions</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">New transactions will show up here.</div>
+              </div>
+            </div>
+          `;
+        }
+        return;
+      }
+
+      if (tbody) {
+        tbody.innerHTML = recent.map(r => {
+          const userEsc = window.hvnEscapeHtml ? window.hvnEscapeHtml(r.username) : r.username;
+          const cleanIgn = window.hvnCleanMcIgn ? window.hvnCleanMcIgn(r.username) : String(r.username || 'Steve').replace(/^\.+/, '');
+          const itemEsc = window.hvnEscapeHtml ? window.hvnEscapeHtml(r.item) : r.item;
+          const codeEsc = window.hvnEscapeHtml ? window.hvnEscapeHtml(r.code) : r.code;
+
+          const targetUrl = r.targetHref || 'finance/index.html';
+          return `
+            <tr onclick="window.location.href='${targetUrl}'" style="cursor: pointer;" title="Click to view details">
+              <td class="dash-feed-truncate" style="font-family: var(--font-mono); font-weight: 600; color: var(--primary); font-size: 0.77rem;" title="${codeEsc}">${codeEsc}</td>
+              <td style="overflow: hidden;">
+                <div class="dash-feed-player-cell">
+                  <img src="https://mc-heads.net/avatar/${encodeURIComponent(cleanIgn)}/20" alt="${userEsc}" style="width: 20px; height: 20px; border-radius: 5px; flex-shrink: 0;" onerror="this.src='https://mc-heads.net/avatar/Steve/20';">
+                  <span class="dash-feed-player-name" title="${userEsc}">${userEsc}</span>
+                </div>
+              </td>
+              <td class="dash-feed-truncate" title="${itemEsc}">${itemEsc}</td>
+              <td class="dash-feed-truncate" style="font-family: var(--font-mono); font-weight: 600; color: var(--text-main); font-size: 0.82rem;" title="${r.amount}">${r.amount}</td>
+              <td style="white-space: nowrap; overflow: hidden;">
+                <span class="badge ${r.badgeClass}" title="${r.statusText}">
+                  <i class="bi ${r.badgeIcon}"></i> <span>${r.statusText}</span>
+                </span>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      if (mobileList) {
+        mobileList.innerHTML = recent.map(r => {
+          const userEsc = window.hvnEscapeHtml ? window.hvnEscapeHtml(r.username) : r.username;
+          const cleanIgn = window.hvnCleanMcIgn ? window.hvnCleanMcIgn(r.username) : String(r.username || 'Steve').replace(/^\.+/, '');
+          const itemEsc = window.hvnEscapeHtml ? window.hvnEscapeHtml(r.item) : r.item;
+          const codeEsc = window.hvnEscapeHtml ? window.hvnEscapeHtml(r.code) : r.code;
+
+          const targetUrl = r.targetHref || 'finance/index.html';
+          return `
+            <div class="dash-mobile-card" onclick="window.location.href='${targetUrl}'" title="Click to view details">
+              <div class="dash-mc-header">
+                <div class="dash-mc-player">
+                  <img src="https://mc-heads.net/avatar/${encodeURIComponent(cleanIgn)}/28" alt="${userEsc}" class="dash-mc-avatar">
+                  <div class="dash-mc-info">
+                    <div class="dash-mc-name">${userEsc}</div>
+                    <div class="dash-mc-code">${codeEsc}</div>
+                  </div>
+                </div>
+                <span class="badge ${r.badgeClass} dash-mc-badge">
+                  <i class="bi ${r.badgeIcon}"></i> ${r.statusText}
+                </span>
+              </div>
+              <div class="dash-mc-body">
+                <span class="dash-mc-item" title="${itemEsc}">
+                  <i class="bi bi-box-seam"></i> ${itemEsc}
+                </span>
+                <span class="dash-mc-amount">${r.amount}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function renderRecentTickets(tickets) {
+      const tbody = document.getElementById('dashTicketTableBody');
+      const mobileList = document.getElementById('dashTicketMobileList');
+      if (!tbody && !mobileList) return;
+
+      const recent = (tickets || []).slice(0, 5);
+
+      if (recent.length === 0) {
+        if (tbody) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="4" style="text-align: center; padding: 36px 16px;">
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
+                  <div style="width: 42px; height: 42px; border-radius: 50%; background: var(--chip-bg); display: flex; align-items: center; justify-content: center; border: 1px solid var(--border);">
+                    <i class="bi bi-ticket-perforated" style="font-size: 1.25rem; color: var(--text-muted);"></i>
+                  </div>
+                  <div style="font-weight: 600; color: var(--text-main); font-size: 0.85rem;">No support tickets found</div>
+                  <div style="font-size: 0.74rem; color: var(--text-muted);">Player inquiries and appeal tickets will appear here.</div>
+                </div>
+              </td>
+            </tr>
+          `;
+        }
+        if (mobileList) {
+          mobileList.innerHTML = `
+            <div style="text-align: center; padding: 28px 16px;">
+              <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--chip-bg); display: flex; align-items: center; justify-content: center; border: 1px solid var(--border);">
+                  <i class="bi bi-ticket-perforated" style="font-size: 1.2rem; color: var(--text-muted);"></i>
+                </div>
+                <div style="font-weight: 600; color: var(--text-main); font-size: 0.82rem;">No support tickets found</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Player inquiries will show up here.</div>
+              </div>
+            </div>
+          `;
+        }
+        return;
+      }
+
+      if (tbody) {
+        tbody.innerHTML = recent.map(t => {
+          const isOpen = (t.status === 'open');
+          const userEsc = window.hvnEscapeHtml ? window.hvnEscapeHtml(t.user_name || 'Player') : (t.user_name || 'Player');
+          const cleanIgn = window.hvnCleanMcIgn ? window.hvnCleanMcIgn(t.user_name) : String(t.user_name || 'Steve').replace(/^\.+/, '');
+          const subjectEsc = window.hvnEscapeHtml ? window.hvnEscapeHtml(t.subject || 'Support') : (t.subject || 'Support');
+          const codeEsc = window.hvnEscapeHtml ? window.hvnEscapeHtml(t.ticket_code || `#${t.id}`) : (t.ticket_code || `#${t.id}`);
+
+          return `
+            <tr onclick="window.location.href='tickets/index.html'" style="cursor: pointer;" title="Click to view ticket">
+              <td class="dash-feed-truncate" style="font-family: var(--font-mono); font-weight: 600; color: var(--primary); font-size: 0.77rem;" title="${codeEsc}">${codeEsc}</td>
+              <td style="overflow: hidden;">
+                <div class="dash-feed-player-cell">
+                  <img src="https://mc-heads.net/avatar/${encodeURIComponent(cleanIgn)}/20" alt="${userEsc}" style="width: 20px; height: 20px; border-radius: 5px; flex-shrink: 0;" onerror="this.src='https://mc-heads.net/avatar/Steve/20';">
+                  <span class="dash-feed-player-name" title="${userEsc}">${userEsc}</span>
+                </div>
+              </td>
+              <td class="dash-feed-truncate" title="${subjectEsc}">${subjectEsc}</td>
+              <td style="white-space: nowrap; overflow: hidden;">
+                <span class="badge ${isOpen ? 'badge-open' : 'badge-closed'}" title="${t.status || 'closed'}">
+                  <i class="bi ${isOpen ? 'bi-circle-fill' : 'bi-check-circle'}"></i> <span>${t.status || 'closed'}</span>
+                </span>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      if (mobileList) {
+        mobileList.innerHTML = recent.map(t => {
+          const isOpen = (t.status === 'open');
+          const userEsc = window.hvnEscapeHtml ? window.hvnEscapeHtml(t.user_name || 'Player') : (t.user_name || 'Player');
+          const cleanIgn = window.hvnCleanMcIgn ? window.hvnCleanMcIgn(t.user_name) : String(t.user_name || 'Steve').replace(/^\.+/, '');
+          const subjectEsc = window.hvnEscapeHtml ? window.hvnEscapeHtml(t.subject || 'Support') : (t.subject || 'Support');
+          const codeEsc = window.hvnEscapeHtml ? window.hvnEscapeHtml(t.ticket_code || `#${t.id}`) : (t.ticket_code || `#${t.id}`);
+
+          return `
+            <div class="dash-mobile-card" onclick="window.location.href='tickets/index.html'" title="Click to view ticket">
+              <div class="dash-mc-header">
+                <div class="dash-mc-player">
+                  <img src="https://mc-heads.net/avatar/${encodeURIComponent(cleanIgn)}/28" alt="${userEsc}" class="dash-mc-avatar">
+                  <div class="dash-mc-info">
+                    <div class="dash-mc-name">${userEsc}</div>
+                    <div class="dash-mc-code">${codeEsc}</div>
+                  </div>
+                </div>
+                <span class="badge ${isOpen ? 'badge-open' : 'badge-closed'} dash-mc-badge">
+                  <i class="bi ${isOpen ? 'bi-circle-fill' : 'bi-check-circle'}"></i> ${t.status || 'closed'}
+                </span>
+              </div>
+              <div class="dash-mc-body">
+                <span class="dash-mc-item" title="${subjectEsc}">
+                  <i class="bi bi-chat-left-text"></i> ${subjectEsc}
+                </span>
+                <span class="dash-mc-link">View <i class="bi bi-chevron-right"></i></span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // Live CPU Utilization gauge — fed by /api/server-status (Pterodactyl resources)
+    // via hvnFetchServerStatus (10s session cache + in-flight dedup, no extra requests)
+    async function refreshCpuGauge() {
+      const cpuNum = document.getElementById('dashCpuNumber');
+      const cpuSub = document.getElementById('dashCpuSub');
+      const cpuGauge = document.getElementById('dashCpuGauge');
+      if (!cpuNum || !cpuSub || !cpuGauge) return;
+
+      try {
+        const t = (typeof window.hvnFetchServerStatus === 'function') ? await window.hvnFetchServerStatus() : null;
+        const cpuPct = (t && typeof t.cpu === 'number' && t.cpu > 0) ? Math.min(100, Math.max(0, t.cpu)) : null;
+        const isRunning = !!(t && (t.state === 'running' || t.state === 'starting'));
+
+        if (cpuPct === null) {
+          cpuNum.textContent = '--%';
+          cpuSub.textContent = isRunning ? 'CPU DATA UNAVAILABLE' : 'SERVER OFFLINE';
+          cpuGauge.style.strokeDashoffset = '440';
+          cpuGauge.style.stroke = '';
+          return;
+        }
+
+        cpuNum.textContent = `${cpuPct.toFixed(1)}%`;
+        cpuSub.textContent = 'CPU UTILIZATION';
+        cpuGauge.style.strokeDashoffset = String(440 - (cpuPct / 100) * 420);
+        cpuGauge.style.stroke = cpuPct >= 90 ? 'var(--danger)' : (cpuPct >= 70 ? 'var(--warning)' : '');
+      } catch (err) {
+        cpuNum.textContent = '--%';
+        cpuSub.textContent = 'CPU DATA UNAVAILABLE';
+        cpuGauge.style.strokeDashoffset = '440';
+        cpuGauge.style.stroke = '';
+      }
+    }
+
+    // Main Live Telemetry & Data Loader
+    async function loadDashboardData() {
+      // 1. Live Date
+      const dateEl = document.getElementById('dashLiveDate');
+      if (dateEl) {
+        const now = new Date();
+        const options = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
+        dateEl.textContent = now.toLocaleDateString('en-GB', options);
+      }
+
+      // 2. Staff Profile Greeting
+      const greetingEl = document.getElementById('dashGreetingUser');
+      if (greetingEl && window.hvnAuth && window.hvnAuth.getCurrentProfile) {
+        const p = window.hvnAuth.getCurrentProfile();
+        if (p && (p.minecraftIgn || p.fullName)) {
+          greetingEl.textContent = p.minecraftIgn || p.fullName;
+        }
+      }
+
+      // 3. Live Minecraft Server Telemetry (api.mcsrvstat.us)
+      const serverTarget = window.HVN_CONFIG?.getServerTarget ? window.HVN_CONFIG.getServerTarget() : ((window.HVN_CONFIG && window.HVN_CONFIG.serverIp) || 'mc.havencraft.pro');
+      const playersEl = document.getElementById('dashPlayersCount');
+      const playersSubEl = document.getElementById('dashPlayersSub');
+      const pingBadge = document.getElementById('dashServerPingBadge');
+      const capText = document.getElementById('dashCapacityText');
+      const capBar = document.getElementById('dashCapacityBar');
+
+      // CPU gauge reads real Pterodactyl telemetry (shared 10s-cached fetcher)
+      refreshCpuGauge();
+
+      try {
+        const res = await fetch(`https://api.mcsrvstat.us/3/${encodeURIComponent(serverTarget)}`);
+        const data = await res.json();
+
+        if (data && data.online) {
+          const online = data.players?.online || 0;
+          const max = data.players?.max || 100;
+          const capPct = max > 0 ? Math.min(100, Math.round((online / max) * 100)) : 0;
+          const verStr = data.version ? `v${data.version}` : 'Online';
+
+          if (playersEl) playersEl.textContent = `${online} / ${max}`;
+          if (playersSubEl) playersSubEl.textContent = `${serverTarget} • ${verStr}`;
+          if (pingBadge) pingBadge.innerHTML = `<span class="pulse-dot" style="margin: 0;"></span> Live Ping`;
+          if (capText) capText.textContent = `${capPct}%`;
+          if (capBar) capBar.style.width = `${capPct}%`;
+
+        } else {
+          if (playersEl) playersEl.textContent = 'Offline';
+          if (playersSubEl) playersSubEl.textContent = `${serverTarget} • Unreachable`;
+          if (pingBadge) pingBadge.innerHTML = `<span class="pulse-dot" style="background: var(--danger); margin: 0;"></span> Offline`;
+          if (capText) capText.textContent = '0%';
+          if (capBar) capBar.style.width = '0%';
+
+        }
+      } catch (err) {
+        console.warn('Live server ping failed:', err);
+      }
+
+      // 4. Supabase Data Queries (Strictly Permission-Gated after Supabase Auth Verification)
+      const client = window.initHavenSupabase ? window.initHavenSupabase() : window.supabaseClient;
+      if (!client) return;
+
+      let verifiedStaff = null;
+      if (window.hvnAuth && typeof window.hvnAuth.waitForProfile === 'function') {
+        verifiedStaff = await window.hvnAuth.waitForProfile();
+      } else if (window.hvnAuth && typeof window.hvnAuth.getCurrentProfile === 'function') {
+        verifiedStaff = window.hvnAuth.getCurrentProfile();
+      }
+
+      if (!verifiedStaff) return;
+
+      const isOwner = Boolean(verifiedStaff.isOwner && verifiedStaff.email === 'rajuel55@gmail.com');
+      const perms = verifiedStaff.permissions || {};
+      const canViewFinance = Boolean(isOwner || perms.finance || perms.orders);
+      const canViewTickets = Boolean(isOwner || perms.tickets);
+
+      try {
+        const [ordersRes, salesRes, expRes, ticketsRes] = await Promise.all([
+          canViewFinance ? client.from('store_orders').select('id, order_code, username, item_name, price, status, created_at').order('created_at', { ascending: false }) : Promise.resolve({ data: [] }),
+          canViewFinance ? client.from('server_sales').select('id, sl_no, player_name, gamer_tag, purchased_item, spawner_type, total_price, paid_amount, due_amount, status, sale_date, created_at').order('sale_date', { ascending: false }) : Promise.resolve({ data: [] }),
+          canViewFinance ? client.from('server_expenses').select('id, amount, expense_date, category') : Promise.resolve({ data: [] }),
+          canViewTickets ? client.from('tickets').select('id, ticket_code, user_name, subject, status, created_at').order('created_at', { ascending: false }) : Promise.resolve({ data: [] })
+        ]);
+
+        const orders = (ordersRes && ordersRes.data) || [];
+        const sales = (salesRes && salesRes.data) || [];
+        const expenses = (expRes && expRes.data) || [];
+        const tickets = (ticketsRes && ticketsRes.data) || [];
+
+        cachedOrdersData = orders;
+        cachedSalesData = sales;
+
+        if (!canViewFinance) {
+          // Mask financial telemetry for staff roles without finance/orders permission
+          const revEl = document.getElementById('dashRevenueVal');
+          if (revEl) revEl.textContent = 'Restricted';
+          const revSub = document.getElementById('dashRevenueSub');
+          if (revSub) revSub.textContent = 'Requires Finance / Orders Permission';
+          const revTrendBadge = document.getElementById('dashRevTrendBadge');
+          if (revTrendBadge) revTrendBadge.innerHTML = `<i class="bi bi-shield-lock-fill"></i> Protected`;
+          const monthRevEl = document.getElementById('dashMonthRevenue');
+          if (monthRevEl) monthRevEl.textContent = 'Protected';
+          const netTreasuryEl = document.getElementById('dashNetTreasury');
+          if (netTreasuryEl) netTreasuryEl.textContent = 'Protected';
+          const dailyAvgEl = document.getElementById('dashDailyAvg');
+          if (dailyAvgEl) dailyAvgEl.textContent = 'Protected';
+          const ordersCountEl = document.getElementById('dashOrdersCount');
+          if (ordersCountEl) ordersCountEl.textContent = 'Restricted';
+          const ordersSubEl = document.getElementById('dashOrdersSub');
+          if (ordersSubEl) ordersSubEl.textContent = 'Requires Finance / Orders Permission';
+          const ordersTrendBadge = document.getElementById('dashOrdersTrendBadge');
+          if (ordersTrendBadge) ordersTrendBadge.innerHTML = `<i class="bi bi-shield-lock-fill"></i> Protected`;
+          const chartWrap = document.getElementById('dashBarChartWrap');
+          if (chartWrap) {
+            chartWrap.innerHTML = `<div style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.85rem; gap: 6px;"><i class="bi bi-shield-lock" style="font-size: 1.6rem; color: var(--primary);"></i><span>Revenue chart is restricted to Finance &amp; Orders staff.</span></div>`;
+          }
+          const tbody = document.getElementById('dashOrderTableBody');
+          if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 28px 16px;"><i class="bi bi-shield-lock" style="font-size: 1.4rem; opacity: 0.6; display: block; margin-bottom: 6px;"></i>Financial transaction history requires Orders or Finance permission.</td></tr>`;
+          }
+          const mobileList = document.getElementById('dashOrderMobileList');
+          if (mobileList) {
+            mobileList.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 24px 12px; font-size: 0.85rem;"><i class="bi bi-shield-lock" style="font-size: 1.4rem; opacity: 0.6; display: block; margin-bottom: 6px;"></i>Financial transaction history requires Orders or Finance permission.</div>`;
+          }
+        } else {
+          // --- A. REVENUE CARD & TOTALS ---
+          let manualSalesPaid = 0;
+          let manualSalesDue = 0;
+          sales.forEach(s => {
+            manualSalesPaid += Number(s.paid_amount) || 0;
+            manualSalesDue += Number(s.due_amount) || 0;
+          });
+
+          let webDeliveredRev = 0;
+          let webDeliveredCount = 0;
+          orders.forEach(o => {
+            const isDelivered = (o.status === 'delivered' || o.status === 'verified');
+            if (isDelivered) {
+              webDeliveredCount++;
+              const numPrice = parseFloat(String(o.price || '0').replace(/[^0-9.]/g, '')) || 0;
+              webDeliveredRev += numPrice;
+            }
+          });
+
+          const totalRevenue = manualSalesPaid + webDeliveredRev;
+          const totalBilled = totalRevenue + manualSalesDue;
+          const paidCollectionRate = totalBilled > 0 ? Math.round((totalRevenue / totalBilled) * 100) : 100;
+
+          // Current Month Revenue calculation (Using local timezone month key)
+          const now = new Date();
+          const curYear = now.getFullYear();
+          const curMonthStr = `${curYear}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+          let monthRev = 0;
+          sales.forEach(s => {
+            const sMonth = window.hvnFormatLocalMonthKey ? window.hvnFormatLocalMonthKey(s.sale_date) : (s.sale_date ? s.sale_date.slice(0, 7) : '');
+            if (sMonth === curMonthStr) {
+              monthRev += Number(s.paid_amount) || 0;
+            }
+          });
+          orders.forEach(o => {
+            const isDelivered = (o.status === 'delivered' || o.status === 'verified');
+            const oMonth = window.hvnFormatLocalMonthKey ? window.hvnFormatLocalMonthKey(o.created_at) : (o.created_at ? o.created_at.slice(0, 7) : '');
+            if (isDelivered && oMonth === curMonthStr) {
+              monthRev += parseFloat(String(o.price || '0').replace(/[^0-9.]/g, '')) || 0;
+            }
+          });
+
+          // Total Expenses & Net Treasury
+          let totalExpenses = 0;
+          expenses.forEach(e => {
+            totalExpenses += Number(e.amount) || 0;
+          });
+          const netTreasury = totalRevenue - totalExpenses;
+
+          const revEl = document.getElementById('dashRevenueVal');
+          if (revEl && typeof window.hvnCountUp === 'function') {
+            window.hvnCountUp(revEl, totalRevenue, n => '৳' + Math.round(n).toLocaleString());
+          } else if (revEl) {
+            revEl.textContent = `৳${totalRevenue.toLocaleString()}`;
+          }
+
+          const revSub = document.getElementById('dashRevenueSub');
+          if (revSub) revSub.textContent = `৳${manualSalesPaid.toLocaleString()} Sales Ledger • ৳${webDeliveredRev.toLocaleString()} Webstore`;
+
+          const revTrendBadge = document.getElementById('dashRevTrendBadge');
+          if (revTrendBadge) {
+            revTrendBadge.innerHTML = `<i class="bi bi-calendar2-check"></i> ৳${monthRev.toLocaleString()} This Month`;
+          }
+
+          const paidRateEl = document.getElementById('dashPaidRate');
+          if (paidRateEl) paidRateEl.textContent = `${paidCollectionRate}%`;
+
+          const paidBarEl = document.getElementById('dashPaidBar');
+          if (paidBarEl) paidBarEl.style.width = `${paidCollectionRate}%`;
+
+          const monthRevEl = document.getElementById('dashMonthRevenue');
+          if (monthRevEl) monthRevEl.textContent = `৳${monthRev.toLocaleString()}`;
+
+          const netTreasuryEl = document.getElementById('dashNetTreasury');
+          if (netTreasuryEl) {
+            netTreasuryEl.textContent = `৳${netTreasury.toLocaleString()}`;
+            netTreasuryEl.style.color = netTreasury >= 0 ? 'var(--info)' : 'var(--danger)';
+          }
+
+          // --- B. ORDERS & SALES CARD (Exclude rejected web orders from active transaction/due counts) ---
+          const activeWebOrders = orders.filter(o => String(o.status || '').toLowerCase() !== 'rejected');
+          const totalTransactions = sales.length + activeWebOrders.length;
+          const paidSalesCount = sales.filter(s => (Number(s.due_amount) || 0) <= 0).length;
+          const totalCompleted = paidSalesCount + webDeliveredCount;
+          const settlementRate = totalTransactions > 0 ? Math.round((totalCompleted / totalTransactions) * 100) : 100;
+          const dueOrPendingCount = Math.max(0, totalTransactions - totalCompleted);
+
+          const ordersCountEl = document.getElementById('dashOrdersCount');
+          if (ordersCountEl && typeof window.hvnCountUp === 'function') {
+            window.hvnCountUp(ordersCountEl, totalTransactions, n => `${Math.round(n)} Transactions`);
+          } else if (ordersCountEl) {
+            ordersCountEl.textContent = `${totalTransactions} Transactions`;
+          }
+
+          const ordersSubEl = document.getElementById('dashOrdersSub');
+          if (ordersSubEl) ordersSubEl.textContent = `${sales.length} Sales Ledger • ${activeWebOrders.length} Webstore`;
+
+          const ordersTrendBadge = document.getElementById('dashOrdersTrendBadge');
+          if (ordersTrendBadge) {
+            if (dueOrPendingCount > 0) {
+              ordersTrendBadge.className = 'crm-stat-trend trend-amber';
+              ordersTrendBadge.innerHTML = `<i class="bi bi-clock-history"></i> ${totalCompleted} Settled • <span style="font-weight: 700; color: #fbbf24;">${dueOrPendingCount} Due</span>`;
+            } else {
+              ordersTrendBadge.className = 'crm-stat-trend trend-up';
+              ordersTrendBadge.innerHTML = `<i class="bi bi-check2-all"></i> All ${totalCompleted} Settled`;
+            }
+          }
+
+          const completedRatioEl = document.getElementById('dashCompletedRatio');
+          if (completedRatioEl) completedRatioEl.textContent = `${settlementRate}%`;
+
+          const completedBarEl = document.getElementById('dashCompletedBar');
+          if (completedBarEl) completedBarEl.style.width = `${settlementRate}%`;
+
+          renderRevenueChart(sales, orders, currentChartDays);
+          renderPopularItems(sales, orders);
+          renderRecentTransactions(sales, orders);
+        }
+
+        // --- C. TICKETS CARD ---
+        const totalTickets = tickets.length;
+        const openTickets = tickets.filter(t => t.status === 'open').length;
+        const closedTickets = tickets.filter(t => t.status === 'closed' || t.status === 'resolved').length;
+        const resolveRate = totalTickets > 0 ? Math.round((closedTickets / totalTickets) * 100) : 100;
+
+        const ticketsCountEl = document.getElementById('dashTicketsCount');
+        if (ticketsCountEl) {
+          if (canViewTickets && typeof window.hvnCountUp === 'function') {
+            window.hvnCountUp(ticketsCountEl, openTickets, n => `${Math.round(n)} Open Inquiries`);
+          } else {
+            ticketsCountEl.textContent = canViewTickets ? `${openTickets} Open Inquiries` : 'Restricted';
+          }
+        }
+
+        const ticketsSubEl = document.getElementById('dashTicketsSub');
+        if (ticketsSubEl) ticketsSubEl.textContent = canViewTickets ? `${openTickets} Pending Reply • ${closedTickets} Resolved` : 'Requires Tickets Permission';
+
+        const ticketsTrendBadge = document.getElementById('dashTicketsTrendBadge');
+        if (ticketsTrendBadge) {
+          if (!canViewTickets) {
+            ticketsTrendBadge.innerHTML = `<i class="bi bi-shield-lock-fill"></i> Protected`;
+          } else if (openTickets === 0) {
+            ticketsTrendBadge.innerHTML = `<i class="bi bi-check2-circle"></i> 100% Handled`;
+          } else {
+            ticketsTrendBadge.innerHTML = `<i class="bi bi-exclamation-circle"></i> ${openTickets} Needs Staff`;
+          }
+        }
+
+        const resolveRateEl = document.getElementById('dashTicketResolveRate');
+        if (resolveRateEl) resolveRateEl.textContent = `${resolveRate}%`;
+
+        const resolveBarEl = document.getElementById('dashTicketResolveBar');
+        if (resolveBarEl) resolveBarEl.style.width = `${resolveRate}%`;
+
+        renderRecentTickets(tickets);
+
+        // Data arrived — swap skeleton placeholders for real values
+        document.querySelectorAll('#app-layout .hvn-skeleton').forEach(el => el.classList.remove('hvn-skeleton'));
+
+      } catch (err) {
+        console.error('Error loading dashboard live telemetry:', err);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadDashboardData();
+      setInterval(() => {
+        if (!document.hidden) refreshCpuGauge();
+      }, 30000);
+
+      const debouncedDashReload = (typeof window.hvnDebounce === 'function')
+        ? window.hvnDebounce(loadDashboardData, 600)
+        : loadDashboardData;
+
+      const client = window.initHavenSupabase ? window.initHavenSupabase() : window.supabaseClient;
+      if (client) {
+        client.channel('admin-main-dashboard-realtime')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'store_orders' }, () => debouncedDashReload())
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'server_sales' }, () => debouncedDashReload())
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'tickets' }, () => debouncedDashReload())
+          .subscribe();
+      }
+
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) debouncedDashReload();
+      });
+
+      // Re-render trend chart colors when the Theme Studio changes mode/accent
+      window.addEventListener('hvnThemeChanged', () => {
+        if (currentChartMode === 'trend' && typeof window.Chart !== 'undefined') {
+          renderRevenueChart(cachedSalesData, cachedOrdersData, currentChartDays);
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

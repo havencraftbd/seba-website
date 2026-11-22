@@ -1,0 +1,4572 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finance & Sales Ledger — HavenCraft Admin</title>
+  <link rel="icon" href="../logo/logo.svg" type="image/svg+xml">
+
+  <!-- Bootstrap Icons CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous">
+
+  <!-- HavenCraft Admin Theme -->
+  <script src="../assets/js/theme.js?v=3.9"></script>
+  <link rel="stylesheet" href="../assets/css/admin.css?v=3.8">
+
+  <!-- Anti-FOUC Auth Guard -->
+  <script>
+    (function () {
+      var isFile = window.location.protocol === 'file:';
+      var rawPath = (window.location.pathname || '').replace(/\\/g, '/').toLowerCase();
+      var isSub = rawPath.includes('/users') || rawPath.includes('/tickets') ||
+        rawPath.includes('/orders') || rawPath.includes('/settings') ||
+        rawPath.includes('/shop') || rawPath.includes('/gallery') ||
+        rawPath.includes('/logs') || rawPath.includes('/profile') ||
+        rawPath.includes('/server') || rawPath.includes('/finance');
+      var pfx = isSub ? '../' : './';
+
+      var hasSession = false;
+      try {
+        for (var i = 0; i < localStorage.length; i++) {
+          var k = localStorage.key(i);
+          if (k && ((k.indexOf('sb-') === 0 && k.indexOf('-auth-token') !== -1) || k === 'supabase.auth.token')) {
+            var val = localStorage.getItem(k);
+            if (val && val !== 'null' && val !== 'undefined') {
+              var parsed = JSON.parse(val);
+              if (parsed && (parsed.access_token || parsed.user || (parsed.currentSession && parsed.currentSession.access_token))) {
+                hasSession = true;
+                break;
+              }
+            }
+          }
+        }
+      } catch (e) { }
+
+      if (!hasSession) {
+        window.location.replace(isFile ? pfx + 'login/index.html' : '/login');
+      }
+    })();
+  </script>
+
+  <style>
+    /* ===== Compact Finance Ledger — Zero Horizontal Scroll ===== */
+    .fin-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .fin-card-head-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .fin-card-kicker {
+      font-size: 0.74rem;
+      font-weight: 500;
+      text-transform: none;
+      letter-spacing: normal;
+      color: var(--text-secondary);
+      line-height: 1.2;
+    }
+
+    .fin-card-subkicker {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .fin-card-mid {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 2px;
+    }
+
+    .fin-card-pct {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: var(--chip-bg);
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .fin-card-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .finance-tab-bar-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 8px 12px;
+      margin-bottom: 18px;
+    }
+
+    .finance-tab-nav {
+      display: flex;
+      gap: 6px;
+      background: var(--panel-tint);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 4px;
+      margin-bottom: 0;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .finance-tab-nav::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+
+    .finance-tab-btn {
+      white-space: nowrap;
+      flex-shrink: 0;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      color: var(--text-secondary);
+      font-size: 0.84rem;
+      font-weight: 600;
+      padding: 7px 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .finance-tab-btn:hover {
+      color: var(--text-main);
+      background: var(--chip-bg);
+    }
+
+    .finance-tab-btn.active {
+      color: var(--primary);
+      border-color: var(--border-primary);
+      background: var(--primary-dim);
+      box-shadow: 0 0 12px rgba(0, 200, 150, 0.14);
+    }
+
+    .finance-tab-badge {
+      font-size: 0.71rem;
+      padding: 1px 7px;
+      border-radius: var(--radius-full);
+      background: var(--chip-bg);
+      color: var(--text-muted);
+    }
+
+    .finance-tab-btn.active .finance-tab-badge {
+      background: rgba(0, 200, 150, 0.22);
+      color: var(--primary);
+    }
+
+    .finance-tab-meta {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      padding-right: 4px;
+    }
+
+    .fin-toolbar-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+
+    /* ==========================================================================
+       Custom Dropdown System (Matches Spawner Dropdown Style)
+       ========================================================================== */
+    .hvn-custom-dropdown {
+      position: relative;
+      display: inline-block;
+      min-width: 165px;
+      user-select: none;
+    }
+
+    .hvn-custom-select-btn {
+      width: 100%;
+      height: 34px;
+      padding: 0 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm, 8px);
+      color: var(--text-main);
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      white-space: nowrap;
+    }
+
+    .hvn-custom-select-btn:hover,
+    .hvn-custom-dropdown.open .hvn-custom-select-btn {
+      border-color: var(--primary);
+      background: rgba(0, 200, 150, 0.08);
+      box-shadow: 0 0 0 3px rgba(0, 200, 150, 0.12);
+    }
+
+    .hvn-select-btn-left {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+      white-space: nowrap;
+    }
+
+    .hvn-cat-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: inline-block;
+    }
+
+    .hvn-select-chevron {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      transition: transform 0.2s ease, color 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .hvn-custom-dropdown.open .hvn-select-chevron {
+      transform: rotate(180deg);
+      color: var(--primary);
+    }
+
+    .hvn-custom-select-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      min-width: 200px;
+      background: var(--bg-sunken);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 6px;
+      box-shadow: var(--shadow-lg), 0 0 0 1px rgba(0, 200, 150, 0.08);
+      z-index: 120;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-6px) scale(0.98);
+      transition: opacity 0.18s ease, transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.18s ease;
+    }
+
+    .hvn-custom-dropdown.open .hvn-custom-select-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+
+    .hvn-custom-option {
+      width: 100%;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 7px;
+      padding: 7px 9px;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: left;
+    }
+
+    .hvn-custom-option:hover {
+      background: var(--chip-bg);
+      color: var(--text-main);
+    }
+
+    .hvn-custom-option.active {
+      background: rgba(0, 200, 150, 0.14);
+      border-color: rgba(0, 200, 150, 0.3);
+      color: var(--primary);
+    }
+
+    .hvn-opt-left {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .hvn-opt-right {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hvn-opt-count {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: var(--chip-bg);
+      color: var(--text-muted);
+    }
+
+    .hvn-custom-option.active .hvn-opt-count {
+      background: rgba(0, 200, 150, 0.22);
+      color: var(--primary);
+    }
+
+    .hvn-opt-check {
+      font-size: 0.85rem;
+      opacity: 0;
+      color: var(--primary);
+    }
+
+    .hvn-custom-option.active .hvn-opt-check {
+      opacity: 1;
+    }
+
+    /* ==========================================================================
+       Compact Search Box (Exact Match to Tickets Inbox Search)
+       ========================================================================== */
+    .fin-search-box {
+      position: relative;
+      width: 140px;
+      transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      flex-shrink: 0;
+    }
+
+    .fin-search-box:focus-within {
+      width: 220px;
+    }
+
+    .fin-search-box i.bi-search {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.74rem;
+      pointer-events: none;
+      transition: color 0.18s ease;
+    }
+
+    .fin-search-box:focus-within i.bi-search {
+      color: var(--primary);
+    }
+
+    .fin-search-input {
+      width: 100%;
+      height: 32px;
+      padding: 4px 24px 4px 28px;
+      font-size: 0.78rem;
+      background: var(--chip-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      color: var(--text-main);
+      outline: none;
+      transition: all 0.18s ease;
+    }
+
+    .fin-search-input:focus {
+      background: var(--chip-bg);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+    }
+
+    .fin-search-clear {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.74rem;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .fin-search-clear:hover {
+      color: var(--text-main);
+    }
+
+    /* Single-Row Card Header for Sales & Revenue on Desktop */
+    .fin-card-header {
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .fin-header-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .fin-card-title {
+      margin: 0;
+      font-size: 0.92rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-main);
+      white-space: nowrap;
+    }
+
+    .fin-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .fin-header-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .fin-header-controls .hvn-custom-dropdown {
+      min-width: 140px;
+    }
+
+    .fin-header-controls .hvn-custom-select-btn {
+      height: 32px;
+      font-size: 0.78rem;
+      padding: 0 9px;
+    }
+
+    .fin-header-controls .hvn-custom-select-menu {
+      left: auto;
+      right: 0;
+      max-width: calc(100vw - 32px);
+    }
+
+    .fin-action-btn {
+      height: 32px;
+      padding: 0 10px;
+      font-size: 0.78rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border-radius: 8px;
+      white-space: nowrap;
+    }
+
+    /* Responsive text switchers */
+    .fin-tab-text-full {
+      display: inline;
+    }
+    .fin-tab-text-short {
+      display: none;
+    }
+
+    .fin-btn-text-full {
+      display: inline;
+    }
+    .fin-btn-text-short {
+      display: none;
+    }
+
+    .fin-text-desktop {
+      display: inline;
+    }
+
+    @media (max-width: 767px) {
+      .fin-text-desktop {
+        display: none !important;
+      }
+
+      .finance-tab-bar-wrap {
+        padding: 5px;
+        margin-bottom: 14px;
+      }
+
+      .finance-tab-nav {
+        width: 100%;
+        display: flex;
+        gap: 5px;
+        padding: 3px;
+      }
+
+      .finance-tab-btn {
+        flex: 1 1 50%;
+        justify-content: center;
+        padding: 7px 8px;
+        font-size: 0.82rem;
+        gap: 6px;
+        text-align: center;
+      }
+
+      .finance-tab-badge {
+        padding: 1px 6px;
+        font-size: 0.7rem;
+      }
+
+      .fin-card-header {
+        padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 9px;
+      }
+
+      .fin-header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        gap: 8px;
+      }
+
+      .fin-card-title {
+        font-size: 0.85rem;
+      }
+
+      .fin-header-actions {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        flex-shrink: 0;
+      }
+
+      .fin-header-controls {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-left: 0;
+      }
+
+      .fin-header-controls .hvn-custom-dropdown {
+        flex: 1 1 50%;
+        min-width: 0;
+      }
+
+      .fin-search-box {
+        flex: 1 1 50%;
+        width: auto;
+        min-width: 0;
+      }
+
+      .fin-search-box:focus-within {
+        flex: 2 1 60%;
+      }
+
+      .fin-header-controls .hvn-custom-select-menu {
+        left: 0;
+        right: auto;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .fin-tab-text-full {
+        display: none !important;
+      }
+      .fin-tab-text-short {
+        display: inline !important;
+      }
+      .fin-btn-text-full {
+        display: none !important;
+      }
+      .fin-btn-text-short {
+        display: inline !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .finance-tab-btn {
+        font-size: 0.78rem;
+        padding: 6px 4px;
+        gap: 5px;
+      }
+      .finance-tab-badge {
+        padding: 1px 5px;
+        font-size: 0.68rem;
+      }
+      .fin-sale-btn-label {
+        font-size: 0.74rem;
+      }
+      .fin-action-btn {
+        padding: 0 7px;
+      }
+    }
+
+    .fin-filter-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .fin-filter-group .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 6px 13px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .fin-pill-cnt {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: var(--chip-bg);
+      color: var(--text-secondary);
+      line-height: 1.3;
+    }
+
+    .fin-filter-group .btn.active .fin-pill-cnt {
+      background: rgba(5, 20, 16, 0.25);
+      color: var(--on-primary);
+    }
+
+    .due-badge {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-weight: 600;
+      font-size: 0.75rem;
+      white-space: nowrap;
+    }
+
+    .paid-badge {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-weight: 600;
+      font-size: 0.75rem;
+      white-space: nowrap;
+    }
+
+    .source-badge-manual {
+      background: rgba(0, 200, 150, 0.12);
+      color: var(--primary);
+      border: 1px solid rgba(0, 200, 150, 0.25);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .source-badge-web {
+      background: rgba(56, 189, 248, 0.12);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .category-pill {
+      font-size: 0.74rem;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+
+    .cat-hosting {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    .cat-domain {
+      background: rgba(168, 85, 247, 0.15);
+      color: #c084fc;
+      border: 1px solid rgba(168, 85, 247, 0.3);
+    }
+
+    .cat-plugins {
+      background: rgba(234, 179, 8, 0.15);
+      color: #facc15;
+      border: 1px solid rgba(234, 179, 8, 0.3);
+    }
+
+    .cat-marketing {
+      background: rgba(244, 114, 182, 0.15);
+      color: #f472b6;
+      border: 1px solid rgba(244, 114, 182, 0.3);
+    }
+
+    .cat-maint {
+      background: rgba(148, 163, 184, 0.15);
+      color: #cbd5e1;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    /* Modern Ledger Container (Full Dashboard Width) */
+    .finance-scroll-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      width: 100%;
+    }
+
+    /* Due action badge / button inside status column */
+    .due-pay-pill {
+      background: rgba(245, 158, 11, 0.16) !important;
+      color: var(--warning) !important;
+      border: 1px solid rgba(245, 158, 11, 0.45) !important;
+      border-radius: var(--radius-full) !important;
+      padding: 3px 10px !important;
+      font-size: 0.74rem !important;
+      font-weight: 700 !important;
+      cursor: pointer !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 5px !important;
+      white-space: nowrap !important;
+      transition: all 0.2s ease !important;
+      min-height: 26px !important;
+      height: 26px !important;
+      line-height: 24px !important;
+      box-sizing: border-box !important;
+    }
+
+    .due-pay-pill:hover {
+      background: var(--warning) !important;
+      color: #000 !important;
+      border-color: var(--warning) !important;
+      transform: translateY(-1px);
+      box-shadow: 0 3px 10px rgba(245, 158, 11, 0.35);
+    }
+
+    .due-pay-pill i {
+      font-size: 0.85rem;
+    }
+
+    .fmc-actions .btn {
+      min-height: 28px !important;
+      height: 28px !important;
+      padding: 0 8px !important;
+      font-size: 0.76rem !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 4px !important;
+      flex-shrink: 0 !important;
+      white-space: nowrap !important;
+      box-sizing: border-box !important;
+      border-radius: 6px !important;
+    }
+
+    .fmc-actions .btn-icon-only {
+      width: 28px !important;
+      padding: 0 !important;
+    }
+
+    /* ==========================================================================
+       Lumen Design System: Responsive Desktop Table (Screenshot 1) vs Mobile Cards
+       ========================================================================== */
+    .lumen-table-viewport {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .lumen-desktop-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .lumen-desktop-table thead th {
+      background: var(--bg-sunken);
+      color: #64748b;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: capitalize;
+      letter-spacing: 0.02em;
+      padding: 13px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      white-space: nowrap;
+      text-align: left;
+      box-sizing: border-box;
+    }
+
+    .lumen-desktop-table tbody tr {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      transition: background-color 0.15s ease;
+    }
+
+    .lumen-desktop-table tbody tr:hover {
+      background: var(--chip-bg);
+    }
+
+    .lumen-desktop-table tbody td {
+      padding: 13px 18px;
+      vertical-align: middle;
+      font-size: 0.88rem;
+      white-space: nowrap;
+    }
+
+    /* Column 1: Invoice / Ref (Screenshot 1) */
+    .lumen-col-invoice {
+      font-family: var(--font-mono), monospace;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #94a3b8;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .lumen-col-invoice .hvn-copy-pill {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Column 2: Customer / Player (Screenshot 1) */
+    .lumen-col-customer {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .lumen-table-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--chip-bg);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .lumen-table-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .lumen-customer-name {
+      font-weight: 600;
+      color: var(--text-main);
+      font-size: 0.92rem;
+    }
+
+    /* Column 3: Tabular Amount (Screenshot 1) */
+    .lumen-col-amount {
+      font-family: var(--font-mono), monospace;
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      font-size: 0.98rem;
+      color: var(--text-main);
+      text-align: right;
+    }
+
+    .lumen-col-amount.expense {
+      color: var(--text-main);
+    }
+
+    /* Column 5: Due date (Screenshot 1) */
+    .lumen-col-date {
+      color: #94a3b8;
+      font-size: 0.84rem;
+      font-weight: 500;
+      text-align: left;
+      box-sizing: border-box;
+    }
+
+    .lumen-count-badge {
+      font-size: 0.74rem;
+      font-weight: 700;
+      background: var(--chip-bg);
+      color: var(--text-muted);
+      padding: 2px 7px;
+      border-radius: 12px;
+      margin-left: 6px;
+    }
+
+    /* Responsive Switch: Desktop Table (>= 768px) vs Mobile Cards (< 768px) */
+    @media (min-width: 768px) {
+      .lumen-table-viewport {
+        display: block !important;
+      }
+
+      .finance-card-list {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 767px) {
+      .lumen-table-viewport {
+        display: none !important;
+      }
+
+      .finance-card-list {
+        display: flex !important;
+      }
+    }
+
+    /* Mobile Cards (Unchanged, exactly as user loved!) */
+    .finance-card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    @media (max-width: 600px) {
+      .finance-card-list {
+        padding: 10px 4px;
+        gap: 7px;
+      }
+    }
+
+    /* Collapsed Card: Ultra-clean, dark, scannable */
+    .fmc-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+    }
+
+    .fmc-card:hover {
+      border-color: var(--border-hover);
+      background: var(--bg-card-hover);
+    }
+
+    /* Expanded Card: Exact match to Image 1 (Bright Teal Glow Border) */
+    .fmc-card.is-expanded {
+      border: 1.5px solid var(--primary) !important;
+      background: var(--bg-surface) !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 200, 150, 0.15);
+    }
+
+    /* LINE 1: Left Avatar + Name | Right Amount */
+    .fmc-line-1 {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .fmc-identity {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    /* Circular avatar chip with 2 letters or icon (Screenshot exact) */
+    .fmc-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: var(--chip-bg);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: 0.02em;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .fmc-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .fmc-name {
+      font-weight: 600;
+      font-size: 0.94rem;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      letter-spacing: -0.01em;
+    }
+
+    /* Top-Right Tabular Amount */
+    .fmc-amount-slot {
+      text-align: right;
+      flex-shrink: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, var(--font-mono), monospace;
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      font-size: 1.02rem;
+      color: var(--text-main);
+      letter-spacing: -0.01em;
+    }
+
+    .fmc-amount-slot.expense {
+      color: var(--text-main);
+    }
+
+    /* LINE 2: Status Pill + Date + Chevron */
+    .fmc-line-2 {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: 5px;
+    }
+
+    .fmc-meta-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    /* Status Pill with dot (Screenshot exact) */
+    .fmc-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      line-height: 1.3;
+      white-space: nowrap;
+    }
+
+    .fmc-pill .fmc-pill-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .fmc-pill-paid {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.28);
+      color: #34d399;
+    }
+
+    .fmc-pill-paid .fmc-pill-dot {
+      background: #10b981;
+    }
+
+    .fmc-pill-overdue {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.28);
+      color: #f87171;
+    }
+
+    .fmc-pill-overdue .fmc-pill-dot {
+      background: #ef4444;
+    }
+
+    .fmc-pill-open {
+      background: rgba(6, 182, 212, 0.12);
+      border: 1px solid rgba(6, 182, 212, 0.28);
+      color: #22d3ee;
+    }
+
+    .fmc-pill-open .fmc-pill-dot {
+      background: #06b6d4;
+    }
+
+    .fmc-pill-category {
+      background: rgba(148, 163, 184, 0.1);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      color: #94a3b8;
+    }
+
+    .fmc-pill-category .fmc-pill-dot {
+      background: #64748b;
+    }
+
+    /* Labeled date */
+    .fmc-date-label {
+      font-size: 0.78rem;
+      color: #64748b;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    /* Far-right chevron */
+    .fmc-meta-right {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      color: #64748b;
+      font-size: 0.76rem;
+    }
+
+    .fmc-chevron {
+      transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .fmc-card.is-expanded .fmc-chevron {
+      transform: rotate(180deg);
+      color: #00c896;
+    }
+
+    /* ACCORDION (Exact match to Image 1) */
+    .fmc-accordion {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+    }
+
+    .fmc-card.is-expanded .fmc-accordion {
+      max-height: 320px;
+      opacity: 1;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Rows inside accordion */
+    .fmc-info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 7px;
+      font-size: 0.8rem;
+    }
+
+    .fmc-info-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .fmc-info-label {
+      color: #64748b;
+      font-size: 0.78rem;
+      font-weight: 500;
+      min-width: 50px;
+      flex-shrink: 0;
+    }
+
+    .fmc-info-value {
+      color: var(--text-main);
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .fmc-info-value.mono {
+      font-family: var(--font-mono), monospace;
+    }
+
+    /* Full record link */
+    .fmc-record-link {
+      color: #00c896 !important;
+      font-size: 0.78rem !important;
+      font-weight: 600 !important;
+      text-decoration: none !important;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .fmc-record-link:hover {
+      opacity: 0.85;
+      text-decoration: underline !important;
+    }
+
+    /* Action Buttons Row (Image 1: 2 prominent side-by-side buttons) */
+    .fmc-action-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      align-items: center;
+    }
+
+    .fmc-btn-sec {
+      flex: 1;
+      background: var(--chip-bg) !important;
+      border: 1px solid var(--border) !important;
+      color: var(--text-main) !important;
+      border-radius: 8px !important;
+      padding: 8px 12px !important;
+      font-size: 0.82rem !important;
+      font-weight: 600 !important;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: background 0.18s ease, transform 0.15s ease;
+      min-height: 36px;
+      box-sizing: border-box;
+    }
+
+    .fmc-btn-sec:hover {
+      background: var(--panel-tint) !important;
+      transform: translateY(-1px);
+    }
+
+    .fmc-btn-pri {
+      flex: 1;
+      background: #00c896 !important;
+      border: none !important;
+      color: #051310 !important;
+      border-radius: 8px !important;
+      padding: 8px 12px !important;
+      font-size: 0.82rem !important;
+      font-weight: 700 !important;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: background 0.18s ease, transform 0.15s ease, box-shadow 0.18s ease;
+      min-height: 36px;
+      box-sizing: border-box;
+    }
+
+    .fmc-btn-pri:hover {
+      background: #00e0a7 !important;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 200, 150, 0.35);
+    }
+
+    .fmc-btn-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--chip-bg) !important;
+      border: 1px solid var(--border) !important;
+      color: var(--text-muted) !important;
+      border-radius: 8px !important;
+      padding: 0 !important;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.18s ease;
+    }
+
+    .fmc-btn-icon:hover {
+      background: rgba(239, 68, 68, 0.15) !important;
+      border-color: rgba(239, 68, 68, 0.3) !important;
+      color: #f87171 !important;
+    }
+
+    /* Modal styling */
+    .admin-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .admin-modal.show {
+      display: flex;
+    }
+
+    .admin-modal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 580px;
+      box-shadow: var(--shadow-lg);
+      max-height: calc(100vh - 32px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      margin: auto;
+    }
+
+    .admin-modal-card form {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+      margin: 0;
+    }
+
+    @keyframes modalPop {
+      0% {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .admin-modal-header {
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      background: rgba(10, 15, 26, 0.65);
+    }
+
+    .admin-modal-body {
+      padding: 18px 22px;
+      overflow-y: auto;
+      flex: 1;
+      min-height: 0;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.2) rgba(0, 0, 0, 0.15);
+    }
+
+    .admin-modal-body .form-group {
+      margin-bottom: 0;
+      /* Let flex gap control the vertical spacing cleanly */
+    }
+
+    .admin-modal-body::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .admin-modal-body::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 4px;
+    }
+
+    .admin-modal-body::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+    }
+
+    .admin-modal-body::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.35);
+    }
+
+    .admin-modal-footer {
+      padding: 14px 22px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-shrink: 0;
+      background: rgba(10, 15, 26, 0.9);
+    }
+
+    .btn-modal-close {
+      background: var(--chip-bg);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 0.9rem;
+    }
+
+    .btn-modal-close:hover {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #f87171;
+    }
+
+    @media (max-width: 560px) {
+      .admin-modal {
+        padding: 10px;
+      }
+
+      .admin-modal-card {
+        max-height: calc(100vh - 20px);
+        border-radius: var(--radius-md);
+      }
+
+      .admin-modal-header,
+      .admin-modal-footer {
+        padding: 12px 16px;
+      }
+
+      .admin-modal-body {
+        padding: 14px 16px;
+      }
+
+      .admin-modal-body div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    /* Receipt Details Grid */
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+      font-size: 0.88rem;
+    }
+
+    .receipt-row:last-child {
+      border-bottom: none;
+    }
+
+    .receipt-label {
+      color: var(--text-muted);
+    }
+
+    .receipt-val {
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* Financial Analytics: grouped bars + responsive layout */
+    .fin-analytics-grid {
+      display: grid;
+      grid-template-columns: 1.45fr 1fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .fin-chart-panel {
+      background: var(--panel-tint);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .fin-breakdown-panel {
+      background: var(--panel-tint);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .fin-bar-chart-wrap {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 10px;
+      height: 185px;
+      padding: 15px 6px 0;
+      position: relative;
+    }
+
+    .fin-bar-group {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      height: 100%;
+      align-items: center;
+      justify-content: flex-end;
+      cursor: pointer;
+    }
+
+    .fin-bar-pair {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 4px;
+      width: 100%;
+      height: 135px;
+      padding-bottom: 6px;
+    }
+
+    .fin-bar-pair .crm-bar-track {
+      width: 14px;
+      max-width: 16px;
+      height: 100%;
+      background: var(--chip-bg);
+      border-radius: 4px 4px 0 0;
+      display: flex;
+      align-items: flex-end;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .fin-bar-pair .crm-bar-fill {
+      width: 100%;
+      border-radius: 4px 4px 0 0;
+      transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .fin-donut-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 4px;
+    }
+
+    .fin-donut-chart-wrap {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .fin-cat-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
+      max-height: 140px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .fin-cat-item {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .fin-cat-item-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      font-size: 0.76rem;
+    }
+
+    .fin-cat-progress-track {
+      width: 100%;
+      height: 4px;
+      background: var(--chip-bg);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .fin-cat-progress-bar {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.5s ease;
+    }
+
+    .fin-insight-strip {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--border);
+    }
+
+    .fin-insight-pill {
+      background: var(--bg-hover);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .fin-insight-pill-label {
+      font-size: 0.72rem;
+      text-transform: none;
+      letter-spacing: normal;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .fin-insight-pill-value {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 1024px) {
+      .fin-donut-row {
+        flex-direction: column !important;
+        align-items: center !important;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .fin-analytics-grid {
+        grid-template-columns: 1fr;
+      }
+
+      #finSummaryStrip {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="app-layout">
+    <!-- Content Header -->
+    <div class="content-header">
+      <h1 class="page-title">
+        <i class="bi bi-wallet2"></i>
+        <span>Server Finance &amp; Sales Ledger</span>
+      </h1>
+      <ul class="breadcrumb-list">
+        <li><a href="../index.html">Home</a></li>
+        <li class="breadcrumb-separator">/</li>
+        <li><span>Finance Ledger</span></li>
+      </ul>
+    </div>
+
+    <!-- 4 High-Impact Financial Overview Cards (Unified Web & Manual Sales) -->
+    <div class="dash-stat-grid" style="margin-bottom: 20px;">
+      <!-- Card 1: Total Sales Collected -->
+      <div class="glass-card crm-stat-card stat-card-teal" style="gap: 12px; padding: 18px 20px;">
+        <div class="fin-card-head">
+          <div class="fin-card-head-left">
+            <div class="crm-icon-bubble"
+              style="background: rgba(0, 200, 150, 0.2); color: var(--primary); width: 42px; height: 42px; font-size: 1.25rem; border-radius: 12px;">
+              <i class="bi bi-cash-stack"></i>
+            </div>
+            <div style="min-width: 0;">
+              <div class="fin-card-kicker" style="color: var(--primary);">Gross Revenue</div>
+              <div class="fin-card-subkicker">Verified &amp; Collected</div>
+            </div>
+          </div>
+          <span class="crm-stat-trend trend-up">
+            <i class="bi bi-arrow-up-right"></i> Collected
+          </span>
+        </div>
+        <div class="fin-card-mid">
+          <div class="crm-stat-number hvn-skeleton" id="statTotalPaid">৳0</div>
+          <span class="fin-card-pct" id="statPaidRatePct"
+            style="color: var(--primary); background: rgba(0, 200, 150, 0.12);">100% Paid</span>
+        </div>
+        <div class="crm-stat-progress-track" style="height: 5px;">
+          <div class="crm-stat-progress-bar" id="barTotalPaid"
+            style="width: 100%; background: linear-gradient(90deg, #00c896, #34d399);"></div>
+        </div>
+        <div class="fin-card-foot">
+          <span id="statRevBreakdown">Loading revenue breakdown...</span>
+        </div>
+      </div>
+
+      <!-- Card 2: Total Operational Expenses -->
+      <div class="glass-card crm-stat-card stat-card-pink" style="gap: 12px; padding: 18px 20px;">
+        <div class="fin-card-head">
+          <div class="fin-card-head-left">
+            <div class="crm-icon-bubble"
+              style="background: rgba(239, 68, 68, 0.2); color: #f87171; width: 42px; height: 42px; font-size: 1.25rem; border-radius: 12px;">
+              <i class="bi bi-receipt"></i>
+            </div>
+            <div style="min-width: 0;">
+              <div class="fin-card-kicker" style="color: #f87171;">Operating Costs</div>
+              <div class="fin-card-subkicker">Hosting &amp; Infrastructure</div>
+            </div>
+          </div>
+          <span class="crm-stat-trend"
+            style="color: #f87171; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.28);">
+            <i class="bi bi-arrow-down-right"></i> Outflow
+          </span>
+        </div>
+        <div class="fin-card-mid">
+          <div class="crm-stat-number hvn-skeleton" id="statTotalExpenses" style="color: #fca5a5;">৳0</div>
+          <span class="fin-card-pct" id="statExpRatioPct"
+            style="color: #fca5a5; background: rgba(239, 68, 68, 0.12);">0% of Rev</span>
+        </div>
+        <div class="crm-stat-progress-track" style="height: 5px;">
+          <div class="crm-stat-progress-bar" id="barTotalExp"
+            style="width: 35%; background: linear-gradient(90deg, #f43f5e, #fb7185);"></div>
+        </div>
+        <div class="fin-card-foot">
+          <span id="statExpCount">Hosting, domains &amp; maintenance</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Net Treasury Balance -->
+      <div class="glass-card crm-stat-card stat-card-cyan" style="gap: 12px; padding: 18px 20px;">
+        <div class="fin-card-head">
+          <div class="fin-card-head-left">
+            <div class="crm-icon-bubble"
+              style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; width: 42px; height: 42px; font-size: 1.25rem; border-radius: 12px;">
+              <i class="bi bi-bank"></i>
+            </div>
+            <div style="min-width: 0;">
+              <div class="fin-card-kicker" style="color: #38bdf8;">Net Treasury</div>
+              <div class="fin-card-subkicker">Available Reserve</div>
+            </div>
+          </div>
+          <span class="crm-stat-trend trend-up">
+            <i class="bi bi-safe"></i> Net Fund
+          </span>
+        </div>
+        <div class="fin-card-mid">
+          <div class="crm-stat-number hvn-skeleton" id="statNetBalance" style="color: #38bdf8;">৳0</div>
+          <span class="fin-card-pct" id="statNetMarginPct"
+            style="color: #38bdf8; background: rgba(56, 189, 248, 0.12);">0% Margin</span>
+        </div>
+        <div class="crm-stat-progress-track" style="height: 5px;">
+          <div class="crm-stat-progress-bar" id="barNetBalance"
+            style="width: 65%; background: linear-gradient(90deg, #0ea5e9, #38bdf8);"></div>
+        </div>
+        <div class="fin-card-foot">
+          <span id="statNetBreakdown">Revenue − Total Expenses</span>
+        </div>
+      </div>
+
+      <!-- Card 4: Total Due Receivable -->
+      <div class="glass-card crm-stat-card stat-card-purple" style="gap: 12px; padding: 18px 20px;">
+        <div class="fin-card-head">
+          <div class="fin-card-head-left">
+            <div class="crm-icon-bubble"
+              style="background: rgba(245, 158, 11, 0.2); color: var(--warning); width: 42px; height: 42px; font-size: 1.25rem; border-radius: 12px;">
+              <i class="bi bi-hourglass-split"></i>
+            </div>
+            <div style="min-width: 0;">
+              <div class="fin-card-kicker" style="color: var(--warning);">Due Receivable</div>
+              <div class="fin-card-subkicker">Unpaid Player Balances</div>
+            </div>
+          </div>
+          <span class="crm-stat-trend"
+            style="color: var(--warning); background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.28);">
+            <i class="bi bi-exclamation-circle"></i> Outstanding
+          </span>
+        </div>
+        <div class="fin-card-mid">
+          <div class="crm-stat-number hvn-skeleton" id="statTotalDue" style="color: var(--warning);">৳0</div>
+          <span class="fin-card-pct" id="statDueRatioPct"
+            style="color: var(--warning); background: rgba(245, 158, 11, 0.12);">0% Due</span>
+        </div>
+        <div class="crm-stat-progress-track" style="height: 5px;">
+          <div class="crm-stat-progress-bar" id="barTotalDue"
+            style="width: 12%; background: linear-gradient(90deg, #f59e0b, #fbbf24);"></div>
+        </div>
+        <div class="fin-card-foot">
+          <span id="statDueCount">0 pending player dues</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Financial Analytics: Revenue vs Expenses + Category Breakdown -->
+    <div class="glass-card card" style="padding: 24px; margin-bottom: 20px;">
+      <div
+        style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <h2
+            style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+            <i class="bi bi-graph-up-arrow" style="color: var(--primary);"></i> Financial Analytics
+          </h2>
+          <div style="font-size: 0.78rem; color: var(--text-muted);" id="finAnalyticsSubtitle">
+            Monthly revenue against operational costs (bKash, Nagad &amp; web store)</div>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <button type="button" class="badge" id="btnFin6m" onclick="setFinAnalyticsRange(6)"
+            style="background: rgba(var(--primary-rgb), 0.15); color: var(--primary); border: 1px solid var(--border-primary); cursor: pointer; padding: 6px 12px; border-radius: 6px; font-weight: 600;">6 Months</button>
+          <button type="button" class="badge" id="btnFin12m" onclick="setFinAnalyticsRange(12)"
+            style="background: var(--chip-bg); color: var(--text-muted); border: 1px solid var(--border); cursor: pointer; padding: 6px 12px; border-radius: 6px; font-weight: 500;">12 Months</button>
+        </div>
+      </div>
+
+      <!-- Period Summary Strip -->
+      <div
+        style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px;"
+        id="finSummaryStrip">
+        <div style="background: var(--panel-tint); padding: 12px; border-radius: var(--radius-sm); text-align: center;">
+          <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 500;">Total Revenue</div>
+          <div style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--primary); margin-top: 2px;" id="finSumRevenue">৳0</div>
+        </div>
+        <div style="background: var(--panel-tint); padding: 12px; border-radius: var(--radius-sm); text-align: center;">
+          <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 500;">Total Expenses</div>
+          <div style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: #f87171; margin-top: 2px;" id="finSumExpenses">৳0</div>
+        </div>
+        <div style="background: var(--panel-tint); padding: 12px; border-radius: var(--radius-sm); text-align: center;">
+          <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 500;">Net Profit</div>
+          <div style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--info); margin-top: 2px;" id="finSumProfit">৳0</div>
+        </div>
+        <div style="background: var(--panel-tint); padding: 12px; border-radius: var(--radius-sm); text-align: center;">
+          <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 500;">Profit Margin</div>
+          <div style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin-top: 2px;" id="finSumMargin">0%</div>
+        </div>
+      </div>
+
+      <div class="fin-analytics-grid">
+        <!-- Left: Revenue vs Expenses grouped bars -->
+        <div class="fin-chart-panel">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+            <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">
+              Monthly Trajectory
+            </div>
+            <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+              <span style="display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: var(--text-muted);"><span style="width: 10px; height: 10px; border-radius: 3px; background: linear-gradient(180deg, var(--primary), #008f6b); display: inline-block;"></span> Revenue</span>
+              <span style="display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: var(--text-muted);"><span style="width: 10px; height: 10px; border-radius: 3px; background: linear-gradient(180deg, #f43f5e, #be123c); display: inline-block;"></span> Expenses</span>
+            </div>
+          </div>
+          <div class="fin-bar-chart-wrap" id="finRevExpChart">
+            <div style="width: 100%; text-align: center; color: var(--text-muted); padding: 40px 0; font-size: 0.85rem;">
+              <i class="bi bi-arrow-repeat spin"></i> Calculating monthly analytics...
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Expense category breakdown & insights -->
+        <div class="fin-breakdown-panel">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">
+              Expense Breakdown
+            </div>
+            <span style="font-size: 0.72rem; color: var(--primary); font-weight: 600; font-family: var(--font-mono);" id="finExpPeriodTag">6M Total</span>
+          </div>
+          <div id="finExpenseDonut" style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+            <div style="text-align: center; color: var(--text-muted); padding: 24px 0; font-size: 0.82rem;">
+              <i class="bi bi-arrow-repeat spin"></i> Loading breakdown...
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Navigation Tabs: Sales vs Expenses -->
+    <div class="finance-tab-bar-wrap">
+      <div class="finance-tab-nav">
+        <button class="finance-tab-btn active" id="tabBtnSales" onclick="switchFinanceTab('sales')" title="View Sales & Revenue">
+          <i class="bi bi-cart-check"></i>
+          <span class="fin-tab-text-full">Sales &amp; Revenue</span>
+          <span class="fin-tab-text-short">Sales</span>
+          <span class="finance-tab-badge" id="tabBadgeSales">0</span>
+        </button>
+        <button class="finance-tab-btn" id="tabBtnExpenses" onclick="switchFinanceTab('expenses')" title="View Server Expenses">
+          <i class="bi bi-receipt-cutoff"></i>
+          <span class="fin-tab-text-full">Server Expenses</span>
+          <span class="fin-tab-text-short">Expenses</span>
+          <span class="finance-tab-badge" id="tabBadgeExpenses">0</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- VIEW 1: SALES LEDGER VIEW -->
+    <div id="financeViewSales">
+      <!-- Sales Ledger: Modern Lumen Cards (Desktop & Mobile) -->
+      <div class="finance-scroll-card">
+        <div class="card-header fin-card-header">
+          <div class="fin-header-top">
+            <div class="card-title fin-card-title">
+              <i class="bi bi-journal-text" style="color: var(--primary);"></i>
+              <span class="fin-tab-text-full">Sales &amp; Revenue</span>
+              <span class="fin-tab-text-short">Sales</span>
+              <span class="lumen-count-badge" id="salesTotalCountBadge">0</span>
+            </div>
+
+            <div class="fin-header-actions">
+              <!-- Add Record Button ("Record New Sale" shortened to "New Sale") -->
+              <button class="btn btn-primary btn-sm fin-action-btn" data-hvn-edit-only onclick="openSaleModal()"
+                title="Record new transaction">
+                <i class="bi bi-plus-lg"></i>
+                <span class="fin-btn-text-full">New Sale</span>
+                <span class="fin-btn-text-short">Sale</span>
+              </button>
+
+              <!-- Export Button -->
+              <button class="btn btn-secondary btn-sm fin-action-btn" onclick="exportSalesCSV()"
+                title="Export Sales to CSV">
+                <i class="bi bi-download"></i>
+                <span class="fin-text-desktop">Export</span>
+              </button>
+
+              <!-- Refresh Button -->
+              <button class="btn btn-secondary btn-sm fin-action-btn" onclick="loadSalesData()"
+                title="Refresh Sales">
+                <i class="bi bi-arrow-clockwise"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="fin-header-controls">
+            <!-- Custom Status Dropdown (Matches Screenshot 2 Style) -->
+            <div class="hvn-custom-dropdown" id="salesStatusDropdown">
+              <button type="button" class="hvn-custom-select-btn" onclick="toggleSalesDropdown(event)"
+                aria-expanded="false" title="Filter ledger records">
+                <span class="hvn-select-btn-left">
+                  <span class="hvn-cat-dot" id="salesDropdownDot" style="background: var(--primary);"></span>
+                  <span id="salesDropdownLabel">All Records</span>
+                  <span class="hvn-opt-count" id="salesDropdownCount">0</span>
+                </span>
+                <i class="bi bi-chevron-down hvn-select-chevron"></i>
+              </button>
+              <div class="hvn-custom-select-menu" id="salesDropdownMenu">
+                <button type="button" class="hvn-custom-option active" data-filter="all"
+                  onclick="filterSalesStatus('all')">
+                  <span class="hvn-opt-left">
+                    <span class="hvn-cat-dot" style="background: var(--primary);"></span>
+                    <span>All Records</span>
+                  </span>
+                  <span class="hvn-opt-right">
+                    <span class="hvn-opt-count" id="cntSalesAll">0</span>
+                    <i class="bi bi-check2 hvn-opt-check"></i>
+                  </span>
+                </button>
+                <button type="button" class="hvn-custom-option" data-filter="manual"
+                  onclick="filterSalesStatus('manual')">
+                  <span class="hvn-opt-left">
+                    <span class="hvn-cat-dot" style="background: #38bdf8;"></span>
+                    <span>Spawner &amp; Shop</span>
+                  </span>
+                  <span class="hvn-opt-right">
+                    <span class="hvn-opt-count" id="cntSalesManual">0</span>
+                    <i class="bi bi-check2 hvn-opt-check"></i>
+                  </span>
+                </button>
+                <button type="button" class="hvn-custom-option" data-filter="web" onclick="filterSalesStatus('web')">
+                  <span class="hvn-opt-left">
+                    <span class="hvn-cat-dot" style="background: #c084fc;"></span>
+                    <span>Web Orders</span>
+                  </span>
+                  <span class="hvn-opt-right">
+                    <span class="hvn-opt-count" id="cntSalesWeb">0</span>
+                    <i class="bi bi-check2 hvn-opt-check"></i>
+                  </span>
+                </button>
+                <button type="button" class="hvn-custom-option" data-filter="paid" onclick="filterSalesStatus('paid')">
+                  <span class="hvn-opt-left">
+                    <span class="hvn-cat-dot" style="background: var(--success);"></span>
+                    <span>Paid</span>
+                  </span>
+                  <span class="hvn-opt-right">
+                    <span class="hvn-opt-count" id="cntSalesPaid">0</span>
+                    <i class="bi bi-check2 hvn-opt-check"></i>
+                  </span>
+                </button>
+                <button type="button" class="hvn-custom-option" data-filter="due" onclick="filterSalesStatus('due')">
+                  <span class="hvn-opt-left">
+                    <span class="hvn-cat-dot" style="background: var(--warning);"></span>
+                    <span>Has Due</span>
+                  </span>
+                  <span class="hvn-opt-right">
+                    <span class="hvn-opt-count" id="cntSalesDue">0</span>
+                    <i class="bi bi-check2 hvn-opt-check"></i>
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Compact Search Box (Copied from Tickets Page) -->
+            <div class="fin-search-box">
+              <i class="bi bi-search"></i>
+              <input type="text" id="salesSearchInput" class="fin-search-input" placeholder="Search..."
+                oninput="handleSalesSearch()">
+              <button type="button" id="salesSearchClearBtn" class="fin-search-clear" onclick="clearSalesSearch()"
+                style="display: none;" title="Clear search">
+                <i class="bi bi-x-circle-fill"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Desktop View (>= 768px): Exact Screenshot 1 Single-Line 6-Column Table -->
+        <div class="lumen-table-viewport">
+          <table class="lumen-desktop-table" id="salesDesktopTable">
+            <thead>
+              <tr>
+                <th style="width: 14%; text-align: left;">Invoice</th>
+                <th style="width: 28%; text-align: left;">Customer</th>
+                <th style="width: 16%; text-align: right;">Amount</th>
+                <th style="width: 16%; text-align: center;">Status</th>
+                <th style="width: 14%; text-align: left;">Due Date <i class="bi bi-chevron-down"
+                    style="font-size: 0.7rem; opacity: 0.7;"></i></th>
+                <th style="width: 12%; text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="salesDesktopTableBody">
+              <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 32px;">
+                  <i class="bi bi-arrow-repeat spin"></i> Loading transactions...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile View (< 768px): The Exact Lumen Cards the user loves! -->
+        <div class="finance-card-list" id="salesMobileList">
+          <div style="text-align: center; color: var(--text-muted); padding: 32px;">
+            <i class="bi bi-arrow-repeat spin"></i> Loading transactions...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 2: SERVER EXPENSES VIEW -->
+    <div id="financeViewExpenses" style="display: none;">
+      <!-- Server Expenses: Modern Lumen Cards (Desktop & Mobile) -->
+      <div class="finance-scroll-card">
+        <div class="card-header fin-card-header">
+          <div class="fin-header-top">
+            <div class="card-title fin-card-title">
+              <i class="bi bi-receipt" style="color: #f87171;"></i>
+              <span class="fin-tab-text-full">Server Expenses</span>
+              <span class="fin-tab-text-short">Expenses</span>
+              <span class="lumen-count-badge" id="expTotalCountBadge">0</span>
+            </div>
+
+            <div class="fin-header-actions">
+              <!-- Add Expense Button -->
+              <button class="btn btn-primary btn-sm fin-action-btn" data-hvn-edit-only onclick="openExpenseModal()"
+                style="background: rgba(239, 68, 68, 0.14); border-color: rgba(239, 68, 68, 0.35); color: #f87171;" title="Record new expense">
+                <i class="bi bi-plus-lg"></i>
+                <span class="fin-btn-text-full">Add Expense</span>
+                <span class="fin-btn-text-short">Expense</span>
+              </button>
+
+              <!-- Refresh Button -->
+              <button class="btn btn-secondary btn-sm fin-action-btn" onclick="loadExpensesData()"
+                title="Refresh Expenses">
+                <i class="bi bi-arrow-clockwise"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="fin-header-controls">
+            <!-- Custom Expense Category Dropdown (Matches Screenshot 2 Style) -->
+            <div class="hvn-custom-dropdown" id="expenseCategoryDropdown">
+              <button type="button" class="hvn-custom-select-btn" onclick="toggleExpenseDropdown(event)"
+                aria-expanded="false" title="Filter expense category">
+                <span class="hvn-select-btn-left">
+                  <span class="hvn-cat-dot" id="expenseDropdownDot" style="background: var(--primary);"></span>
+                  <span id="expenseDropdownLabel">All Expenses</span>
+                  <span class="hvn-opt-count" id="expenseDropdownCount">0</span>
+                </span>
+                <i class="bi bi-chevron-down hvn-select-chevron"></i>
+              </button>
+              <div class="hvn-custom-select-menu" id="expenseDropdownMenu">
+                <button type="button" class="hvn-custom-option active" data-cat="all"
+                  onclick="filterExpenseCategory('all')">
+                  <span class="hvn-opt-left">
+                    <span class="hvn-cat-dot" style="background: var(--primary);"></span>
+                    <span>All Expenses</span>
+                  </span>
+                  <span class="hvn-opt-right">
+                    <span class="hvn-opt-count" id="cntExpAll">0</span>
+                    <i class="bi bi-check2 hvn-opt-check"></i>
+                  </span>
+                </button>
+                <button type="button" class="hvn-custom-option" data-cat="Server Hosting"
+                  onclick="filterExpenseCategory('Server Hosting')">
+                  <span class="hvn-opt-left">
+                    <span class="hvn-cat-dot" style="background: #38bdf8;"></span>
+                    <span>Hosting</span>
+                  </span>
+                  <span class="hvn-opt-right">
+                    <span class="hvn-opt-count" id="cntExpHosting">0</span>
+                    <i class="bi bi-check2 hvn-opt-check"></i>
+                  </span>
+                </button>
+                <button type="button" class="hvn-custom-option" data-cat="Domain & Web"
+                  onclick="filterExpenseCategory('Domain & Web')">
+                  <span class="hvn-opt-left">
+                    <span class="hvn-cat-dot" style="background: #c084fc;"></span>
+                    <span>Domain</span>
+                  </span>
+                  <span class="hvn-opt-right">
+                    <span class="hvn-opt-count" id="cntExpDomain">0</span>
+                    <i class="bi bi-check2 hvn-opt-check"></i>
+                  </span>
+                </button>
+                <button type="button" class="hvn-custom-option" data-cat="Plugins & Dev"
+                  onclick="filterExpenseCategory('Plugins & Dev')">
+                  <span class="hvn-opt-left">
+                    <span class="hvn-cat-dot" style="background: #facc15;"></span>
+                    <span>Plugins/Dev</span>
+                  </span>
+                  <span class="hvn-opt-right">
+                    <span class="hvn-opt-count" id="cntExpPlugins">0</span>
+                    <i class="bi bi-check2 hvn-opt-check"></i>
+                  </span>
+                </button>
+                <button type="button" class="hvn-custom-option" data-cat="Marketing & Ads"
+                  onclick="filterExpenseCategory('Marketing & Ads')">
+                  <span class="hvn-opt-left">
+                    <span class="hvn-cat-dot" style="background: #f472b6;"></span>
+                    <span>Marketing</span>
+                  </span>
+                  <span class="hvn-opt-right">
+                    <span class="hvn-opt-count" id="cntExpMarketing">0</span>
+                    <i class="bi bi-check2 hvn-opt-check"></i>
+                  </span>
+                </button>
+                <button type="button" class="hvn-custom-option" data-cat="Events & Giveaways"
+                  onclick="filterExpenseCategory('Events & Giveaways')">
+                  <span class="hvn-opt-left">
+                    <span class="hvn-cat-dot" style="background: #34d399;"></span>
+                    <span>Events</span>
+                  </span>
+                  <span class="hvn-opt-right">
+                    <span class="hvn-opt-count" id="cntExpEvents">0</span>
+                    <i class="bi bi-check2 hvn-opt-check"></i>
+                  </span>
+                </button>
+                <button type="button" class="hvn-custom-option" data-cat="Maintenance"
+                  onclick="filterExpenseCategory('Maintenance')">
+                  <span class="hvn-opt-left">
+                    <span class="hvn-cat-dot" style="background: #94a3b8;"></span>
+                    <span>Maintenance</span>
+                  </span>
+                  <span class="hvn-opt-right">
+                    <span class="hvn-opt-count" id="cntExpMaint">0</span>
+                    <i class="bi bi-check2 hvn-opt-check"></i>
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Compact Search Box (Copied from Tickets Page) -->
+            <div class="fin-search-box">
+              <i class="bi bi-search"></i>
+              <input type="text" id="expenseSearchInput" class="fin-search-input" placeholder="Search..."
+                oninput="handleExpenseSearch()">
+              <button type="button" id="expenseSearchClearBtn" class="fin-search-clear" onclick="clearExpenseSearch()"
+                style="display: none;" title="Clear search">
+                <i class="bi bi-x-circle-fill"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Desktop View (>= 768px): Exact Screenshot 1 Single-Line Table -->
+        <div class="lumen-table-viewport">
+          <table class="lumen-desktop-table" id="expDesktopTable">
+            <thead>
+              <tr>
+                <th style="width: 14%; text-align: left;">Ref</th>
+                <th style="width: 28%; text-align: left;">Expense / Vendor</th>
+                <th style="width: 16%; text-align: right;">Amount</th>
+                <th style="width: 16%; text-align: center;">Category</th>
+                <th style="width: 14%; text-align: left;">Date <i class="bi bi-chevron-down"
+                    style="font-size: 0.7rem; opacity: 0.7;"></i></th>
+                <th style="width: 12%; text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="expDesktopTableBody">
+              <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 32px;">
+                  <i class="bi bi-arrow-repeat spin"></i> Loading expenses...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile View (< 768px): The Exact Lumen Cards the user loves! -->
+        <div class="finance-card-list" id="expensesMobileList">
+          <div style="text-align: center; color: var(--text-muted); padding: 32px;">
+            <i class="bi bi-arrow-repeat spin"></i> Loading expenses...
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL 1: ADD / EDIT SALE MODAL -->
+  <div class="admin-modal" id="saleModal">
+    <div class="admin-modal-card">
+      <div class="admin-modal-header">
+        <div
+          style="display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.1rem; color: var(--text-main);">
+          <i class="bi bi-cart-plus-fill" style="color: var(--primary);"></i>
+          <span id="saleModalTitle">Record New Server Sale</span>
+        </div>
+        <button class="btn-sidebar-close btn-modal-close" onclick="closeSaleModal()" type="button" aria-label="Close"><i
+            class="bi bi-x-lg"></i></button>
+      </div>
+      <form id="saleForm" onsubmit="handleSaleSubmit(event)">
+        <input type="hidden" id="saleRecordId">
+        <div class="admin-modal-body" style="display: flex; flex-direction: column; gap: 14px;">
+          <!-- Staff Operator Indicator -->
+          <div
+            style="font-size: 0.76rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; padding: 6px 10px; background: rgba(0,200,150,0.06); border: 1px solid rgba(0,200,150,0.2); border-radius: 6px;">
+            <i class="bi bi-shield-check" style="color: var(--primary);"></i>
+            <span>Authorized Operator: <strong style="color: var(--text-main);"
+                id="saleOperatorIgn">JU3L_</strong></span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label">Sale Date</label>
+              <input type="date" id="saleDateInput" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Payment Method</label>
+              <select id="saleMethodInput" class="form-select">
+                <option value="bKash">bKash</option>
+                <option value="Nagad">Nagad</option>
+                <option value="Rocket">Rocket</option>
+                <option value="Bank">Bank Transfer</option>
+                <option value="Hand Cash">Hand Cash</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label">Player Name</label>
+              <input type="text" id="salePlayerInput" class="form-control" placeholder="e.g. another_mahfuz" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">GamerTag / IGN</label>
+              <input type="text" id="saleGamerTagInput" class="form-control" placeholder="e.g. JUEL" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label">Purchased Item</label>
+              <select id="saleItemSelect" class="form-select" onchange="handleSaleItemChange(this.value)">
+                <option value="ELITE RANK">ELITE RANK (৳420)</option>
+                <option value="LEGEND RANK">LEGEND RANK (৳340)</option>
+                <option value="PRIME RANK">PRIME RANK (৳220)</option>
+                <option value="SPECIAL SPAWNERS">SPECIAL SPAWNERS (৳55)</option>
+                <option value="ADVANCED SPAWNERS">ADVANCED SPAWNERS (৳45)</option>
+                <option value="COMBAT SPAWNER">COMBAT SPAWNER (৳35)</option>
+                <option value="BASIC SPAWNER">BASIC SPAWNER (৳25)</option>
+                <option value="Custom">Custom Item</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Spawner Type (If Any)</label>
+              <input type="text" id="saleSpawnerTypeInput" class="form-control" placeholder="e.g. Cow, Breeze, Ghast">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+            <div class="form-group">
+              <label class="form-label">Quantity</label>
+              <input type="number" id="saleQtyInput" class="form-control" min="1" value="1"
+                oninput="calculateSaleTotals()" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Unit Price (৳)</label>
+              <input type="number" step="0.01" id="saleUnitPriceInput" class="form-control" value="420"
+                oninput="calculateSaleTotals()" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Total Price (৳)</label>
+              <input type="number" step="0.01" id="saleTotalPriceInput" class="form-control" value="420" readonly
+                style="background: var(--panel-tint);">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+            <div class="form-group">
+              <label class="form-label">Paid Amount (৳)</label>
+              <input type="number" step="0.01" id="salePaidInput" class="form-control" value="420"
+                oninput="calculateSaleTotals('paid')" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="color: #c084fc;">Discount (৳)</label>
+              <input type="number" step="0.01" min="0" id="saleDiscountInput" class="form-control" value="0"
+                oninput="calculateSaleTotals('discount')"
+                style="border-color: rgba(168, 85, 247, 0.35); color: #e9d5ff; font-weight: 700;">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Due Amount (৳)</label>
+              <input type="number" step="0.01" id="saleDueInput" class="form-control" value="0" readonly
+                style="background: var(--panel-tint); color: var(--warning); font-weight: 700;">
+            </div>
+          </div>
+
+          <!-- Quick Remainder Toggle: Keep as Due vs. Waive as Discount -->
+          <div id="saleRemainderToggleWrap"
+            style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 12px; background: var(--chip-bg); border: 1px solid var(--border); border-radius: 8px; flex-wrap: wrap;">
+            <span style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 600;">
+              <i class="bi bi-sliders" style="color: var(--primary);"></i> If Paid &lt; Total Price:
+            </span>
+            <div
+              style="display: inline-flex; gap: 6px; background: var(--panel-tint); padding: 3px; border-radius: 6px; border: 1px solid var(--border);">
+              <button type="button" id="btnModeKeepDue" class="btn btn-secondary btn-sm active"
+                style="padding: 4px 10px; font-size: 0.74rem; min-height: 26px; height: 26px;"
+                onclick="setSaleRemainderMode('due')">
+                <i class="bi bi-exclamation-circle"></i> Keep as Due
+              </button>
+              <button type="button" id="btnModeGiveDiscount" class="btn btn-secondary btn-sm"
+                style="padding: 4px 10px; font-size: 0.74rem; min-height: 26px; height: 26px;"
+                onclick="setSaleRemainderMode('discount')">
+                <i class="bi bi-tag-fill"></i> Give as Discount (No Due)
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Notes / Freebies / Discount Details</label>
+            <input type="text" id="saleNotesInput" class="form-control"
+              placeholder="e.g. Free gift spawners or discount note">
+          </div>
+        </div>
+        <div class="admin-modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeSaleModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveSale">Save Sale Entry</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: ADD / EDIT EXPENSE MODAL -->
+  <div class="admin-modal" id="expenseModal">
+    <div class="admin-modal-card">
+      <div class="admin-modal-header">
+        <div
+          style="display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.1rem; color: #f87171;">
+          <i class="bi bi-receipt"></i>
+          <span id="expenseModalTitle">Add Server Expense</span>
+        </div>
+        <button class="btn-sidebar-close btn-modal-close" onclick="closeExpenseModal()" type="button"
+          aria-label="Close"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <form id="expenseForm" onsubmit="handleExpenseSubmit(event)">
+        <input type="hidden" id="expenseRecordId">
+        <div class="admin-modal-body" style="display: flex; flex-direction: column; gap: 14px;">
+          <!-- Staff Operator Indicator -->
+          <div
+            style="font-size: 0.76rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; padding: 6px 10px; background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); border-radius: 6px;">
+            <i class="bi bi-shield-check" style="color: #f87171;"></i>
+            <span>Authorized Operator: <strong style="color: var(--text-main);"
+                id="expOperatorIgn">JU3L_</strong></span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label">Expense Date</label>
+              <input type="date" id="expDateInput" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select id="expCategorySelect" class="form-select" required>
+                <option value="Server Hosting">Server Hosting (VPS / Dedicated)</option>
+                <option value="Domain & Web">Domain &amp; Web Hosting</option>
+                <option value="Plugins & Dev">Plugins &amp; Developer Fee</option>
+                <option value="Marketing & Ads">Marketing, Promo &amp; Ads</option>
+                <option value="Events & Giveaways">Events &amp; Giveaways</option>
+                <option value="Maintenance">Maintenance &amp; Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Expense Title / Description</label>
+            <input type="text" id="expTitleInput" class="form-control"
+              placeholder="e.g. PebbleHost 16GB Dedicated Server Renewal" required>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label">Amount in BDT (৳)</label>
+              <input type="number" step="0.01" id="expAmountInput" class="form-control" placeholder="e.g. 1500"
+                required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Paid To / Vendor</label>
+              <input type="text" id="expPaidToInput" class="form-control" placeholder="e.g. Hetzner, Namecheap">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label">Payment Method</label>
+              <select id="expMethodInput" class="form-select">
+                <option value="bKash">bKash</option>
+                <option value="Nagad">Nagad</option>
+                <option value="Bank Card">Bank / Card</option>
+                <option value="PayPal">PayPal</option>
+                <option value="Crypto">Crypto</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Invoice Ref / TrxID</label>
+              <input type="text" id="expInvoiceRefInput" class="form-control" placeholder="e.g. INV-2026-9901">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Additional Notes</label>
+            <input type="text" id="expNotesInput" class="form-control" placeholder="Optional notes">
+          </div>
+        </div>
+        <div class="admin-modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeExpenseModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveExpense"
+            style="background: rgba(239, 68, 68, 0.14); border-color: rgba(239, 68, 68, 0.35); color: #f87171;">Save Expense</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 3: COLLECT DUE OR APPLY DISCOUNT MODAL -->
+  <div class="admin-modal" id="dueModal">
+    <div class="admin-modal-card" style="max-width: 460px;">
+      <div class="admin-modal-header">
+        <div
+          style="display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.05rem; color: var(--text-main);">
+          <i class="bi bi-cash-coin" style="color: var(--warning);"></i>
+          <span>Settle Due or Apply Discount</span>
+        </div>
+        <button class="btn-sidebar-close btn-modal-close" onclick="closeDueModal()" type="button" aria-label="Close"><i
+            class="bi bi-x-lg"></i></button>
+      </div>
+      <form onsubmit="handleDuePaymentSubmit(event)">
+        <input type="hidden" id="dueSaleId">
+        <input type="hidden" id="dueSettleModeInput" value="payment">
+        <div class="admin-modal-body" style="display: flex; flex-direction: column; gap: 14px;">
+          <div
+            style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: var(--radius-md); padding: 14px;">
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 2px;">Player Account</div>
+            <div style="font-weight: 700; font-size: 1.1rem; color: var(--text-main);" id="dueModalPlayer">Player</div>
+            <div style="font-size: 0.78rem; color: var(--primary);" id="dueModalItem">Item Name</div>
+            <div
+              style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border); padding-top: 8px;">
+              <span style="font-size: 0.84rem;">Current Due Balance:</span>
+              <span style="font-weight: 700; font-size: 1.1rem; color: var(--warning);" id="dueModalAmount">৳0.00</span>
+            </div>
+          </div>
+
+          <!-- Action Switcher: Collect Payment vs. Waive as Discount -->
+          <div class="modal-tabs" style="margin-bottom: 2px;">
+            <button type="button" class="modal-tab-btn active" id="tabDueModePayment"
+              onclick="setDueSettleMode('payment')">
+              <i class="bi bi-cash-stack"></i> Collect Due Payment
+            </button>
+            <button type="button" class="modal-tab-btn" id="tabDueModeDiscount" onclick="setDueSettleMode('discount')">
+              <i class="bi bi-tag-fill"></i> Convert to Discount
+            </button>
+          </div>
+
+          <div id="duePaymentFieldsWrap" style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div class="form-group" style="margin: 0;">
+                <label class="form-label">Payment Received (৳)</label>
+                <input type="number" step="0.01" min="0" id="duePaymentReceivedInput" class="form-control" required
+                  style="font-size: 1.1rem; font-weight: 700; color: var(--success);">
+              </div>
+              <div class="form-group" style="margin: 0;">
+                <label class="form-label" style="color: #c084fc;">Discount Given (৳)</label>
+                <input type="number" step="0.01" min="0" id="dueDiscountGivenInput" class="form-control" value="0"
+                  style="font-size: 1.1rem; font-weight: 700; color: #c084fc;">
+              </div>
+            </div>
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label">Payment Method</label>
+              <select id="duePaymentMethodSelect" class="form-select">
+                <option value="bKash">bKash</option>
+                <option value="Nagad">Nagad</option>
+                <option value="Rocket">Rocket</option>
+                <option value="Hand Cash">Hand Cash</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="dueDiscountNoticeWrap"
+            style="display: none; padding: 12px 14px; border-radius: 8px; background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3); font-size: 0.82rem; color: #e9d5ff; line-height: 1.5;">
+            <i class="bi bi-tag-fill" style="color: #c084fc;"></i>
+            <strong>Discount Mode:</strong> This balance was given as a discount to the player (not an unpaid due).
+            Marking it as a discount will set <strong>Due = ৳0 (Paid)</strong> without adding extra money to Paid
+            Revenue.
+          </div>
+        </div>
+        <div class="admin-modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeDueModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnConfirmDueSubmit"
+            style="background: rgba(245, 158, 11, 0.14); border-color: rgba(245, 158, 11, 0.35); color: #fbbf24;">
+            Confirm Due Collection
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 4: TRANSACTION RECEIPT & AUDIT INSPECTOR -->
+  <div class="admin-modal" id="receiptModal">
+    <div class="admin-modal-card" style="max-width: 520px;">
+      <div class="admin-modal-header">
+        <div
+          style="display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.05rem; color: var(--text-main);">
+          <i class="bi bi-receipt-cutoff" style="color: var(--primary);"></i>
+          <span>Transaction Receipt Details</span>
+        </div>
+        <button class="btn-sidebar-close btn-modal-close" onclick="closeReceiptModal()" type="button"
+          aria-label="Close"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div class="admin-modal-body" id="receiptModalBody">
+        <!-- Rendered dynamically -->
+      </div>
+      <div class="admin-modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeReceiptModal()">Close Receipt</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Core JavaScript Bundles -->
+  <script src="../assets/js/config.js?v=3.4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1" integrity="sha384-YieCqqg9gQufX7+5HcFvCEg/n3KUEdl8/Jb+A6J0npf1mB740VayvwKjTrtCeUoy" crossorigin="anonymous"></script>
+  <script src="../assets/js/supabase.js?v=3.4"></script>
+  <script src="../assets/js/auth.js?v=3.5"></script>
+  <script src="../assets/js/utils.js?v=3.4"></script>
+  <script src="../assets/js/layout.js?v=3.8"></script>
+
+  <!-- Finance Ledger Controller Logic -->
+  <script>
+    (function () {
+      'use strict';
+
+      // Inline safety fallbacks for escaping & alerts
+      if (!window.hvnEscapeHtml) {
+        window.hvnEscapeHtml = function (str) {
+          if (str == null) return '';
+          return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+        };
+      }
+      if (!window.hvnToast) {
+        window.hvnToast = function (msg) {
+          console.log('[Toast]', msg);
+        };
+      }
+      if (!window.hvnConfirm) {
+        window.hvnConfirm = function (opts) {
+          const msg = typeof opts === 'string' ? opts : (opts && opts.message) || 'Are you sure?';
+          return Promise.resolve(window.confirm(msg));
+        };
+      }
+
+      let salesData = [];
+      let webOrdersData = [];
+      let expensesData = [];
+      let currentSalesFilter = 'all';
+      let currentSalesSearch = '';
+      let currentExpCategory = 'all';
+      let currentExpSearch = '';
+
+      function getClient() {
+        return window.initHavenSupabase ? window.initHavenSupabase() : window.supabaseClient;
+      }
+
+      function getActiveStaff() {
+        if (window.havenStaffProfile && window.havenStaffProfile._verified === true) {
+          return window.havenStaffProfile;
+        }
+        return null;
+      }
+
+      function hasFinancePermission() {
+        if (window.hvnAuth && typeof window.hvnAuth.canEdit === 'function') {
+          return window.hvnAuth.canEdit('finance');
+        }
+        const staff = getActiveStaff();
+        if (!staff) return false;
+        if (staff.isOwner || staff.role === 'Owner' || (staff.email && staff.email.toLowerCase() === 'rajuel55@gmail.com')) return true;
+        const perms = staff.permissions || {};
+        if (perms.read_only === true || perms.finance_edit === false || perms.orders_edit === false) return false;
+        const hasPerm = (perms.finance === true || perms.orders === true);
+        const isActive = (staff.is_active === true || staff.isActive === true || staff.is_active === undefined || staff.status === 'active');
+        return Boolean(isActive && hasPerm);
+      }
+
+      async function logFinanceAction(action, target, status, details = {}) {
+        const staff = getActiveStaff();
+        const staffIgn = staff ? (staff.ign || staff.minecraftIgn || staff.minecraft_ign || staff.name || staff.full_name || 'Staff') : 'Staff';
+        const staffRole = staff ? (staff.role || 'Staff') : 'Staff';
+        const client = getClient();
+        if (!client) return;
+        try {
+          await client.from('audit_logs').insert([{
+            staff_name: staffIgn,
+            staff_role: staffRole,
+            category: 'Finance Ledger',
+            action: action,
+            target: target,
+            result: status || 'Success',
+            details: details
+          }]);
+        } catch (e) {
+          console.warn('Audit log write error:', e);
+        }
+      }
+
+      // Tab Switching (persisted across visits)
+      window.switchFinanceTab = function (tab) {
+        const isSales = tab === 'sales';
+        document.getElementById('financeViewSales').style.display = isSales ? 'block' : 'none';
+        document.getElementById('financeViewExpenses').style.display = isSales ? 'none' : 'block';
+        document.getElementById('tabBtnSales').classList.toggle('active', isSales);
+        document.getElementById('tabBtnExpenses').classList.toggle('active', !isSales);
+        try { localStorage.setItem('hvn_finance_tab', tab); } catch (e) { }
+
+        // Recalculate top scrollbar width
+        setTimeout(() => {
+          updateScrollDummyWidths();
+        }, 100);
+      };
+
+      // 1. Load Both Sales Data & Webstore Orders for Unified Accounting
+      async function loadSalesData() {
+        const client = getClient();
+        if (!client) {
+          console.warn('Supabase client not initialized yet.');
+          return;
+        }
+
+        try {
+          // Fetch Manual / Spreadsheet Sales safely
+          let sSales = [];
+          const { data, error } = await client
+            .from('server_sales')
+            .select('*');
+
+          if (error) {
+            console.error('Error fetching server_sales:', error);
+            throw error;
+          }
+
+          sSales = data || [];
+          // Sort in JavaScript safely so nulls or missing indexes don't break PostgREST
+          sSales.sort((a, b) => (Number(b.sl_no || b.id) || 0) - (Number(a.sl_no || a.id) || 0));
+          salesData = sSales;
+
+          // Fetch Webstore Orders safely (Only Delivered/Verified orders count in Sales & Revenue Ledger)
+          try {
+            const { data: wOrders } = await client
+              .from('store_orders')
+              .select('*')
+              .order('created_at', { ascending: false });
+
+            const verifiedWebOrders = (wOrders || []).filter(o => {
+              const st = String(o.status || '').toLowerCase();
+              return st === 'delivered' || st === 'verified';
+            });
+
+            webOrdersData = verifiedWebOrders.map(o => {
+              const numPrice = parseFloat(String(o.price || '0').replace(/[^0-9.]/g, '')) || 0;
+              const shortCode = o.order_code || ('HC-' + String(o.id || '').slice(0, 6).toUpperCase());
+              let rawItem = String(o.item_name || 'Webstore Item').trim();
+              if (/^custom\s+spawners?/i.test(rawItem)) {
+                const qtyMatch = rawItem.match(/\((\d+)\s*pcs\)/i);
+                const qtyNum = qtyMatch ? (parseInt(qtyMatch[1], 10) || 1) : 1;
+                const unitPrice = qtyNum > 0 ? Math.round(numPrice / qtyNum) : numPrice;
+                if (unitPrice === 25) rawItem = qtyNum > 1 ? `Pig Spawner (x${qtyNum})` : 'Pig Spawner';
+                else if (unitPrice === 35) rawItem = qtyNum > 1 ? `Combat Spawner (x${qtyNum})` : 'Combat Spawner';
+                else if (unitPrice === 45) rawItem = qtyNum > 1 ? `Advanced Spawner (x${qtyNum})` : 'Advanced Spawner';
+                else if (unitPrice === 55) rawItem = qtyNum > 1 ? `Special Spawner (x${qtyNum})` : 'Special Spawner';
+              }
+              return {
+                id: `web-${o.id}`,
+                raw_id: o.id,
+                order_code: shortCode,
+                sl_no: shortCode,
+                sale_date: o.created_at ? (window.hvnFormatLocalDateKey ? window.hvnFormatLocalDateKey(o.created_at) : o.created_at.split('T')[0]) : '-',
+                player_name: o.username || 'Player',
+                gamer_tag: o.username || 'Player',
+                purchased_item: rawItem,
+                spawner_type: (rawItem && rawItem.toLowerCase().includes('spawner')) ? rawItem : '',
+                quantity: 1,
+                unit_price: numPrice,
+                total_price: numPrice,
+                paid_amount: numPrice,
+                due_amount: 0,
+                payment_method: o.payment_method || 'Online Store',
+                status: 'Paid',
+                notes: `Trx: ${o.trx_id || '-'} • Web Store (${shortCode})`,
+                is_web_order: true
+              };
+            });
+          } catch (eWeb) {
+            console.warn('Web orders fetch warning:', eWeb);
+          }
+
+          try { updateSummaryCards(); } catch (errCards) { console.error('Cards render error:', errCards); }
+          try { renderSalesTable(); } catch (errTable) { console.error('Table render error:', errTable); }
+          try { renderFinanceAnalytics(); } catch (errAn) { console.error('Analytics render error:', errAn); }
+          try { updateScrollDummyWidths(); } catch (errScroll) { console.warn('Scroll sync error:', errScroll); }
+        } catch (err) {
+          console.error('Error loading sales data:', err);
+          const errMsg = err ? (err.message || err.error_description || err.code || JSON.stringify(err)) : 'Unknown database error';
+          const errHint = err && err.hint ? `<div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 4px;">Hint: ${err.hint}</div>` : '';
+          const salesList = document.getElementById('salesMobileList');
+          if (salesList) {
+            salesList.innerHTML = `
+              <div style="text-align: center; color: var(--danger); padding: 32px 16px; grid-column: 1 / -1;">
+                <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 6px;">
+                  <i class="bi bi-exclamation-triangle-fill"></i> Failed to load sales ledger
+                </div>
+                <div style="font-size: 0.8rem; font-family: var(--font-mono); color: #fca5a5; max-width: 550px; margin: 0 auto; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25); padding: 8px 12px; border-radius: 6px;">
+                  ${window.hvnEscapeHtml ? window.hvnEscapeHtml(String(errMsg)) : errMsg}
+                </div>
+                ${errHint}
+              </div>
+            `;
+          }
+        }
+      }
+
+      window.loadSalesData = loadSalesData;
+
+      // 2. Load Expenses Data
+      async function loadExpensesData() {
+        const client = getClient();
+        if (!client) return;
+
+        try {
+          const { data, error } = await client
+            .from('server_expenses')
+            .select('*');
+
+          if (error) {
+            console.error('Error fetching server_expenses:', error);
+            throw error;
+          }
+
+          expensesData = (data || []).sort((a, b) => new Date(b.expense_date || 0) - new Date(a.expense_date || 0));
+          try { updateSummaryCards(); } catch (e) { }
+          try { renderExpensesTable(); } catch (e) { }
+          try { renderFinanceAnalytics(); } catch (e) { }
+          try { updateScrollDummyWidths(); } catch (e) { }
+        } catch (err) {
+          console.error('Error fetching server_expenses:', err);
+          const errMsg = err ? (err.message || JSON.stringify(err)) : 'Unknown error';
+          const expList = document.getElementById('expensesMobileList');
+          if (expList) {
+            expList.innerHTML = `
+              <div style="text-align: center; color: var(--danger); padding: 24px; grid-column: 1 / -1;">
+                Failed to load expenses: ${window.hvnEscapeHtml ? window.hvnEscapeHtml(String(errMsg)) : errMsg}
+              </div>
+            `;
+          }
+        }
+      }
+
+      window.loadExpensesData = loadExpensesData;
+
+      // 3. Update Stat Cards & Summary (Unified to Match Dashboard 100%)
+      function updateSummaryCards() {
+        let manualPaid = 0;
+        let manualDue = 0;
+        salesData.forEach(s => {
+          manualPaid += Number(s.paid_amount) || 0;
+          manualDue += Number(s.due_amount) || 0;
+        });
+
+        let webPaid = 0;
+        webOrdersData.forEach(w => {
+          webPaid += Number(w.paid_amount) || 0;
+        });
+
+        const totalPaid = manualPaid + webPaid;
+        const totalTxCount = salesData.length + webOrdersData.length;
+
+        let totalExp = 0;
+        expensesData.forEach(e => {
+          totalExp += Number(e.amount) || 0;
+        });
+
+        const netBalance = totalPaid - totalExp;
+        const grossBilled = totalPaid + manualDue;
+        const paidRatePct = grossBilled > 0 ? Math.round((totalPaid / grossBilled) * 100) : 100;
+        const expRatioPct = totalPaid > 0 ? Math.round((totalExp / totalPaid) * 100) : 0;
+        const netMarginPct = totalPaid > 0 ? Math.round((netBalance / totalPaid) * 100) : 0;
+        const dueRatioPct = grossBilled > 0 ? Math.max(0, 100 - paidRatePct) : 0;
+
+        // Card 1: Total Revenue (Paid)
+        document.getElementById('statTotalPaid').textContent = `৳${totalPaid.toLocaleString()}`;
+        if (typeof window.hvnCountUp === 'function') {
+          window.hvnCountUp(document.getElementById('statTotalPaid'), totalPaid, n => '৳' + Math.round(n).toLocaleString());
+        }
+        document.getElementById('statRevBreakdown').textContent = `Manual: ৳${manualPaid.toLocaleString()} (${salesData.length}) • Web: ৳${webPaid.toLocaleString()} (${webOrdersData.length})`;
+        const paidRateEl = document.getElementById('statPaidRatePct');
+        if (paidRateEl) paidRateEl.textContent = `${paidRatePct}% Paid`;
+        const barPaidEl = document.getElementById('barTotalPaid');
+        if (barPaidEl) barPaidEl.style.width = `${Math.min(100, Math.max(8, paidRatePct))}%`;
+
+        // Card 2: Server Expenses
+        document.getElementById('statTotalExpenses').textContent = `৳${totalExp.toLocaleString()}`;
+        if (typeof window.hvnCountUp === 'function') {
+          window.hvnCountUp(document.getElementById('statTotalExpenses'), totalExp, n => '৳' + Math.round(n).toLocaleString());
+        }
+        document.getElementById('statExpCount').textContent = `${expensesData.length} operating bills • Hosting & infrastructure`;
+        const expRatioEl = document.getElementById('statExpRatioPct');
+        if (expRatioEl) expRatioEl.textContent = `${expRatioPct}% of Rev`;
+        const barExpEl = document.getElementById('barTotalExp');
+        if (barExpEl) barExpEl.style.width = `${Math.min(100, Math.max(6, expRatioPct))}%`;
+
+        // Card 3: Net Treasury Balance
+        const netEl = document.getElementById('statNetBalance');
+        netEl.textContent = `৳${netBalance.toLocaleString()}`;
+        if (typeof window.hvnCountUp === 'function') {
+          window.hvnCountUp(netEl, netBalance, n => '৳' + Math.round(n).toLocaleString());
+        }
+        netEl.style.color = netBalance >= 0 ? '#38bdf8' : '#f87171';
+        const netMarginEl = document.getElementById('statNetMarginPct');
+        if (netMarginEl) netMarginEl.textContent = `${netMarginPct >= 0 ? '+' : ''}${netMarginPct}% Margin`;
+        const barNetEl = document.getElementById('barNetBalance');
+        if (barNetEl) barNetEl.style.width = `${Math.min(100, Math.max(8, Math.abs(netMarginPct)))}%`;
+        const netBreakdownEl = document.getElementById('statNetBreakdown');
+        if (netBreakdownEl) netBreakdownEl.textContent = `Gross Billed: ৳${grossBilled.toLocaleString()} • Revenue − Costs`;
+
+        // Card 4: Due Receivable
+        const dueCount = salesData.filter(s => (Number(s.due_amount) || 0) > 0).length;
+        document.getElementById('statTotalDue').textContent = `৳${manualDue.toLocaleString()}`;
+        if (typeof window.hvnCountUp === 'function') {
+          window.hvnCountUp(document.getElementById('statTotalDue'), manualDue, n => '৳' + Math.round(n).toLocaleString());
+        }
+        document.getElementById('statDueCount').textContent = `${dueCount} player accounts with pending balance`;
+        const dueRatioEl = document.getElementById('statDueRatioPct');
+        if (dueRatioEl) dueRatioEl.textContent = `${dueRatioPct}% Unpaid`;
+        const barDueEl = document.getElementById('barTotalDue');
+        if (barDueEl) barDueEl.style.width = `${Math.min(100, Math.max(6, dueRatioPct))}%`;
+
+        // Tab Badges
+        document.getElementById('tabBadgeSales').textContent = totalTxCount;
+        document.getElementById('tabBadgeExpenses').textContent = expensesData.length;
+
+        // Sales Filter Counts
+        const elSalesAll = document.getElementById('cntSalesAll');
+        const elSalesManual = document.getElementById('cntSalesManual');
+        const elSalesWeb = document.getElementById('cntSalesWeb');
+        const elSalesPaid = document.getElementById('cntSalesPaid');
+        const elSalesDue = document.getElementById('cntSalesDue');
+        const paidCount = salesData.filter(s => (Number(s.due_amount) || 0) <= 0).length + webOrdersData.filter(w => w.status === 'Paid').length;
+
+        if (elSalesAll) elSalesAll.textContent = totalTxCount;
+        if (elSalesManual) elSalesManual.textContent = salesData.length;
+        if (elSalesWeb) elSalesWeb.textContent = webOrdersData.length;
+        if (elSalesPaid) elSalesPaid.textContent = paidCount;
+        if (elSalesDue) elSalesDue.textContent = dueCount;
+
+        const salesCountMap = {
+          all: totalTxCount,
+          manual: salesData.length,
+          web: webOrdersData.length,
+          paid: paidCount,
+          due: dueCount
+        };
+        const ddSalesCount = document.getElementById('salesDropdownCount');
+        if (ddSalesCount) ddSalesCount.textContent = salesCountMap[currentSalesFilter] !== undefined ? salesCountMap[currentSalesFilter] : totalTxCount;
+
+        // Expenses Filter Counts
+        const expAll = expensesData.length;
+        const expHosting = expensesData.filter(e => e.category === 'Server Hosting').length;
+        const expDomain = expensesData.filter(e => e.category === 'Domain & Web').length;
+        const expPlugins = expensesData.filter(e => e.category === 'Plugins & Dev').length;
+        const expMarketing = expensesData.filter(e => e.category === 'Marketing & Ads').length;
+        const expEvents = expensesData.filter(e => e.category === 'Events & Giveaways').length;
+        const expMaintenance = expensesData.filter(e => e.category === 'Maintenance').length;
+
+        const elExpAll = document.getElementById('cntExpAll');
+        const elExpHosting = document.getElementById('cntExpHosting');
+        const elExpDomain = document.getElementById('cntExpDomain');
+        const elExpPlugins = document.getElementById('cntExpPlugins');
+        const elExpMarketing = document.getElementById('cntExpMarketing');
+        const elExpEvents = document.getElementById('cntExpEvents');
+        const elExpMaint = document.getElementById('cntExpMaint');
+
+        if (elExpAll) elExpAll.textContent = expAll;
+        if (elExpHosting) elExpHosting.textContent = expHosting;
+        if (elExpDomain) elExpDomain.textContent = expDomain;
+        if (elExpPlugins) elExpPlugins.textContent = expPlugins;
+        if (elExpMarketing) elExpMarketing.textContent = expMarketing;
+        if (elExpEvents) elExpEvents.textContent = expEvents;
+        if (elExpMaint) elExpMaint.textContent = expMaintenance;
+
+        const expCountMap = {
+          all: expAll,
+          'Server Hosting': expHosting,
+          'Domain & Web': expDomain,
+          'Plugins & Dev': expPlugins,
+          'Marketing & Ads': expMarketing,
+          'Events & Giveaways': expEvents,
+          'Maintenance': expMaintenance
+        };
+        const ddExpCount = document.getElementById('expenseDropdownCount');
+        if (ddExpCount) ddExpCount.textContent = expCountMap[currentExpCategory] !== undefined ? expCountMap[currentExpCategory] : expAll;
+
+        // Screenshot 1 count badges
+        const salesBadge = document.getElementById('salesTotalCountBadge');
+        if (salesBadge) salesBadge.textContent = totalTxCount;
+        const expBadge = document.getElementById('expTotalCountBadge');
+        if (expBadge) expBadge.textContent = expensesData.length;
+
+        // Data arrived — swap skeleton placeholders for real values
+        document.querySelectorAll('#app-layout .hvn-skeleton').forEach(el => el.classList.remove('hvn-skeleton'));
+      }
+
+      // ===== Financial Analytics: Revenue vs Expenses bars + Category Donut =====
+      let finAnalyticsMonths = 6;
+
+      const FIN_CAT_COLORS = {
+        'Server Hosting': '#00c896',
+        'Domain & Web': '#06b6d4',
+        'Plugins & Dev': '#a855f7',
+        'Marketing & Ads': '#f59e0b',
+        'Events & Giveaways': '#ec4899',
+        'Maintenance': '#94a3b8'
+      };
+
+      window.setFinAnalyticsRange = function (months) {
+        finAnalyticsMonths = months;
+        const b6 = document.getElementById('btnFin6m');
+        const b12 = document.getElementById('btnFin12m');
+        const sub = document.getElementById('finAnalyticsSubtitle');
+        const periodTag = document.getElementById('finExpPeriodTag');
+        if (periodTag) periodTag.textContent = `${months}M Total`;
+        const active = 'background: rgba(var(--primary-rgb), 0.15); color: var(--primary); border: 1px solid var(--border-primary); cursor: pointer; padding: 6px 12px; border-radius: 6px; font-weight: 600;';
+        const idle = 'background: var(--chip-bg); color: var(--text-muted); border: 1px solid var(--border); cursor: pointer; padding: 6px 12px; border-radius: 6px; font-weight: 500;';
+        if (b6) b6.style.cssText = active;
+        if (b12) b12.style.cssText = idle;
+        if (months === 12) {
+          if (b12) b12.style.cssText = active;
+          if (b6) b6.style.cssText = idle;
+          if (sub) sub.textContent = '12-month revenue against operational costs (bKash, Nagad & web store)';
+        } else {
+          if (sub) sub.textContent = 'Monthly revenue against operational costs (bKash, Nagad & web store)';
+        }
+        renderFinanceAnalytics();
+      };
+
+      function renderFinanceAnalytics() {
+        const chartEl = document.getElementById('finRevExpChart');
+        const donutEl = document.getElementById('finExpenseDonut');
+        if (!chartEl || !donutEl) return;
+
+        const monthKeys = [];
+        const monthLabels = [];
+        const now = new Date();
+        for (let i = finAnalyticsMonths - 1; i >= 0; i--) {
+          const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+          monthKeys.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+          monthLabels.push(d.toLocaleDateString('en-US', { month: 'short' }));
+        }
+
+        const revByMonth = monthKeys.map(() => 0);
+        const expByMonth = monthKeys.map(() => 0);
+
+        (salesData || []).forEach(s => {
+          const key = window.hvnFormatLocalMonthKey ? window.hvnFormatLocalMonthKey(s.sale_date) : (s.sale_date || '').slice(0, 7);
+          const idx = monthKeys.indexOf(key);
+          if (idx !== -1) revByMonth[idx] += Number(s.paid_amount) || 0;
+        });
+        (webOrdersData || []).forEach(w => {
+          const key = window.hvnFormatLocalMonthKey ? window.hvnFormatLocalMonthKey(w.sale_date) : (w.sale_date || '').slice(0, 7);
+          const idx = monthKeys.indexOf(key);
+          if (idx !== -1) revByMonth[idx] += Number(w.paid_amount) || 0;
+        });
+        (expensesData || []).forEach(e => {
+          const key = window.hvnFormatLocalMonthKey ? window.hvnFormatLocalMonthKey(e.expense_date) : (e.expense_date || '').slice(0, 7);
+          const idx = monthKeys.indexOf(key);
+          if (idx !== -1) expByMonth[idx] += Number(e.amount) || 0;
+        });
+
+        // Period summary strip
+        const periodRev = revByMonth.reduce((a, b) => a + b, 0);
+        const periodExp = expByMonth.reduce((a, b) => a + b, 0);
+        const periodProfit = periodRev - periodExp;
+        const marginPct = periodRev > 0 ? Math.round((periodProfit / periodRev) * 100) : 0;
+        const elRev = document.getElementById('finSumRevenue');
+        const elExp = document.getElementById('finSumExpenses');
+        const elProfit = document.getElementById('finSumProfit');
+        const elMargin = document.getElementById('finSumMargin');
+        if (elRev) elRev.textContent = `৳${periodRev.toLocaleString()}`;
+        if (elExp) elExp.textContent = `৳${periodExp.toLocaleString()}`;
+        if (elProfit) {
+          elProfit.textContent = `৳${periodProfit.toLocaleString()}`;
+          elProfit.style.color = periodProfit >= 0 ? 'var(--info)' : '#f87171';
+        }
+        if (elMargin) {
+          elMargin.textContent = `${marginPct}%`;
+          elMargin.style.color = marginPct >= 0 ? 'var(--text-main)' : '#f87171';
+        }
+
+        // Grouped bars: two tracks (revenue, expenses) per month
+        const maxVal = Math.max(...revByMonth, ...expByMonth, 500);
+        chartEl.innerHTML = monthKeys.map((key, idx) => {
+          const rev = revByMonth[idx];
+          const exp = expByMonth[idx];
+          const revPct = rev > 0 ? Math.max(6, Math.min(100, Math.round((rev / maxVal) * 100))) : 0;
+          const expPct = exp > 0 ? Math.max(6, Math.min(100, Math.round((exp / maxVal) * 100))) : 0;
+          const net = rev - exp;
+          const isCurrent = idx === monthKeys.length - 1;
+          const labelStyle = isCurrent ? 'color: var(--primary); font-weight: 700;' : '';
+          return `
+            <div class="crm-bar-col fin-bar-group ${isCurrent ? 'accent' : ''}" style="position: relative;">
+              <div class="crm-bar-tooltip">৳${rev.toLocaleString()} in • ৳${exp.toLocaleString()} out • Net ৳${net.toLocaleString()}</div>
+              <div class="fin-bar-pair">
+                <div class="crm-bar-track" title="Revenue: ৳${rev.toLocaleString()}">
+                  <div class="crm-bar-fill" style="height: ${revPct > 0 ? revPct + '%' : '2px'}; background: linear-gradient(180deg, var(--primary), #008f6b); opacity: ${revPct > 0 ? '1' : '0.35'};"></div>
+                </div>
+                <div class="crm-bar-track" title="Expenses: ৳${exp.toLocaleString()}">
+                  <div class="crm-bar-fill" style="height: ${expPct > 0 ? expPct + '%' : '2px'}; background: linear-gradient(180deg, #f43f5e, #be123c); opacity: ${expPct > 0 ? '1' : '0.35'};"></div>
+                </div>
+              </div>
+              <div class="crm-bar-label" style="${labelStyle}">${monthLabels[idx]}</div>
+              <div style="font-size: 0.62rem; font-weight: 600; color: ${net >= 0 ? 'var(--text-muted)' : '#f87171'}; text-align: center; margin-top: 2px;">
+                ${net >= 0 ? '+' : ''}৳${net.toLocaleString()}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Expense category donut (SVG, stroke-dasharray segments)
+        const catTotals = {};
+        (expensesData || []).forEach(e => {
+          const key = window.hvnFormatLocalMonthKey ? window.hvnFormatLocalMonthKey(e.expense_date) : (e.expense_date || '').slice(0, 7);
+          if (monthKeys.includes(key)) {
+            const cat = e.category || 'Other';
+            catTotals[cat] = (catTotals[cat] || 0) + (Number(e.amount) || 0);
+          }
+        });
+        const sortedCats = Object.entries(catTotals).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
+        const grandExp = sortedCats.reduce((sum, [, v]) => sum + v, 0);
+
+        if (sortedCats.length === 0) {
+          donutEl.innerHTML = `
+            <div style="text-align: center; color: var(--text-muted); padding: 36px 0; font-size: 0.82rem;">
+              <i class="bi bi-pie-chart" style="font-size: 1.6rem; opacity: 0.5; display: block; margin-bottom: 8px;"></i>
+              No expenses recorded in this period
+            </div>
+          `;
+          return;
+        }
+
+        const topCat = sortedCats[0];
+        const topCatName = topCat ? topCat[0] : 'None';
+        const topCatPct = grandExp > 0 && topCat ? Math.round((topCat[1] / grandExp) * 100) : 0;
+        const avgBurnMo = finAnalyticsMonths > 0 ? Math.round(grandExp / finAnalyticsMonths) : 0;
+
+        const R = 44;
+        const CIRC = 2 * Math.PI * R;
+        let accLen = 0;
+        const segments = sortedCats.map(([cat, val]) => {
+          const len = grandExp > 0 ? (val / grandExp) * CIRC : 0;
+          const offset = -accLen;
+          accLen += len;
+          const color = FIN_CAT_COLORS[cat] || '#94a3b8';
+          return `<circle cx="60" cy="60" r="${R}" fill="none" stroke="${color}" stroke-width="16"
+            stroke-dasharray="${len.toFixed(2)} ${(CIRC - len).toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}"></circle>`;
+        }).join('');
+
+        const catListHtml = sortedCats.map(([cat, val]) => {
+          const pct = grandExp > 0 ? Math.round((val / grandExp) * 100) : 0;
+          const color = FIN_CAT_COLORS[cat] || '#94a3b8';
+          return `
+            <div class="fin-cat-item">
+              <div class="fin-cat-item-header">
+                <div style="display: flex; align-items: center; gap: 6px; min-width: 0;">
+                  <span style="width: 8px; height: 8px; border-radius: 2px; background: ${color}; flex-shrink: 0;"></span>
+                  <span style="color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${window.hvnEscapeHtml ? window.hvnEscapeHtml(cat) : cat}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+                  <span style="font-family: var(--font-mono); color: var(--text-main); font-weight: 600;">৳${val.toLocaleString()}</span>
+                  <span style="color: var(--text-muted); min-width: 32px; text-align: right; font-size: 0.72rem;">${pct}%</span>
+                </div>
+              </div>
+              <div class="fin-cat-progress-track">
+                <div class="fin-cat-progress-bar" style="width: ${pct}%; background: ${color};"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        donutEl.innerHTML = `
+          <div class="fin-donut-row">
+            <div class="fin-donut-chart-wrap">
+              <svg viewBox="0 0 120 120" style="width: 120px; height: 120px; transform: rotate(-90deg);">
+                <circle cx="60" cy="60" r="${R}" fill="none" stroke="rgba(255, 255, 255, 0.06)" stroke-width="16"></circle>
+                ${segments}
+              </svg>
+              <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none;">
+                <div style="font-family: var(--font-heading); font-size: 0.92rem; font-weight: 700; color: var(--text-main); line-height: 1.1;">৳${grandExp.toLocaleString()}</div>
+                <div style="font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px;">Total Spent</div>
+              </div>
+            </div>
+            <div class="fin-cat-list">${catListHtml}</div>
+          </div>
+          <div class="fin-insight-strip">
+            <div class="fin-insight-pill">
+              <span class="fin-insight-pill-label">Top Expense</span>
+              <span class="fin-insight-pill-value" title="${window.hvnEscapeHtml ? window.hvnEscapeHtml(topCatName) : topCatName}">${window.hvnEscapeHtml ? window.hvnEscapeHtml(topCatName) : topCatName} <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">(${topCatPct}%)</span></span>
+            </div>
+            <div class="fin-insight-pill">
+              <span class="fin-insight-pill-label">Avg Burn / Mo</span>
+              <span class="fin-insight-pill-value" style="font-family: var(--font-mono); color: #f87171;">৳${avgBurnMo.toLocaleString()}<span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">/mo</span></span>
+            </div>
+          </div>
+        `;
+      }
+
+      // Helper: Format initials (e.g. "Ada Lindqvist" -> "AL")
+      function getPlayerInitials(name) {
+        if (!name) return 'PL';
+        const parts = name.trim().split(/\s+/);
+        if (parts.length >= 2) {
+          return (parts[0][0] + parts[1][0]).toUpperCase();
+        }
+        return name.slice(0, 2).toUpperCase();
+      }
+
+      // Helper: Format concise date (e.g. "Mar 04", "Oct 19")
+      function formatLumenDate(dStr) {
+        if (!dStr) return '-';
+        try {
+          const d = new Date(dStr);
+          if (isNaN(d.getTime())) return dStr;
+          const m = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()];
+          const day = String(d.getDate()).padStart(2, '0');
+          return `${m} ${day}`;
+        } catch (e) {
+          return dStr;
+        }
+      }
+
+      // Helper: Extract & Format Discount Amount cleanly (No DB schema migration required)
+      function getSaleDiscountAmount(s) {
+        if (!s || s.is_web_order) return 0;
+        const notes = String(s.notes || '');
+        const tagMatch = notes.match(/\[Discount:\s*৳?([0-9.]+)\]/i);
+        if (tagMatch) {
+          return parseFloat(tagMatch[1]) || 0;
+        }
+        const gross = (Number(s.quantity) || 1) * (Number(s.unit_price) || 0);
+        const paid = Number(s.paid_amount) || 0;
+        const due = Number(s.due_amount) || 0;
+        if (gross > 0 && gross > (paid + due)) {
+          return Math.max(0, gross - paid - due);
+        }
+        return 0;
+      }
+
+      function stripDiscountTag(notes) {
+        return String(notes || '')
+          .replace(/\[Discount:\s*৳?[0-9.]+\]\s*•?\s*/gi, '')
+          .trim();
+      }
+
+      function formatNotesWithDiscount(notes, discountAmt) {
+        const clean = stripDiscountTag(notes);
+        const dNum = Math.max(0, Number(discountAmt) || 0);
+        if (dNum > 0) {
+          return clean ? `[Discount: ৳${dNum}] • ${clean}` : `[Discount: ৳${dNum}]`;
+        }
+        return clean;
+      }
+
+      // 4. Render Sales: Desktop 1-Line Table (Screenshot 1) & Mobile Cards (Screenshot 0 & 1)
+      function renderSalesTable() {
+        const desktopTbody = document.getElementById('salesDesktopTableBody');
+        const mobileList = document.getElementById('salesMobileList');
+
+        // Combine or filter data sources
+        let combined = [];
+        if (currentSalesFilter === 'manual') {
+          combined = [...salesData];
+        } else if (currentSalesFilter === 'web') {
+          combined = [...webOrdersData];
+        } else if (currentSalesFilter === 'paid') {
+          combined = [
+            ...salesData.filter(s => (Number(s.due_amount) || 0) <= 0),
+            ...webOrdersData.filter(w => w.status === 'Paid')
+          ];
+        } else if (currentSalesFilter === 'due') {
+          combined = salesData.filter(s => (Number(s.due_amount) || 0) > 0);
+        } else {
+          // 'all'
+          combined = [...salesData, ...webOrdersData];
+        }
+
+        // Sort combined ledger chronologically by sale_date descending
+        combined.sort((a, b) => String(b.sale_date || '').localeCompare(String(a.sale_date || '')));
+
+        if (currentSalesSearch) {
+          const q = currentSalesSearch.toLowerCase();
+          combined = combined.filter(s =>
+            (s.player_name && s.player_name.toLowerCase().includes(q)) ||
+            (s.gamer_tag && s.gamer_tag.toLowerCase().includes(q)) ||
+            (s.purchased_item && s.purchased_item.toLowerCase().includes(q)) ||
+            (s.spawner_type && s.spawner_type.toLowerCase().includes(q)) ||
+            (s.notes && s.notes.toLowerCase().includes(q)) ||
+            (s.payment_method && s.payment_method.toLowerCase().includes(q))
+          );
+        }
+
+        if (!combined || combined.length === 0) {
+          const emptyMsg = '<div style="text-align: center; color: var(--text-muted); padding: 36px;">No transactions found matching filter.</div>';
+          if (desktopTbody) desktopTbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 36px;">No transactions found matching filter.</td></tr>';
+          if (mobileList) mobileList.innerHTML = emptyMsg;
+          return;
+        }
+
+        // A. Render Desktop 1-Line Table Rows (Exact match to Screenshot 1: INV-2041 | Ada Lindqvist | $1,204.00 | Paid | Mar 04 | ...)
+        if (desktopTbody) {
+          desktopTbody.innerHTML = combined.map(s => {
+            const isWeb = Boolean(s.is_web_order);
+            const dueNum = Number(s.due_amount) || 0;
+            const paidNum = Number(s.paid_amount) || 0;
+            const totalNum = Number(s.total_price) || 0;
+            const discountNum = getSaleDiscountAmount(s);
+            const displayAmount = (!isWeb && discountNum > 0 && dueNum <= 0) ? paidNum : totalNum;
+
+            let pillHtml = '';
+            if (dueNum > 0) {
+              pillHtml = '<span class="fmc-pill fmc-pill-overdue"><span class="fmc-pill-dot"></span> Due</span>';
+            } else if (isWeb && String(s.status || '').toLowerCase() === 'pending') {
+              pillHtml = '<span class="fmc-pill fmc-pill-open"><span class="fmc-pill-dot"></span> Open</span>';
+            } else {
+              pillHtml = '<span class="fmc-pill fmc-pill-paid"><span class="fmc-pill-dot"></span> Paid</span>';
+            }
+
+            const pName = window.hvnEscapeHtml(s.player_name || 'Player');
+            const gTag = window.hvnEscapeHtml(s.gamer_tag || s.player_name || 'Steve');
+            const cleanIgn = window.hvnCleanMcIgn ? window.hvnCleanMcIgn(s.gamer_tag || s.player_name) : String(s.gamer_tag || s.player_name || 'Steve').replace(/^\.+/, '');
+            const initials = getPlayerInitials(s.player_name || s.gamer_tag);
+            const invId = isWeb
+              ? String(s.order_code || s.sl_no || ('HC-' + String(s.raw_id || s.id).slice(0, 6).toUpperCase()))
+              : (s.sl_no ? ('INV-' + s.sl_no) : (s.id ? ('INV-' + String(s.id).slice(0, 6)) : 'INV-001'));
+            const itemTitle = window.hvnEscapeHtml(s.spawner_type || s.purchased_item || 'Server Item');
+            const discountBadgeHtml = discountNum > 0
+              ? ` <span style="color:#c084fc;font-weight:700;">• -৳${discountNum.toLocaleString()} Discount</span>`
+              : '';
+            const dueBadgeHtml = dueNum > 0
+              ? ` <span style="color:#fbbf24;font-weight:700;">• ৳${dueNum.toLocaleString()} Due</span>`
+              : '';
+
+            return `
+              <tr>
+                <td class="lumen-col-invoice" title="${window.hvnEscapeHtml(invId)} • ${itemTitle}">
+                  <span class="hvn-copy-pill" data-copy-val="${window.hvnEscapeHtml(invId)}" data-copy-label="Invoice ID" onclick="window.hvnHandleCopy(this)" title="Click to copy Invoice ID">
+                    ${window.hvnEscapeHtml(invId)} <i class="bi bi-copy copy-hint-icon"></i>
+                  </span>
+                </td>
+                <td>
+                  <div class="lumen-col-customer">
+                    <div class="lumen-table-avatar" title="${pName}">
+                      <img src="https://mc-heads.net/avatar/${encodeURIComponent(cleanIgn)}/30" alt="${initials}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                      <span style="display: none;">${initials}</span>
+                    </div>
+                    <div>
+                      <div class="lumen-customer-name hvn-copy-pill" data-copy-val="${pName}" data-copy-label="Player IGN" onclick="window.hvnHandleCopy(this)" title="Click to copy Player IGN">
+                        ${pName} <i class="bi bi-copy copy-hint-icon"></i>
+                      </div>
+                      <div style="font-size: 0.72rem; color: #64748b;">${itemTitle}${isWeb ? ' <span style="color:#38bdf8;font-weight:600;">• Web Order</span>' : ''}${discountBadgeHtml}${dueBadgeHtml}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="lumen-col-amount">
+                  ৳${displayAmount.toLocaleString()}
+                </td>
+                <td style="text-align: center;">
+                  ${pillHtml}
+                </td>
+                <td class="lumen-col-date" style="text-align: left;">
+                  ${formatLumenDate(s.sale_date)}
+                </td>
+                <td style="text-align: right;">
+                  <div style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">
+                    ${dueNum > 0 && hasFinancePermission() ? `
+                      <button class="due-pay-pill" onclick="openDueModal('${s.id}')" title="Collect Due Payment or Convert to Discount" style="min-height: 24px; height: 24px; padding: 2px 8px; font-size: 0.72rem;">
+                        <i class="bi bi-cash"></i> Pay / Discount
+                      </button>
+                    ` : ''}
+                    <button class="btn btn-secondary btn-sm" onclick="openReceiptModal('${s.id}')" title="View Full Receipt" style="padding: 2px 8px; font-size: 0.74rem; min-height: 26px; height: 26px;">
+                      <i class="bi bi-receipt"></i>
+                    </button>
+                    ${!isWeb && hasFinancePermission() ? `
+                      <button class="btn btn-secondary btn-sm" onclick="editSale('${s.id}')" title="Edit Record" style="padding: 2px 8px; font-size: 0.74rem; min-height: 26px; height: 26px;">
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                    ` : ''}
+                    ${hasFinancePermission() ? `
+                      <button class="btn btn-danger btn-sm" onclick="deleteSale('${s.id}')" title="Delete Record" style="padding: 2px 8px; font-size: 0.74rem; min-height: 26px; height: 26px;">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    ` : ''}
+                  </div>
+                </td>
+              </tr>
+            `;
+          }).join('');
+        }
+
+        // B. Render Mobile Cards (Untouched, exactly as user loved!)
+        if (mobileList) {
+          mobileList.innerHTML = combined.map(s => {
+            const isWeb = Boolean(s.is_web_order);
+            const dueNum = Number(s.due_amount) || 0;
+            const paidNum = Number(s.paid_amount) || 0;
+            const totalNum = Number(s.total_price) || 0;
+            const discountNum = getSaleDiscountAmount(s);
+            const displayAmount = (!isWeb && discountNum > 0 && dueNum <= 0) ? paidNum : totalNum;
+
+            let pillHtml = '';
+            let dateLabel = '';
+            if (dueNum > 0) {
+              pillHtml = '<span class="fmc-pill fmc-pill-overdue"><span class="fmc-pill-dot"></span> Due</span>';
+              dateLabel = 'Due ' + formatLumenDate(s.sale_date);
+            } else if (isWeb && String(s.status || '').toLowerCase() === 'pending') {
+              pillHtml = '<span class="fmc-pill fmc-pill-open"><span class="fmc-pill-dot"></span> Open</span>';
+              dateLabel = 'Ordered ' + formatLumenDate(s.sale_date);
+            } else {
+              pillHtml = '<span class="fmc-pill fmc-pill-paid"><span class="fmc-pill-dot"></span> Paid</span>';
+              dateLabel = 'Paid ' + formatLumenDate(s.sale_date);
+            }
+
+            const pName = window.hvnEscapeHtml(s.player_name || 'Player');
+            const gTag = window.hvnEscapeHtml(s.gamer_tag || s.player_name || 'Steve');
+            const cleanIgn = window.hvnCleanMcIgn ? window.hvnCleanMcIgn(s.gamer_tag || s.player_name) : String(s.gamer_tag || s.player_name || 'Steve').replace(/^\.+/, '');
+            const initials = getPlayerInitials(s.player_name || s.gamer_tag);
+            const invId = isWeb
+              ? String(s.order_code || s.sl_no || ('HC-' + String(s.raw_id || s.id).slice(0, 6).toUpperCase()))
+              : (s.sl_no ? ('INV-' + s.sl_no) : (s.id ? ('INV-' + String(s.id).slice(0, 6)) : 'INV-001'));
+            const itemTitle = window.hvnEscapeHtml(s.spawner_type || s.purchased_item || 'Server Item');
+            const noteText = window.hvnEscapeHtml(s.notes || (s.payment_method || 'bKash') + ' • Qty: ' + (s.quantity || 1));
+
+            return `
+              <div class="fmc-card" onclick="window.toggleFmcCard(this, event)">
+                <!-- LINE 1: Avatar + Name (left) | Tabular Amount (right) -->
+                <div class="fmc-line-1">
+                  <div class="fmc-identity">
+                    <div class="fmc-avatar" title="${pName}">
+                      <img src="https://mc-heads.net/avatar/${encodeURIComponent(cleanIgn)}/32" alt="${initials}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                      <span style="display: none;">${initials}</span>
+                    </div>
+                    <span class="fmc-name" title="${pName}">${pName}</span>
+                  </div>
+                  <div class="fmc-amount-slot">
+                    ৳${displayAmount.toLocaleString()}
+                  </div>
+                </div>
+
+                <!-- LINE 2: Status Pill + Labeled Date (left) | Chevron (right) -->
+                <div class="fmc-line-2">
+                  <div class="fmc-meta-left">
+                    ${pillHtml}
+                    ${discountNum > 0 ? `<span class="fmc-pill" style="background:rgba(168,85,247,0.14);color:#c084fc;border:1px solid rgba(168,85,247,0.3);">-৳${discountNum.toLocaleString()} Off</span>` : ''}
+                    <span class="fmc-date-label">${dateLabel}</span>
+                  </div>
+                  <div class="fmc-meta-right">
+                    <i class="bi bi-chevron-down fmc-chevron"></i>
+                  </div>
+                </div>
+
+                <!-- ACCORDION EXPAND DETAILS (Exact match to Image 1) -->
+                <div class="fmc-accordion">
+                  <div class="fmc-info-row">
+                    <div class="fmc-info-left">
+                      <span class="fmc-info-label">Invoice</span>
+                      <span class="fmc-info-value mono">${invId} • ${itemTitle}</span>
+                    </div>
+                    <a href="javascript:void(0)" class="fmc-record-link" onclick="event.stopPropagation(); openReceiptModal('${s.id}')">
+                      Full record <i class="bi bi-box-arrow-up-right"></i>
+                    </a>
+                  </div>
+
+                  <div class="fmc-info-row">
+                    <div class="fmc-info-left">
+                      <span class="fmc-info-label">Note</span>
+                      <span class="fmc-info-value" style="color: #94a3b8; font-weight: 400;">${noteText}</span>
+                    </div>
+                  </div>
+
+                  <div class="fmc-action-buttons">
+                    ${!isWeb && hasFinancePermission() ? `
+                      <button class="fmc-btn-sec" onclick="event.stopPropagation(); editSale('${s.id}')">
+                        <i class="bi bi-pencil"></i> Edit record
+                      </button>
+                    ` : ''}
+                    ${dueNum > 0 && hasFinancePermission() ? `
+                      <button class="fmc-btn-pri" onclick="event.stopPropagation(); openDueModal('${s.id}')">
+                        <i class="bi bi-cash-stack"></i> Pay / Discount (৳${dueNum.toLocaleString()})
+                      </button>
+                    ` : `
+                      <button class="fmc-btn-pri" onclick="event.stopPropagation(); openReceiptModal('${s.id}')">
+                        <i class="bi bi-receipt"></i> View receipt
+                      </button>
+                    `}
+                    ${hasFinancePermission() ? `
+                      <button class="fmc-btn-icon" onclick="event.stopPropagation(); deleteSale('${s.id}')" title="Delete record">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    ` : ''}
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+
+      function renderExpensesTable() {
+        const desktopTbody = document.getElementById('expDesktopTableBody');
+        const mobileList = document.getElementById('expensesMobileList');
+        let filtered = expensesData;
+
+        if (currentExpCategory !== 'all') {
+          filtered = filtered.filter(e => e.category === currentExpCategory);
+        }
+
+        if (currentExpSearch) {
+          const q = currentExpSearch.toLowerCase();
+          filtered = filtered.filter(e =>
+            (e.title && e.title.toLowerCase().includes(q)) ||
+            (e.paid_to && e.paid_to.toLowerCase().includes(q)) ||
+            (e.invoice_ref && e.invoice_ref.toLowerCase().includes(q)) ||
+            (e.notes && e.notes.toLowerCase().includes(q))
+          );
+        }
+
+        if (!filtered || filtered.length === 0) {
+          const emptyMsg = '<div style="text-align: center; color: var(--text-muted); padding: 36px;">No server expenses recorded yet. Click "+ Add New Expense" to create one.</div>';
+          if (desktopTbody) desktopTbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 36px;">No server expenses recorded yet. Click "+ Add New Expense" to create one.</td></tr>';
+          if (mobileList) mobileList.innerHTML = emptyMsg;
+          return;
+        }
+
+        // A. Render Desktop 1-Line Table Rows (Exact match to Screenshot 1)
+        if (desktopTbody) {
+          desktopTbody.innerHTML = filtered.map(e => {
+            const catInitials = {
+              'Server Hosting': 'HS',
+              'Domain & Web': 'DM',
+              'Plugins & Dev': 'PL',
+              'Marketing & Ads': 'MK',
+              'Maintenance': 'MN'
+            }[e.category] || 'EX';
+
+            const catDotColor = {
+              'Server Hosting': '#06b6d4',
+              'Domain & Web': '#a855f7',
+              'Plugins & Dev': '#10b981',
+              'Marketing & Ads': '#f472b6',
+              'Maintenance': '#94a3b8'
+            }[e.category] || '#64748b';
+
+            const expTitle = window.hvnEscapeHtml(e.title || 'Expense');
+            const paidTo = window.hvnEscapeHtml(e.paid_to || 'Vendor');
+            const amountNum = Number(e.amount) || 0;
+            const refText = e.invoice_ref ? window.hvnEscapeHtml(e.invoice_ref) : ('EXP-' + String(e.id).slice(0, 4));
+
+            return `
+              <tr>
+                <td class="lumen-col-invoice">
+                  ${refText}
+                </td>
+                <td>
+                  <div class="lumen-col-customer">
+                    <div class="lumen-table-avatar" title="${window.hvnEscapeHtml(e.category || 'Expense')}">
+                      <span>${catInitials}</span>
+                    </div>
+                    <div>
+                      <div class="lumen-customer-name">${expTitle}</div>
+                      <div style="font-size: 0.72rem; color: #64748b;">${paidTo}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="lumen-col-amount expense">
+                  ৳${amountNum.toLocaleString()}
+                </td>
+                <td style="text-align: center;">
+                  <span class="fmc-pill fmc-pill-category">
+                    <span class="fmc-pill-dot" style="background: ${catDotColor};"></span> ${window.hvnEscapeHtml(e.category || 'Expense')}
+                  </span>
+                </td>
+                <td class="lumen-col-date" style="text-align: left;">
+                  ${formatLumenDate(e.expense_date)}
+                </td>
+                <td style="text-align: right;">
+                  <div style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">
+                    ${hasFinancePermission() ? `
+                      <button class="btn btn-secondary btn-sm" onclick="editExpense('${e.id}')" title="Edit Expense" style="padding: 2px 8px; font-size: 0.74rem; min-height: 26px; height: 26px;">
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                      <button class="btn btn-danger btn-sm" onclick="deleteExpense('${e.id}')" title="Delete Expense" style="padding: 2px 8px; font-size: 0.74rem; min-height: 26px; height: 26px;">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    ` : `<span style="color: var(--text-muted);">—</span>`}
+                  </div>
+                </td>
+              </tr>
+            `;
+          }).join('');
+        }
+
+        // B. Render Mobile Cards (Untouched, exactly as user loved!)
+        if (mobileList) {
+          mobileList.innerHTML = filtered.map(e => {
+            const catInitials = {
+              'Server Hosting': 'HS',
+              'Domain & Web': 'DM',
+              'Plugins & Dev': 'PL',
+              'Marketing & Ads': 'MK',
+              'Maintenance': 'MN'
+            }[e.category] || 'EX';
+
+            const catDotColor = {
+              'Server Hosting': '#06b6d4',
+              'Domain & Web': '#a855f7',
+              'Plugins & Dev': '#10b981',
+              'Marketing & Ads': '#f472b6',
+              'Maintenance': '#94a3b8'
+            }[e.category] || '#64748b';
+
+            const expTitle = window.hvnEscapeHtml(e.title || 'Expense');
+            const paidTo = window.hvnEscapeHtml(e.paid_to || 'Vendor');
+            const amountNum = Number(e.amount) || 0;
+            const dateLabel = 'Paid ' + formatLumenDate(e.expense_date);
+            const noteText = window.hvnEscapeHtml(e.notes || ((e.payment_method || 'bKash') + ' • ' + (e.invoice_ref || 'No Ref')));
+
+            return `
+              <div class="fmc-card" onclick="window.toggleFmcCard(this, event)">
+                <!-- LINE 1: Category Avatar + Title (left) | Amount (right) -->
+                <div class="fmc-line-1">
+                  <div class="fmc-identity">
+                    <div class="fmc-avatar" title="${window.hvnEscapeHtml(e.category || 'Expense')}">
+                      <span>${catInitials}</span>
+                    </div>
+                    <span class="fmc-name" title="${expTitle}">${expTitle}</span>
+                  </div>
+                  <div class="fmc-amount-slot expense">
+                    ৳${amountNum.toLocaleString()}
+                  </div>
+                </div>
+
+                <!-- LINE 2: Category Pill + Date (left) | Chevron (right) -->
+                <div class="fmc-line-2">
+                  <div class="fmc-meta-left">
+                    <span class="fmc-pill fmc-pill-category">
+                      <span class="fmc-pill-dot" style="background: ${catDotColor};"></span> ${window.hvnEscapeHtml(e.category || 'Expense')}
+                    </span>
+                    <span class="fmc-date-label">${dateLabel}</span>
+                  </div>
+                  <div class="fmc-meta-right">
+                    <i class="bi bi-chevron-down fmc-chevron"></i>
+                  </div>
+                </div>
+
+                <!-- ACCORDION EXPAND DETAILS (Exact match to Image 1) -->
+                <div class="fmc-accordion">
+                  <div class="fmc-info-row">
+                    <div class="fmc-info-left">
+                      <span class="fmc-info-label">Vendor</span>
+                      <span class="fmc-info-value">${paidTo}</span>
+                    </div>
+                    ${e.invoice_ref ? `
+                      <span class="fmc-info-value mono" style="font-size: 0.76rem; color: #94a3b8;">Ref: ${window.hvnEscapeHtml(e.invoice_ref)}</span>
+                    ` : ''}
+                  </div>
+
+                  <div class="fmc-info-row">
+                    <div class="fmc-info-left">
+                      <span class="fmc-info-label">Note</span>
+                      <span class="fmc-info-value" style="color: #94a3b8; font-weight: 400;">${noteText}</span>
+                    </div>
+                  </div>
+
+                  ${hasFinancePermission() ? `
+                  <div class="fmc-action-buttons">
+                    <button class="fmc-btn-sec" onclick="event.stopPropagation(); editExpense('${e.id}')">
+                      <i class="bi bi-pencil"></i> Edit expense
+                    </button>
+                    <button class="fmc-btn-sec" style="color: #f87171 !important; border-color: rgba(239, 68, 68, 0.25) !important;" onclick="event.stopPropagation(); deleteExpense('${e.id}')">
+                      <i class="bi bi-trash"></i> Delete
+                    </button>
+                  </div>
+                  ` : ''}
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+
+      // Helper: Accordion Toggle for Mobile Cards (Single-expand exclusive accordion)
+      window.toggleFmcCard = function (cardEl, evt) {
+        if (evt && evt.target && evt.target.closest('button, a, input, select, textarea, .fmc-actions-row, .due-pay-pill')) {
+          return;
+        }
+        if (!cardEl) return;
+        const willExpand = !cardEl.classList.contains('is-expanded');
+        // Collapse all other expanded cards in the list
+        const parent = cardEl.parentElement;
+        if (parent) {
+          parent.querySelectorAll('.fmc-card.is-expanded').forEach(c => {
+            if (c !== cardEl) c.classList.remove('is-expanded');
+          });
+        }
+        if (willExpand) {
+          cardEl.classList.add('is-expanded');
+        } else {
+          cardEl.classList.remove('is-expanded');
+        }
+      };
+
+      // View Mode Stubs (Modern Cards is now the sole permanent ledger)
+      window.setSalesViewMode = function () { };
+      window.setExpensesViewMode = function () { };
+
+      function updateScrollDummyWidths() { /* no-op */ }
+      function initScrollSync() { /* no-op */ }
+
+      const SALES_FILTER_META = {
+        all: { label: 'All Records', dot: 'var(--primary)' },
+        manual: { label: 'Spawner & Shop', dot: '#38bdf8' },
+        web: { label: 'Web Orders', dot: '#c084fc' },
+        paid: { label: 'Paid', dot: 'var(--success)' },
+        due: { label: 'Has Due', dot: 'var(--warning)' }
+      };
+
+      window.toggleSalesDropdown = function (e) {
+        if (e) e.stopPropagation();
+        const dd = document.getElementById('salesStatusDropdown');
+        if (dd) dd.classList.toggle('open');
+      };
+
+      const EXPENSE_CAT_META = {
+        all: { label: 'All Expenses', dot: 'var(--primary)' },
+        'Server Hosting': { label: 'Hosting', dot: '#38bdf8' },
+        'Domain & Web': { label: 'Domain', dot: '#c084fc' },
+        'Plugins & Dev': { label: 'Plugins/Dev', dot: '#facc15' },
+        'Marketing & Ads': { label: 'Marketing', dot: '#f472b6' },
+        'Events & Giveaways': { label: 'Events', dot: '#34d399' },
+        'Maintenance': { label: 'Maintenance', dot: '#94a3b8' }
+      };
+
+      window.toggleExpenseDropdown = function (e) {
+        if (e) e.stopPropagation();
+        const dd = document.getElementById('expenseCategoryDropdown');
+        if (dd) dd.classList.toggle('open');
+      };
+
+      document.addEventListener('click', function (e) {
+        const ddSales = document.getElementById('salesStatusDropdown');
+        if (ddSales && ddSales.classList.contains('open') && !ddSales.contains(e.target)) {
+          ddSales.classList.remove('open');
+        }
+        const ddExp = document.getElementById('expenseCategoryDropdown');
+        if (ddExp && ddExp.classList.contains('open') && !ddExp.contains(e.target)) {
+          ddExp.classList.remove('open');
+        }
+      });
+
+      // Filter Handlers
+      window.filterSalesStatus = function (st) {
+        currentSalesFilter = st || 'all';
+
+        const meta = SALES_FILTER_META[currentSalesFilter] || SALES_FILTER_META.all;
+        const dotEl = document.getElementById('salesDropdownDot');
+        const labelEl = document.getElementById('salesDropdownLabel');
+        const dd = document.getElementById('salesStatusDropdown');
+
+        if (dotEl) dotEl.style.background = meta.dot;
+        if (labelEl) labelEl.textContent = meta.label;
+        if (dd) dd.classList.remove('open');
+
+        const menu = document.getElementById('salesDropdownMenu');
+        if (menu) {
+          menu.querySelectorAll('.hvn-custom-option').forEach(opt => {
+            opt.classList.toggle('active', opt.getAttribute('data-filter') === currentSalesFilter);
+          });
+        }
+
+        // Sync dropdown count badge
+        const countMap = {
+          all: document.getElementById('cntSalesAll')?.textContent || 0,
+          manual: document.getElementById('cntSalesManual')?.textContent || 0,
+          web: document.getElementById('cntSalesWeb')?.textContent || 0,
+          paid: document.getElementById('cntSalesPaid')?.textContent || 0,
+          due: document.getElementById('cntSalesDue')?.textContent || 0
+        };
+        const ddSalesCount = document.getElementById('salesDropdownCount');
+        if (ddSalesCount) ddSalesCount.textContent = countMap[currentSalesFilter] !== undefined ? countMap[currentSalesFilter] : 0;
+
+        renderSalesTable();
+      };
+
+      window.handleSalesSearch = function () {
+        const input = document.getElementById('salesSearchInput');
+        const clearBtn = document.getElementById('salesSearchClearBtn');
+        currentSalesSearch = (input ? input.value : '').trim();
+        if (clearBtn) clearBtn.style.display = currentSalesSearch ? 'block' : 'none';
+        renderSalesTable();
+      };
+
+      window.clearSalesSearch = function () {
+        const input = document.getElementById('salesSearchInput');
+        const clearBtn = document.getElementById('salesSearchClearBtn');
+        if (input) input.value = '';
+        if (clearBtn) clearBtn.style.display = 'none';
+        currentSalesSearch = '';
+        renderSalesTable();
+      };
+
+      window.filterExpenseCategory = function (cat) {
+        currentExpCategory = cat || 'all';
+
+        const meta = EXPENSE_CAT_META[currentExpCategory] || EXPENSE_CAT_META.all;
+        const dotEl = document.getElementById('expenseDropdownDot');
+        const labelEl = document.getElementById('expenseDropdownLabel');
+        const dd = document.getElementById('expenseCategoryDropdown');
+
+        if (dotEl) dotEl.style.background = meta.dot;
+        if (labelEl) labelEl.textContent = meta.label;
+        if (dd) dd.classList.remove('open');
+
+        const menu = document.getElementById('expenseDropdownMenu');
+        if (menu) {
+          menu.querySelectorAll('.hvn-custom-option').forEach(opt => {
+            opt.classList.toggle('active', opt.getAttribute('data-cat') === currentExpCategory);
+          });
+        }
+
+        // Sync dropdown count badge
+        const expCountMap = {
+          all: expensesData.length,
+          'Server Hosting': expensesData.filter(e => e.category === 'Server Hosting').length,
+          'Domain & Web': expensesData.filter(e => e.category === 'Domain & Web').length,
+          'Plugins & Dev': expensesData.filter(e => e.category === 'Plugins & Dev').length,
+          'Marketing & Ads': expensesData.filter(e => e.category === 'Marketing & Ads').length,
+          'Events & Giveaways': expensesData.filter(e => e.category === 'Events & Giveaways').length,
+          'Maintenance': expensesData.filter(e => e.category === 'Maintenance').length
+        };
+        const ddExpCount = document.getElementById('expenseDropdownCount');
+        if (ddExpCount) ddExpCount.textContent = expCountMap[currentExpCategory] !== undefined ? expCountMap[currentExpCategory] : expensesData.length;
+
+        renderExpensesTable();
+      };
+
+      window.handleExpenseSearch = function () {
+        const input = document.getElementById('expenseSearchInput');
+        const clearBtn = document.getElementById('expenseSearchClearBtn');
+        currentExpSearch = (input ? input.value : '').trim();
+        if (clearBtn) clearBtn.style.display = currentExpSearch ? 'block' : 'none';
+        renderExpensesTable();
+      };
+
+      window.clearExpenseSearch = function () {
+        const input = document.getElementById('expenseSearchInput');
+        const clearBtn = document.getElementById('expenseSearchClearBtn');
+        if (input) input.value = '';
+        if (clearBtn) clearBtn.style.display = 'none';
+        currentExpSearch = '';
+        renderExpensesTable();
+      };
+
+      // Price preset & Discount vs. Due State
+      let saleRemainderMode = 'due'; // 'due' | 'discount'
+      let dueSettleMode = 'payment'; // 'payment' | 'discount'
+
+      function updateSaleRemainderToggleUI() {
+        const btnDue = document.getElementById('btnModeKeepDue');
+        const btnDisc = document.getElementById('btnModeGiveDiscount');
+        if (btnDue) {
+          if (saleRemainderMode === 'due') {
+            btnDue.style.background = 'rgba(245, 158, 11, 0.16)';
+            btnDue.style.borderColor = 'rgba(245, 158, 11, 0.45)';
+            btnDue.style.color = '#fbbf24';
+          } else {
+            btnDue.style.background = 'rgba(255, 255, 255, 0.04)';
+            btnDue.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+            btnDue.style.color = '#94a3b8';
+          }
+        }
+        if (btnDisc) {
+          if (saleRemainderMode === 'discount') {
+            btnDisc.style.background = 'rgba(168, 85, 247, 0.18)';
+            btnDisc.style.borderColor = 'rgba(168, 85, 247, 0.5)';
+            btnDisc.style.color = '#c084fc';
+          } else {
+            btnDisc.style.background = 'rgba(255, 255, 255, 0.04)';
+            btnDisc.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+            btnDisc.style.color = '#94a3b8';
+          }
+        }
+      }
+
+      window.setSaleRemainderMode = function (mode) {
+        saleRemainderMode = mode === 'discount' ? 'discount' : 'due';
+        updateSaleRemainderToggleUI();
+        const qty = Number(document.getElementById('saleQtyInput').value) || 1;
+        const unit = Number(document.getElementById('saleUnitPriceInput').value) || 0;
+        const grossTotal = qty * unit;
+        const paid = Number(document.getElementById('salePaidInput').value) || 0;
+        const discInput = document.getElementById('saleDiscountInput');
+        if (saleRemainderMode === 'discount') {
+          const shortfall = Math.max(0, grossTotal - paid);
+          if (discInput) discInput.value = shortfall;
+        } else {
+          if (discInput) discInput.value = 0;
+        }
+        calculateSaleTotals('mode');
+      };
+
+      window.handleSaleItemChange = function (val) {
+        const unitInput = document.getElementById('saleUnitPriceInput');
+        if (val === 'ELITE RANK') unitInput.value = 420;
+        else if (val === 'LEGEND RANK') unitInput.value = 340;
+        else if (val === 'PRIME RANK') unitInput.value = 220;
+        else if (val === 'SPECIAL SPAWNERS') unitInput.value = 55;
+        else if (val === 'ADVANCED SPAWNERS') unitInput.value = 45;
+        else if (val === 'COMBAT SPAWNER') unitInput.value = 35;
+        else if (val === 'BASIC SPAWNER') unitInput.value = 25;
+        calculateSaleTotals('item');
+      };
+
+      window.calculateSaleTotals = function (source) {
+        const qty = Number(document.getElementById('saleQtyInput').value) || 1;
+        const unit = Number(document.getElementById('saleUnitPriceInput').value) || 0;
+        const grossTotal = qty * unit;
+
+        const discInput = document.getElementById('saleDiscountInput');
+        const paidInput = document.getElementById('salePaidInput');
+        const dueInput = document.getElementById('saleDueInput');
+        const totalInput = document.getElementById('saleTotalPriceInput');
+        const toggleWrap = document.getElementById('saleRemainderToggleWrap');
+
+        if (source === 'item') {
+          // When switching item preset on a new sale, sync paid amount if no manual edit
+          const isEditing = Boolean(document.getElementById('saleRecordId').value);
+          if (!isEditing) {
+            if (discInput) discInput.value = 0;
+            if (paidInput) paidInput.value = grossTotal;
+            saleRemainderMode = 'due';
+            updateSaleRemainderToggleUI();
+          }
+        }
+
+        let paid = Math.max(0, Number(paidInput ? paidInput.value : 0) || 0);
+        let discount = Math.max(0, Number(discInput ? discInput.value : 0) || 0);
+
+        if (source === 'paid') {
+          // If user changed Paid Amount and mode is 'discount', auto-calculate discount = gross - paid
+          if (saleRemainderMode === 'discount') {
+            discount = Math.max(0, grossTotal - paid);
+            if (discInput) discInput.value = discount;
+          }
+        } else if (source === 'discount') {
+          // User manually typed a discount amount
+          if (discount > grossTotal) {
+            discount = grossTotal;
+            if (discInput) discInput.value = discount;
+          }
+          const netAfterDisc = Math.max(0, grossTotal - discount);
+          if (discount > 0 && paid === grossTotal) {
+            // Auto-reduce Paid Amount when typing Discount on a fully-paid default form
+            paid = netAfterDisc;
+            if (paidInput) paidInput.value = paid;
+          }
+          saleRemainderMode = (discount > 0 && Math.max(0, netAfterDisc - paid) === 0) ? 'discount' : 'due';
+          updateSaleRemainderToggleUI();
+        }
+
+        const netTotal = Math.max(0, grossTotal - discount);
+        const due = Math.max(0, netTotal - paid);
+
+        if (totalInput) totalInput.value = netTotal;
+        if (dueInput) dueInput.value = due;
+
+        // Show quick remainder toggle whenever Paid < Gross Total (so staff can 1-click choose Due vs Discount)
+        if (toggleWrap) {
+          toggleWrap.style.display = (paid < grossTotal || discount > 0) ? 'flex' : 'none';
+        }
+      };
+
+      // Modal Handlers with RBAC Permission Shielding
+      window.openSaleModal = function (record = null) {
+        if (!hasFinancePermission()) {
+          if (window.hvnToast) window.hvnToast('Access Denied: You need Orders/Finance permission to record sales.', 'danger');
+          else alert('Access Denied: You do not have permission to manage financial funds.');
+          return;
+        }
+
+        const staff = getActiveStaff();
+        const staffIgn = staff ? (staff.minecraft_ign || staff.full_name || 'Staff') : 'Staff';
+        const staffRole = staff ? staff.role : 'Authorized';
+        document.getElementById('saleOperatorIgn').textContent = `${staffIgn} (${staffRole})`;
+
+        document.getElementById('saleRecordId').value = record ? record.id : '';
+        document.getElementById('saleModalTitle').textContent = record ? 'Edit Server Sale Record' : 'Record New Server Sale';
+        document.getElementById('saleDateInput').value = record ? record.sale_date : new Date().toISOString().split('T')[0];
+        document.getElementById('saleMethodInput').value = record ? record.payment_method : 'bKash';
+        document.getElementById('salePlayerInput').value = record ? record.player_name : '';
+        document.getElementById('saleGamerTagInput').value = record ? record.gamer_tag : '';
+
+        const itemSel = document.getElementById('saleItemSelect');
+        if (record) {
+          itemSel.value = record.purchased_item;
+          if (!itemSel.value) itemSel.value = 'Custom';
+        } else {
+          itemSel.value = 'ELITE RANK';
+        }
+
+        const existingDiscount = record ? getSaleDiscountAmount(record) : 0;
+        const existingDue = record ? (Number(record.due_amount) || 0) : 0;
+        saleRemainderMode = (existingDiscount > 0 && existingDue <= 0) ? 'discount' : 'due';
+        updateSaleRemainderToggleUI();
+
+        document.getElementById('saleSpawnerTypeInput').value = record ? (record.spawner_type || '') : '';
+        document.getElementById('saleQtyInput').value = record ? record.quantity : 1;
+        document.getElementById('saleUnitPriceInput').value = record ? record.unit_price : 420;
+        const discEl = document.getElementById('saleDiscountInput');
+        if (discEl) discEl.value = existingDiscount;
+        document.getElementById('saleTotalPriceInput').value = record ? record.total_price : 420;
+        document.getElementById('salePaidInput').value = record ? record.paid_amount : 420;
+        document.getElementById('saleDueInput').value = record ? record.due_amount : 0;
+        document.getElementById('saleNotesInput').value = record ? stripDiscountTag(record.notes || '') : '';
+
+        calculateSaleTotals('init');
+        document.getElementById('saleModal').classList.add('show');
+      };
+
+      window.closeSaleModal = function () {
+        document.getElementById('saleModal').classList.remove('show');
+      };
+
+      window.editSale = function (id) {
+        const s = salesData.find(item => String(item.id) === String(id));
+        if (s) openSaleModal(s);
+      };
+
+      window.handleSaleSubmit = async function (e) {
+        e.preventDefault();
+        if (!hasFinancePermission()) {
+          if (window.hvnToast) window.hvnToast('Access Denied: Permission revoked.', 'danger');
+          return;
+        }
+
+        const client = getClient();
+        if (!client) return;
+
+        const id = document.getElementById('saleRecordId').value;
+        const qty = Number(document.getElementById('saleQtyInput').value) || 1;
+        const unit = Number(document.getElementById('saleUnitPriceInput').value) || 0;
+        const grossTotal = qty * unit;
+        const discount = Math.max(0, Number(document.getElementById('saleDiscountInput')?.value) || 0);
+        const netTotal = Math.max(0, grossTotal - discount);
+        const paid = Math.max(0, Number(document.getElementById('salePaidInput').value) || 0);
+        const due = Math.max(0, netTotal - paid);
+        const status = due <= 0 ? 'Paid' : 'Due';
+        const rawNotes = document.getElementById('saleNotesInput').value.trim();
+
+        const payload = {
+          sale_date: document.getElementById('saleDateInput').value,
+          player_name: document.getElementById('salePlayerInput').value.trim(),
+          gamer_tag: document.getElementById('saleGamerTagInput').value.trim(),
+          purchased_item: document.getElementById('saleItemSelect').value,
+          spawner_type: document.getElementById('saleSpawnerTypeInput').value.trim(),
+          quantity: qty,
+          unit_price: unit,
+          total_price: netTotal,
+          paid_amount: paid,
+          due_amount: due,
+          payment_method: document.getElementById('saleMethodInput').value,
+          status: status,
+          notes: formatNotesWithDiscount(rawNotes, discount),
+          updated_at: new Date().toISOString()
+        };
+
+        try {
+          if (id) {
+            const { error } = await client.from('server_sales').update(payload).eq('id', id);
+            if (error) throw error;
+            await logFinanceAction('UPDATE_SALE', `${payload.player_name} (Paid: ৳${paid}${discount > 0 ? ', Discount: ৳' + discount : ''})`, 'Success', payload);
+            if (window.hvnToast) window.hvnToast('Sale record updated successfully!', 'success');
+          } else {
+            // Assign next SL No
+            const maxSl = salesData.reduce((m, item) => Math.max(m, item.sl_no || 0), 0);
+            payload.sl_no = maxSl + 1;
+            const { error } = await client.from('server_sales').insert([payload]);
+            if (error) throw error;
+            await logFinanceAction('CREATE_SALE', `${payload.player_name} (Paid: ৳${paid}${discount > 0 ? ', Discount: ৳' + discount : ''})`, 'Success', payload);
+            if (window.hvnToast) window.hvnToast('New sale recorded to ledger!', 'success');
+          }
+          closeSaleModal();
+          loadSalesData();
+        } catch (err) {
+          console.error('Error saving sale:', err);
+          alert('Failed to save sale: ' + err.message);
+        }
+      };
+
+      window.deleteSale = function (id) {
+        if (!hasFinancePermission()) {
+          if (window.hvnToast) window.hvnToast('Access Denied: You do not have permission to delete sales.', 'danger');
+          return;
+        }
+
+        const isWebRecord = String(id || '').startsWith('web-');
+        const rawWebId = isWebRecord ? String(id).replace(/^web-/, '') : null;
+        const label = isWebRecord ? 'Web order record will be deleted' : 'Sale entry will be deleted';
+
+        if (typeof window.hvnUndoAction !== 'function') {
+          if (window.hvnToast) window.hvnToast('Undo helper not loaded — refresh the page.', 'warning');
+          return;
+        }
+
+        // Undo window: nothing is removed until the toast expires
+        window.hvnUndoAction(label, async function () {
+          const client = getClient();
+          if (!client) return;
+          try {
+            if (isWebRecord) {
+              const { data: delRows, error } = await client.from('store_orders').delete().eq('id', rawWebId).select('id');
+              if (error) throw error;
+              if (!delRows || delRows.length === 0) {
+                throw new Error('Database permission error: Order record could not be deleted from database.');
+              }
+              await logFinanceAction('DELETE_WEB_ORDER', `Web Order ID ${rawWebId}`, 'Success');
+              if (window.hvnToast) window.hvnToast('Web order record deleted from ledger.', 'info');
+            } else {
+              const { data: delRows, error } = await client.from('server_sales').delete().eq('id', id).select('id');
+              if (error) throw error;
+              if (!delRows || delRows.length === 0) {
+                throw new Error('Database permission error: Sale record could not be deleted from database.');
+              }
+              await logFinanceAction('DELETE_SALE', `Sale ID ${id}`, 'Success');
+              if (window.hvnToast) window.hvnToast('Sale entry deleted.', 'info');
+            }
+            loadSalesData();
+          } catch (err) {
+            if (window.hvnToast) window.hvnToast('Delete failed: ' + err.message, 'danger');
+          }
+        });
+      };
+
+      // Due Collect / Convert to Discount Modal
+      window.setDueSettleMode = function (mode) {
+        dueSettleMode = mode === 'discount' ? 'discount' : 'payment';
+        const tabPay = document.getElementById('tabDueModePayment');
+        const tabDisc = document.getElementById('tabDueModeDiscount');
+        const payWrap = document.getElementById('duePaymentFieldsWrap');
+        const discWrap = document.getElementById('dueDiscountNoticeWrap');
+        const payInput = document.getElementById('duePaymentReceivedInput');
+        const submitBtn = document.getElementById('dueSubmitBtn');
+
+        if (dueSettleMode === 'discount') {
+          if (tabDisc) {
+            tabDisc.style.background = 'rgba(168, 85, 247, 0.2)';
+            tabDisc.style.borderColor = 'rgba(168, 85, 247, 0.45)';
+            tabDisc.style.color = '#c084fc';
+          }
+          if (tabPay) {
+            tabPay.style.background = 'transparent';
+            tabPay.style.borderColor = 'transparent';
+            tabPay.style.color = '#94a3b8';
+          }
+          if (payWrap) payWrap.style.display = 'none';
+          if (discWrap) discWrap.style.display = 'block';
+          if (payInput) payInput.required = false;
+          if (submitBtn) {
+            submitBtn.innerHTML = '<i class="bi bi-percent"></i> Confirm Discount (Clear Due)';
+          }
+        } else {
+          if (tabPay) {
+            tabPay.style.background = 'rgba(16, 185, 129, 0.18)';
+            tabPay.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+            tabPay.style.color = '#34d399';
+          }
+          if (tabDisc) {
+            tabDisc.style.background = 'transparent';
+            tabDisc.style.borderColor = 'transparent';
+            tabDisc.style.color = '#94a3b8';
+          }
+          if (payWrap) payWrap.style.display = 'block';
+          if (discWrap) discWrap.style.display = 'none';
+          if (payInput) payInput.required = true;
+          if (submitBtn) {
+            submitBtn.innerHTML = '<i class="bi bi-check2-circle"></i> Confirm &amp; Update Ledger';
+          }
+        }
+      };
+
+      window.openDueModal = function (id) {
+        if (!hasFinancePermission()) {
+          if (window.hvnToast) window.hvnToast('Access Denied: You do not have permission to collect dues.', 'danger');
+          return;
+        }
+
+        const s = salesData.find(item => String(item.id) === String(id));
+        if (!s) return;
+
+        const dueAmt = Number(s.due_amount) || 0;
+        document.getElementById('dueSaleId').value = s.id;
+        document.getElementById('dueModalPlayer').textContent = `${s.player_name} (${s.gamer_tag || '-'})`;
+        document.getElementById('dueModalItem').textContent = `${s.purchased_item} ${s.spawner_type ? '• ' + s.spawner_type : ''}`;
+        document.getElementById('dueModalAmount').textContent = `৳${dueAmt.toLocaleString()}`;
+        document.getElementById('duePaymentReceivedInput').value = dueAmt;
+        document.getElementById('duePaymentReceivedInput').max = dueAmt;
+        const discGivenInput = document.getElementById('dueDiscountGivenInput');
+        if (discGivenInput) {
+          discGivenInput.value = 0;
+          discGivenInput.max = dueAmt;
+        }
+        window.setDueSettleMode('payment');
+        document.getElementById('dueModal').classList.add('show');
+      };
+
+      window.closeDueModal = function () {
+        document.getElementById('dueModal').classList.remove('show');
+      };
+
+      window.handleDuePaymentSubmit = async function (e) {
+        e.preventDefault();
+        if (!hasFinancePermission()) {
+          if (window.hvnToast) window.hvnToast('Access Denied: Permission revoked.', 'danger');
+          return;
+        }
+
+        const client = getClient();
+        if (!client) return;
+
+        const id = document.getElementById('dueSaleId').value;
+        const s = salesData.find(item => String(item.id) === String(id));
+        if (!s) return;
+
+        const currentPaid = Number(s.paid_amount) || 0;
+        const currentDue = Number(s.due_amount) || 0;
+        const existingDiscount = getSaleDiscountAmount(s);
+
+        // Mode 1: Convert entire Due balance into a Discount (No extra cash received, Due becomes 0, Status becomes Paid)
+        if (dueSettleMode === 'discount') {
+          const totalDiscount = existingDiscount + currentDue;
+          const updatedNotes = formatNotesWithDiscount(s.notes || '', totalDiscount);
+          try {
+            const { error } = await client.from('server_sales').update({
+              total_price: currentPaid,
+              paid_amount: currentPaid,
+              due_amount: 0,
+              status: 'Paid',
+              notes: updatedNotes,
+              updated_at: new Date().toISOString()
+            }).eq('id', id);
+
+            if (error) throw error;
+            await logFinanceAction('CONVERT_DUE_TO_DISCOUNT', `${s.player_name} (Discount: ৳${currentDue})`, 'Success', { discount_applied: currentDue, paid_kept: currentPaid });
+            closeDueModal();
+            if (window.hvnToast) window.hvnToast(`Converted ৳${currentDue.toLocaleString()} due into Discount for ${s.player_name}!`, 'success');
+            loadSalesData();
+          } catch (err) {
+            alert('Failed to apply discount: ' + err.message);
+          }
+          return;
+        }
+
+        // Mode 2: Collect Due Payment (with optional partial discount)
+        const paying = Math.max(0, Number(document.getElementById('duePaymentReceivedInput').value) || 0);
+        const discountGiven = Math.max(0, Number(document.getElementById('dueDiscountGivenInput')?.value) || 0);
+        const method = document.getElementById('duePaymentMethodSelect').value;
+
+        const newPaid = currentPaid + paying;
+        const newDue = Math.max(0, currentDue - paying - discountGiven);
+        const newStatus = newDue <= 0 ? 'Paid' : 'Due';
+        const totalDiscount = existingDiscount + discountGiven;
+        const grossTotal = (Number(s.quantity) || 1) * (Number(s.unit_price) || 0);
+        const newTotal = grossTotal > 0 ? Math.max(newPaid + newDue, grossTotal - totalDiscount) : (newPaid + newDue);
+        const updatedNotes = formatNotesWithDiscount(s.notes || '', totalDiscount);
+
+        try {
+          const { error } = await client.from('server_sales').update({
+            total_price: newTotal,
+            paid_amount: newPaid,
+            due_amount: newDue,
+            status: newStatus,
+            payment_method: method,
+            notes: updatedNotes,
+            updated_at: new Date().toISOString()
+          }).eq('id', id);
+
+          if (error) throw error;
+          await logFinanceAction('COLLECT_DUE', `${s.player_name} (Paid: ৳${paying}${discountGiven > 0 ? ', Discount: ৳' + discountGiven : ''})`, 'Success', { collected: paying, discount_given: discountGiven, remaining_due: newDue, method });
+          closeDueModal();
+          if (window.hvnToast) window.hvnToast(`Updated ledger for ${s.player_name} (Paid: ৳${paying.toLocaleString()}${discountGiven > 0 ? ', Discount: ৳' + discountGiven.toLocaleString() : ''})!`, 'success');
+          loadSalesData();
+        } catch (err) {
+          alert('Failed to update due: ' + err.message);
+        }
+      };
+
+      // Full Receipt Inspector Modal
+      window.openReceiptModal = function (id) {
+        const item = [...salesData, ...webOrdersData].find(x => String(x.id) === String(id));
+        if (!item) return;
+
+        const body = document.getElementById('receiptModalBody');
+        const isWeb = Boolean(item.is_web_order);
+        const statusColor = (Number(item.due_amount) || 0) > 0 ? 'var(--warning)' : 'var(--success)';
+        const discountAmt = getSaleDiscountAmount(item);
+        const grossAmt = (Number(item.quantity) || 1) * (Number(item.unit_price) || 0);
+
+        body.innerHTML = `
+          <div style="background: rgba(0, 200, 150, 0.05); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <span class="badge" style="background: var(--chip-bg); margin-bottom: 6px;">SL: ${window.hvnEscapeHtml(item.sl_no || item.id)}</span>
+                <div style="font-weight: 700; font-size: 1.2rem; color: var(--text-main);">${window.hvnEscapeHtml(item.purchased_item)}</div>
+                ${item.spawner_type ? `<div style="font-size: 0.82rem; color: var(--primary);">${window.hvnEscapeHtml(item.spawner_type)}</div>` : ''}
+              </div>
+              <span class="badge" style="background: var(--chip-bg); border: 1px solid ${statusColor}; color: ${statusColor}; font-weight: 700;">
+                ${window.hvnEscapeHtml(item.status || 'Paid')}
+              </span>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <div class="receipt-row">
+              <span class="receipt-label">Player Name:</span>
+              <span class="receipt-val">${window.hvnEscapeHtml(item.player_name)}</span>
+            </div>
+            <div class="receipt-row">
+              <span class="receipt-label">GamerTag / IGN:</span>
+              <span class="receipt-val" style="font-family: var(--font-mono); color: var(--primary);">${window.hvnEscapeHtml(item.gamer_tag)}</span>
+            </div>
+            <div class="receipt-row">
+              <span class="receipt-label">Source:</span>
+              <span class="receipt-val">${isWeb ? '<span class="source-badge-web">Webstore Online</span>' : '<span class="source-badge-manual">Official Sales Ledger</span>'}</span>
+            </div>
+            <div class="receipt-row">
+              <span class="receipt-label">Transaction Date:</span>
+              <span class="receipt-val">${window.hvnEscapeHtml(item.sale_date || '-')}</span>
+            </div>
+            <div class="receipt-row">
+              <span class="receipt-label">Quantity:</span>
+              <span class="receipt-val">${window.hvnEscapeHtml(item.quantity || 1)}</span>
+            </div>
+            <div class="receipt-row">
+              <span class="receipt-label">Unit Price (List):</span>
+              <span class="receipt-val font-mono">৳${Number(item.unit_price || 0).toLocaleString()}</span>
+            </div>
+            ${discountAmt > 0 ? `
+            <div class="receipt-row">
+              <span class="receipt-label">Discount Applied:</span>
+              <span class="receipt-val font-mono" style="color: #c084fc; font-weight: 700;">-৳${discountAmt.toLocaleString()} <span style="font-size:0.72rem;color:#94a3b8;font-weight:500;">(List: ৳${grossAmt.toLocaleString()})</span></span>
+            </div>
+            ` : ''}
+            <div class="receipt-row">
+              <span class="receipt-label">Net Billed Amount:</span>
+              <span class="receipt-val font-mono" style="font-size: 1rem;">৳${Number(item.total_price || 0).toLocaleString()}</span>
+            </div>
+            <div class="receipt-row">
+              <span class="receipt-label">Paid Amount:</span>
+              <span class="receipt-val font-mono" style="color: var(--success); font-size: 1rem;">৳${Number(item.paid_amount || 0).toLocaleString()}</span>
+            </div>
+            <div class="receipt-row">
+              <span class="receipt-label">Due Amount:</span>
+              <span class="receipt-val font-mono" style="color: ${Number(item.due_amount) > 0 ? 'var(--warning)' : 'var(--text-muted)'}; font-size: 1rem;">৳${Number(item.due_amount || 0).toLocaleString()}</span>
+            </div>
+            <div class="receipt-row">
+              <span class="receipt-label">Payment Gateway:</span>
+              <span class="receipt-val"><span class="badge" style="background: rgba(255,255,255,0.06);">${window.hvnEscapeHtml(item.payment_method || 'bKash')}</span></span>
+            </div>
+            <div class="receipt-row">
+              <span class="receipt-label">Notes &amp; Details:</span>
+              <span class="receipt-val" style="font-size: 0.8rem; max-width: 280px; text-align: right;">${window.hvnEscapeHtml(item.notes || '-')}</span>
+            </div>
+          </div>
+        `;
+
+        document.getElementById('receiptModal').classList.add('show');
+      };
+
+      window.closeReceiptModal = function () {
+        document.getElementById('receiptModal').classList.remove('show');
+      };
+
+      // Expense Modal Functions
+      window.openExpenseModal = function (record = null) {
+        if (!hasFinancePermission()) {
+          if (window.hvnToast) window.hvnToast('Access Denied: You need Orders/Finance permission to record expenses.', 'danger');
+          else alert('Access Denied: You do not have permission to manage expenses.');
+          return;
+        }
+
+        const staff = getActiveStaff();
+        const staffIgn = staff ? (staff.minecraft_ign || staff.full_name || 'Staff') : 'Staff';
+        const staffRole = staff ? staff.role : 'Authorized';
+        document.getElementById('expOperatorIgn').textContent = `${staffIgn} (${staffRole})`;
+
+        document.getElementById('expenseRecordId').value = record ? record.id : '';
+        document.getElementById('expenseModalTitle').textContent = record ? 'Edit Expense' : 'Add Server Expense';
+        document.getElementById('expDateInput').value = record ? record.expense_date : new Date().toISOString().split('T')[0];
+        document.getElementById('expCategorySelect').value = record ? record.category : 'Server Hosting';
+        document.getElementById('expTitleInput').value = record ? record.title : '';
+        document.getElementById('expAmountInput').value = record ? record.amount : '';
+        document.getElementById('expPaidToInput').value = record ? (record.paid_to || '') : '';
+        document.getElementById('expMethodInput').value = record ? record.payment_method : 'bKash';
+        document.getElementById('expInvoiceRefInput').value = record ? (record.invoice_ref || '') : '';
+        document.getElementById('expNotesInput').value = record ? (record.notes || '') : '';
+        document.getElementById('expenseModal').classList.add('show');
+      };
+
+      window.closeExpenseModal = function () {
+        document.getElementById('expenseModal').classList.remove('show');
+      };
+
+      window.editExpense = function (id) {
+        const exp = expensesData.find(e => String(e.id) === String(id));
+        if (exp) openExpenseModal(exp);
+      };
+
+      window.handleExpenseSubmit = async function (e) {
+        e.preventDefault();
+        if (!hasFinancePermission()) {
+          if (window.hvnToast) window.hvnToast('Access Denied: Permission revoked.', 'danger');
+          return;
+        }
+
+        const client = getClient();
+        if (!client) return;
+
+        const id = document.getElementById('expenseRecordId').value;
+        const payload = {
+          expense_date: document.getElementById('expDateInput').value,
+          category: document.getElementById('expCategorySelect').value,
+          title: document.getElementById('expTitleInput').value.trim(),
+          amount: Number(document.getElementById('expAmountInput').value) || 0,
+          paid_to: document.getElementById('expPaidToInput').value.trim(),
+          payment_method: document.getElementById('expMethodInput').value,
+          invoice_ref: document.getElementById('expInvoiceRefInput').value.trim(),
+          notes: document.getElementById('expNotesInput').value.trim(),
+          updated_at: new Date().toISOString()
+        };
+
+        try {
+          if (id) {
+            const { error } = await client.from('server_expenses').update(payload).eq('id', id);
+            if (error) throw error;
+            await logFinanceAction('UPDATE_EXPENSE', `${payload.title} (৳${payload.amount})`, 'Success', payload);
+            if (window.hvnToast) window.hvnToast('Expense record updated!', 'success');
+          } else {
+            const { error } = await client.from('server_expenses').insert([payload]);
+            if (error) throw error;
+            await logFinanceAction('CREATE_EXPENSE', `${payload.title} (৳${payload.amount})`, 'Success', payload);
+            if (window.hvnToast) window.hvnToast('New expense recorded!', 'success');
+          }
+          closeExpenseModal();
+          loadExpensesData();
+        } catch (err) {
+          alert('Failed to save expense: ' + err.message);
+        }
+      };
+
+      window.deleteExpense = function (id) {
+        if (!hasFinancePermission()) {
+          if (window.hvnToast) window.hvnToast('Access Denied: You do not have permission to delete expenses.', 'danger');
+          return;
+        }
+
+        if (typeof window.hvnUndoAction !== 'function') {
+          if (window.hvnToast) window.hvnToast('Undo helper not loaded — refresh the page.', 'warning');
+          return;
+        }
+
+        window.hvnUndoAction('Expense record will be deleted', async function () {
+          const client = getClient();
+          if (!client) return;
+          try {
+            const { error } = await client.from('server_expenses').delete().eq('id', id);
+            if (error) throw error;
+            await logFinanceAction('DELETE_EXPENSE', `Expense ID ${id}`, 'Success');
+            if (window.hvnToast) window.hvnToast('Expense removed.', 'info');
+            loadExpensesData();
+          } catch (err) {
+            if (window.hvnToast) window.hvnToast('Delete failed: ' + err.message, 'danger');
+          }
+        });
+      };
+
+      // Export Sales to CSV (with UTF-8 BOM & Formula Injection Shield)
+      function sanitizeCsvCell(val) {
+        const str = String(val == null ? '' : val).replace(/"/g, '""');
+        const safe = /^[=+\-@]/.test(str) ? `'${str}` : str;
+        return `"${safe}"`;
+      }
+
+      window.exportSalesCSV = function () {
+        const combined = [...salesData, ...webOrdersData];
+        combined.sort((a, b) => String(b.sale_date || '').localeCompare(String(a.sale_date || '')));
+        if (!combined || combined.length === 0) {
+          if (window.hvnToast) window.hvnToast('No sales data to export.', 'warning');
+          else alert('No sales data to export.');
+          return;
+        }
+
+        const headers = ['SL No', 'Date', 'Source', 'Player Name', 'GamerTag', 'Purchased Item', 'Spawner Type', 'Quantity', 'Unit Price', 'Total Price', 'Paid Amount', 'Due Amount', 'Payment Method', 'Status', 'Notes'];
+        const csvRows = [headers.join(',')];
+
+        combined.forEach(s => {
+          const row = [
+            sanitizeCsvCell(s.sl_no || s.id),
+            sanitizeCsvCell(s.sale_date || ''),
+            sanitizeCsvCell(s.is_web_order ? 'Webstore' : 'Sheet Sales'),
+            sanitizeCsvCell(s.player_name || ''),
+            sanitizeCsvCell(s.gamer_tag || ''),
+            sanitizeCsvCell(s.purchased_item || ''),
+            sanitizeCsvCell(s.spawner_type || ''),
+            Number(s.quantity) || 1,
+            Number(s.unit_price) || 0,
+            Number(s.total_price) || 0,
+            Number(s.paid_amount) || 0,
+            Number(s.due_amount) || 0,
+            sanitizeCsvCell(s.payment_method || 'bKash'),
+            sanitizeCsvCell(s.status || 'Paid'),
+            sanitizeCsvCell(s.notes || '')
+          ];
+          csvRows.push(row.join(','));
+        });
+
+        const blob = new Blob(['\uFEFF' + csvRows.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `havencraft_financial_ledger_${window.hvnFormatLocalDateKey ? window.hvnFormatLocalDateKey(new Date()) : new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+      };
+
+      document.addEventListener('DOMContentLoaded', async () => {
+        if (window.hvnAuth && typeof window.hvnAuth.waitForProfile === 'function') {
+          await window.hvnAuth.waitForProfile();
+        }
+        // Restore the last active tab (Sales / Expenses) across visits
+        let savedTab = null;
+        try { savedTab = localStorage.getItem('hvn_finance_tab'); } catch (e) { }
+        if (savedTab === 'expenses') switchFinanceTab('expenses');
+        loadSalesData();
+        loadExpensesData();
+
+        const debouncedSalesReload = (typeof window.hvnDebounce === 'function')
+          ? window.hvnDebounce(loadSalesData, 500)
+          : loadSalesData;
+        const debouncedExpensesReload = (typeof window.hvnDebounce === 'function')
+          ? window.hvnDebounce(loadExpensesData, 500)
+          : loadExpensesData;
+
+        const client = getClient();
+        if (client) {
+          client.channel('admin-finance-ledger-realtime')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'server_sales' }, () => debouncedSalesReload())
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'store_orders' }, () => debouncedSalesReload())
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'server_expenses' }, () => debouncedExpensesReload())
+            .subscribe();
+        }
+
+        // Backdrop click to close modals
+        ['saleModal', 'expenseModal', 'dueModal', 'receiptModal'].forEach(id => {
+          const m = document.getElementById(id);
+          if (m) {
+            m.addEventListener('click', (e) => {
+              if (e.target === m) {
+                m.classList.remove('show');
+              }
+            });
+          }
+        });
+
+        // ESC key to close open modals
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            closeSaleModal();
+            closeExpenseModal();
+            closeDueModal();
+            closeReceiptModal();
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+
+</html>

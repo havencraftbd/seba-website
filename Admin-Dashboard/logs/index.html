@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Security Logs — HavenCraft Admin</title>
+  <link rel="icon" href="../logo/logo.svg" type="image/svg+xml">
+
+  <!-- Bootstrap Icons CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous">
+
+  <!-- HavenCraft Admin Theme -->
+  <script src="../assets/js/theme.js?v=3.9"></script>
+  <link rel="stylesheet" href="../assets/css/admin.css?v=3.8">
+
+  <!-- Anti-FOUC Auth Guard (Zero-Flash Route Shield) -->
+  <script>
+    (function () {
+      var isFile = window.location.protocol === 'file:';
+      var rawPath = (window.location.pathname || '').replace(/\\/g, '/').toLowerCase();
+      var isSub = rawPath.includes('/users') || rawPath.includes('/tickets') ||
+        rawPath.includes('/orders') || rawPath.includes('/settings') ||
+        rawPath.includes('/shop') || rawPath.includes('/gallery') ||
+        rawPath.includes('/logs') || rawPath.includes('/profile') ||
+        rawPath.includes('/server') || rawPath.includes('/finance');
+      var pfx = isSub ? '../' : './';
+
+
+      var hasSession = false;
+      try {
+        for (var i = 0; i < localStorage.length; i++) {
+          var k = localStorage.key(i);
+          if (k && ((k.indexOf('sb-') === 0 && k.indexOf('-auth-token') !== -1) || k === 'supabase.auth.token')) {
+            var val = localStorage.getItem(k);
+            if (val && val !== 'null' && val !== 'undefined') {
+              var parsed = JSON.parse(val);
+              if (parsed && (parsed.access_token || parsed.user || (parsed.currentSession && parsed.currentSession.access_token))) {
+                hasSession = true;
+                break;
+              }
+            }
+          }
+        }
+      } catch (e) { }
+
+      if (!hasSession) {
+        window.location.replace(isFile ? pfx + 'login/index.html' : '/login');
+      }
+    })();
+  </script>
+
+  <style>
+    .cat-badge-server {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+
+    .cat-badge-orders {
+      background: var(--primary-dim);
+      color: var(--primary);
+      border: 1px solid var(--border-primary);
+    }
+
+    .cat-badge-tickets {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--info);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+    }
+
+    .cat-badge-security {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+    }
+
+    .cat-badge-gallery {
+      background: rgba(168, 85, 247, 0.15);
+      color: #c084fc;
+      border: 1px solid rgba(168, 85, 247, 0.35);
+    }
+
+    /* Single-Row Card Header for Logs (Matches Finance Page / Screenshot 2) */
+    .fin-card-header {
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .fin-header-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .fin-card-title {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-main);
+      white-space: nowrap;
+    }
+
+    .lumen-count-badge {
+      font-size: 0.74rem;
+      font-weight: 700;
+      background: var(--chip-bg);
+      color: var(--text-muted);
+      padding: 2px 7px;
+      border-radius: 12px;
+      margin-left: 4px;
+    }
+
+    .fin-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .fin-action-btn {
+      height: 32px;
+      padding: 0 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border-radius: var(--radius-sm, 6px);
+      white-space: nowrap;
+    }
+
+    .fin-header-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    /* Custom Dropdown System */
+    .hvn-custom-dropdown {
+      position: relative;
+      display: inline-block;
+      min-width: 155px;
+      user-select: none;
+    }
+
+    .hvn-custom-select-btn {
+      width: 100%;
+      height: 32px;
+      padding: 0 10px;
+      background: var(--chip-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm, 8px);
+      color: var(--text-main);
+      font-size: 0.78rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      white-space: nowrap;
+    }
+
+    .hvn-custom-select-btn:hover,
+    .hvn-custom-dropdown.open .hvn-custom-select-btn {
+      border-color: var(--primary);
+      background: rgba(0, 200, 150, 0.08);
+      box-shadow: 0 0 0 3px rgba(0, 200, 150, 0.12);
+    }
+
+    .hvn-select-btn-left {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+      white-space: nowrap;
+    }
+
+    .hvn-cat-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: inline-block;
+    }
+
+    .hvn-select-chevron {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      transition: transform 0.2s ease, color 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .hvn-custom-dropdown.open .hvn-select-chevron {
+      transform: rotate(180deg);
+      color: var(--primary);
+    }
+
+    .hvn-custom-select-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      min-width: 220px;
+      background: var(--bg-sunken);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 6px;
+      box-shadow: var(--shadow-lg), 0 0 0 1px rgba(0, 200, 150, 0.08);
+      z-index: 120;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-6px) scale(0.98);
+      transition: opacity 0.18s ease, transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.18s ease;
+    }
+
+    .hvn-custom-dropdown.open .hvn-custom-select-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+
+    .hvn-custom-option {
+      width: 100%;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 7px;
+      padding: 7px 9px;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: left;
+    }
+
+    .hvn-custom-option:hover {
+      background: var(--chip-bg);
+      color: var(--text-main);
+    }
+
+    .hvn-custom-option.active {
+      background: rgba(0, 200, 150, 0.14);
+      border-color: rgba(0, 200, 150, 0.3);
+      color: var(--primary);
+    }
+
+    .hvn-opt-left {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .hvn-opt-right {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hvn-opt-count {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: var(--chip-bg);
+      color: var(--text-muted);
+    }
+
+    .hvn-custom-option.active .hvn-opt-count {
+      background: rgba(0, 200, 150, 0.22);
+      color: var(--primary);
+    }
+
+    .hvn-opt-check {
+      font-size: 0.85rem;
+      opacity: 0;
+      color: var(--primary);
+    }
+
+    .hvn-custom-option.active .hvn-opt-check {
+      opacity: 1;
+    }
+
+    /* Compact Search Box */
+    .fin-search-box {
+      position: relative;
+      width: 140px;
+      transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      flex-shrink: 0;
+    }
+
+    .fin-search-box:focus-within {
+      width: 220px;
+    }
+
+    .fin-search-box i.bi-search {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.74rem;
+      pointer-events: none;
+      transition: color 0.18s ease;
+    }
+
+    .fin-search-box:focus-within i.bi-search {
+      color: var(--primary);
+    }
+
+    .fin-search-input {
+      width: 100%;
+      height: 32px;
+      padding: 4px 24px 4px 28px;
+      font-size: 0.78rem;
+      background: var(--chip-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      color: var(--text-main);
+      outline: none;
+      transition: all 0.18s ease;
+    }
+
+    .fin-search-input:focus {
+      background: var(--chip-bg);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+    }
+
+    .fin-search-clear {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.74rem;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .fin-search-clear:hover {
+      color: var(--text-main);
+    }
+
+    .fin-tab-text-short {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .fin-card-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 10px 12px;
+      }
+
+      .fin-header-top {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .fin-header-controls {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-left: 0;
+      }
+
+      .fin-header-controls .hvn-custom-dropdown {
+        flex: 1 1 50%;
+        min-width: 0;
+      }
+
+      .fin-search-box {
+        flex: 1 1 50%;
+        width: auto;
+        min-width: 0;
+      }
+
+      .fin-search-box:focus-within {
+        flex: 2 1 60%;
+      }
+
+      .fin-header-controls .hvn-custom-select-menu {
+        left: 0;
+        right: auto;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .fin-tab-text-full {
+        display: none !important;
+      }
+      .fin-tab-text-short {
+        display: inline !important;
+      }
+      .fin-text-desktop {
+        display: none !important;
+      }
+    }
+
+    /* Responsive View Switch: Desktop Table (>= 769px) vs Clean Mobile Accordion Cards (<= 768px) */
+    @media (min-width: 769px) {
+      .logs-desktop-table-wrap {
+        display: block !important;
+      }
+      .logs-mobile-card-list {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .logs-desktop-table-wrap {
+        display: none !important;
+      }
+      .logs-mobile-card-list {
+        display: flex !important;
+        flex-direction: column;
+        gap: 8px;
+        padding: 10px 12px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .logs-mobile-card-list {
+        padding: 8px 8px;
+        gap: 6px;
+      }
+    }
+
+    /* Modern Log Mobile Cards (Matches Finance & Orders fmc-card) */
+    .fmc-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 13px;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+    }
+
+    .fmc-card:hover {
+      border-color: var(--border-hover);
+      background: var(--bg-card-hover);
+    }
+
+    .fmc-card.is-expanded {
+      border: 1.5px solid var(--primary) !important;
+      background: var(--bg-surface) !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), 0 0 0 1px var(--primary-dim);
+    }
+
+    .fmc-line-1 {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .fmc-identity {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .fmc-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 4px;
+      flex-shrink: 0;
+      background: var(--chip-bg);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .fmc-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .fmc-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .fmc-line-2 {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: 5px;
+    }
+
+    .fmc-meta-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .fmc-action-text {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .fmc-date-label {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .fmc-meta-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      color: var(--text-muted);
+      font-size: 0.74rem;
+    }
+
+    .fmc-chevron {
+      transition: transform 0.2s ease, color 0.2s ease;
+      font-size: 0.72rem;
+    }
+
+    .fmc-card.is-expanded .fmc-chevron {
+      transform: rotate(180deg);
+      color: var(--primary);
+    }
+
+    .fmc-line-3 {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.35;
+    }
+
+    /* Accordion Details */
+    .fmc-accordion {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+    }
+
+    .fmc-card.is-expanded .fmc-accordion {
+      max-height: 420px;
+      opacity: 1;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    .fmc-info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 7px;
+      font-size: 0.8rem;
+    }
+
+    .fmc-info-label {
+      color: var(--text-muted);
+      font-size: 0.74rem;
+      font-weight: 500;
+      min-width: 70px;
+      flex-shrink: 0;
+    }
+
+    .fmc-info-value {
+      color: var(--text-main);
+      font-weight: 500;
+      text-align: right;
+      word-break: break-word;
+      flex: 1;
+    }
+
+    .fmc-info-value.mono {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="app-layout">
+    <!-- Content Header -->
+    <div class="content-header">
+      <h1 class="page-title">
+        <i class="bi bi-journal-text"></i>
+        <span>Security &amp; Staff Audit Logs</span>
+      </h1>
+      <ul class="breadcrumb-list">
+        <li><a href="../index.html">Home</a></li>
+        <li class="breadcrumb-separator">/</li>
+        <li><span>Logs</span></li>
+      </ul>
+    </div>
+
+    <!-- Logs Table Card (Unified Header with Custom Dropdown & Search - Matches Finance Page) -->
+    <div class="glass-card card">
+      <div class="card-header fin-card-header">
+        <div class="fin-header-top">
+          <div class="card-title fin-card-title">
+            <i class="bi bi-shield-shaded" style="color: var(--primary);"></i>
+            <span class="fin-tab-text-full">Security &amp; Staff Audit Logs</span>
+            <span class="fin-tab-text-short">Audit Logs</span>
+            <span class="lumen-count-badge" id="logsTotalCountBadge">0</span>
+          </div>
+
+          <div class="fin-header-actions">
+            <!-- Export Button -->
+            <button class="btn btn-secondary btn-sm fin-action-btn" onclick="exportLogsCsv()"
+              title="Export Logs to CSV">
+              <i class="bi bi-download"></i>
+              <span class="fin-text-desktop">Export</span>
+            </button>
+
+            <!-- Refresh Button -->
+            <button class="btn btn-secondary btn-sm fin-action-btn" onclick="loadAuditLogs()"
+              title="Refresh Logs">
+              <i class="bi bi-arrow-clockwise"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="fin-header-controls">
+          <!-- Custom Status/Category Dropdown (Matches Screenshot 2 Style) -->
+          <div class="hvn-custom-dropdown" id="logsCategoryDropdown">
+            <button type="button" class="hvn-custom-select-btn" onclick="toggleLogsDropdown(event)"
+              aria-expanded="false" title="Filter audit logs">
+              <span class="hvn-select-btn-left">
+                <span class="hvn-cat-dot" id="logsDropdownDot" style="background: var(--primary);"></span>
+                <span id="logsDropdownLabel">All Actions</span>
+                <span class="hvn-opt-count" id="logsDropdownCount">0</span>
+              </span>
+              <i class="bi bi-chevron-down hvn-select-chevron"></i>
+            </button>
+            <div class="hvn-custom-select-menu" id="logsDropdownMenu">
+              <button type="button" class="hvn-custom-option active" data-filter="all"
+                onclick="filterLogs('all')">
+                <span class="hvn-opt-left">
+                  <span class="hvn-cat-dot" style="background: var(--primary);"></span>
+                  <span>All Actions</span>
+                </span>
+                <span class="hvn-opt-right">
+                  <span class="hvn-opt-count" id="countLogsAll">0</span>
+                  <i class="bi bi-check2 hvn-opt-check"></i>
+                </span>
+              </button>
+              <button type="button" class="hvn-custom-option" data-filter="server"
+                onclick="filterLogs('server')">
+                <span class="hvn-opt-left">
+                  <span class="hvn-cat-dot" style="background: var(--warning);"></span>
+                  <span>Server Console / Power</span>
+                </span>
+                <span class="hvn-opt-right">
+                  <span class="hvn-opt-count" id="countLogsServer">0</span>
+                  <i class="bi bi-check2 hvn-opt-check"></i>
+                </span>
+              </button>
+              <button type="button" class="hvn-custom-option" data-filter="orders"
+                onclick="filterLogs('orders')">
+                <span class="hvn-opt-left">
+                  <span class="hvn-cat-dot" style="background: #38bdf8;"></span>
+                  <span>Store Orders</span>
+                </span>
+                <span class="hvn-opt-right">
+                  <span class="hvn-opt-count" id="countLogsOrders">0</span>
+                  <i class="bi bi-check2 hvn-opt-check"></i>
+                </span>
+              </button>
+              <button type="button" class="hvn-custom-option" data-filter="tickets"
+                onclick="filterLogs('tickets')">
+                <span class="hvn-opt-left">
+                  <span class="hvn-cat-dot" style="background: #06b6d4;"></span>
+                  <span>Tickets</span>
+                </span>
+                <span class="hvn-opt-right">
+                  <span class="hvn-opt-count" id="countLogsTickets">0</span>
+                  <i class="bi bi-check2 hvn-opt-check"></i>
+                </span>
+              </button>
+              <button type="button" class="hvn-custom-option" data-filter="gallery"
+                onclick="filterLogs('gallery')">
+                <span class="hvn-opt-left">
+                  <span class="hvn-cat-dot" style="background: #c084fc;"></span>
+                  <span>Gallery &amp; Staff</span>
+                </span>
+                <span class="hvn-opt-right">
+                  <span class="hvn-opt-count" id="countLogsGallery">0</span>
+                  <i class="bi bi-check2 hvn-opt-check"></i>
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Compact Search Box (Exact match to Finance / Tickets Page) -->
+          <div class="fin-search-box">
+            <i class="bi bi-search"></i>
+            <input type="text" id="logSearchInput" class="fin-search-input" placeholder="Search..."
+              oninput="handleLogSearch()">
+            <button type="button" id="logSearchClearBtn" class="fin-search-clear" onclick="clearLogSearch()"
+              style="display: none;" title="Clear search">
+              <i class="bi bi-x-circle-fill"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body" style="padding: 0;">
+        <!-- Desktop Table View (>= 769px) -->
+        <div class="logs-desktop-table-wrap table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Account (IGN / Role)</th>
+                <th>Category</th>
+                <th>Action</th>
+                <th>Target Object / Command</th>
+                <th>Result</th>
+              </tr>
+            </thead>
+            <tbody id="logsTableBody">
+              <tr>
+                <td><span class="hvn-skeleton" style="width: 110px; height: 14px; display: inline-block;"></span></td>
+                <td><div style="display: flex; align-items: center; gap: 8px;"><span class="hvn-skeleton" style="width: 24px; height: 24px; border-radius: 4px; min-width: 24px;"></span><div><span class="hvn-skeleton" style="width: 80px; height: 13px; display: block; margin-bottom: 3px;"></span><span class="hvn-skeleton" style="width: 45px; height: 10px; display: block;"></span></div></div></td>
+                <td><span class="hvn-skeleton" style="width: 70px; height: 20px; border-radius: 6px; display: inline-block;"></span></td>
+                <td><span class="hvn-skeleton" style="width: 90px; height: 14px; display: inline-block;"></span></td>
+                <td><span class="hvn-skeleton" style="width: 130px; height: 14px; display: inline-block;"></span></td>
+                <td><span class="hvn-skeleton" style="width: 60px; height: 20px; border-radius: 6px; display: inline-block;"></span></td>
+              </tr>
+              <tr>
+                <td><span class="hvn-skeleton" style="width: 110px; height: 14px; display: inline-block;"></span></td>
+                <td><div style="display: flex; align-items: center; gap: 8px;"><span class="hvn-skeleton" style="width: 24px; height: 24px; border-radius: 4px; min-width: 24px;"></span><div><span class="hvn-skeleton" style="width: 90px; height: 13px; display: block; margin-bottom: 3px;"></span><span class="hvn-skeleton" style="width: 50px; height: 10px; display: block;"></span></div></div></td>
+                <td><span class="hvn-skeleton" style="width: 80px; height: 20px; border-radius: 6px; display: inline-block;"></span></td>
+                <td><span class="hvn-skeleton" style="width: 100px; height: 14px; display: inline-block;"></span></td>
+                <td><span class="hvn-skeleton" style="width: 150px; height: 14px; display: inline-block;"></span></td>
+                <td><span class="hvn-skeleton" style="width: 60px; height: 20px; border-radius: 6px; display: inline-block;"></span></td>
+              </tr>
+              <tr>
+                <td><span class="hvn-skeleton" style="width: 110px; height: 14px; display: inline-block;"></span></td>
+                <td><div style="display: flex; align-items: center; gap: 8px;"><span class="hvn-skeleton" style="width: 24px; height: 24px; border-radius: 4px; min-width: 24px;"></span><div><span class="hvn-skeleton" style="width: 75px; height: 13px; display: block; margin-bottom: 3px;"></span><span class="hvn-skeleton" style="width: 40px; height: 10px; display: block;"></span></div></div></td>
+                <td><span class="hvn-skeleton" style="width: 65px; height: 20px; border-radius: 6px; display: inline-block;"></span></td>
+                <td><span class="hvn-skeleton" style="width: 85px; height: 14px; display: inline-block;"></span></td>
+                <td><span class="hvn-skeleton" style="width: 110px; height: 14px; display: inline-block;"></span></td>
+                <td><span class="hvn-skeleton" style="width: 60px; height: 20px; border-radius: 6px; display: inline-block;"></span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Card List View (<= 768px - Exact Match to Finance & Orders) -->
+        <div class="logs-mobile-card-list" id="logsMobileList">
+          <div class="fmc-card">
+            <div class="fmc-line-1">
+              <div class="fmc-identity">
+                <span class="hvn-skeleton" style="width: 26px; height: 26px; border-radius: 4px;"></span>
+                <span class="hvn-skeleton" style="width: 80px; height: 14px;"></span>
+                <span class="hvn-skeleton" style="width: 65px; height: 18px; border-radius: 6px;"></span>
+              </div>
+              <span class="hvn-skeleton" style="width: 60px; height: 18px; border-radius: 6px;"></span>
+            </div>
+            <div class="fmc-line-2">
+              <span class="hvn-skeleton" style="width: 120px; height: 14px;"></span>
+              <span class="hvn-skeleton" style="width: 85px; height: 12px;"></span>
+            </div>
+            <div class="fmc-line-3">
+              <span class="hvn-skeleton" style="width: 200px; height: 12px;"></span>
+            </div>
+          </div>
+          <div class="fmc-card">
+            <div class="fmc-line-1">
+              <div class="fmc-identity">
+                <span class="hvn-skeleton" style="width: 26px; height: 26px; border-radius: 4px;"></span>
+                <span class="hvn-skeleton" style="width: 70px; height: 14px;"></span>
+                <span class="hvn-skeleton" style="width: 70px; height: 18px; border-radius: 6px;"></span>
+              </div>
+              <span class="hvn-skeleton" style="width: 60px; height: 18px; border-radius: 6px;"></span>
+            </div>
+            <div class="fmc-line-2">
+              <span class="hvn-skeleton" style="width: 140px; height: 14px;"></span>
+              <span class="hvn-skeleton" style="width: 80px; height: 12px;"></span>
+            </div>
+            <div class="fmc-line-3">
+              <span class="hvn-skeleton" style="width: 170px; height: 12px;"></span>
+            </div>
+          </div>
+          <div class="fmc-card">
+            <div class="fmc-line-1">
+              <div class="fmc-identity">
+                <span class="hvn-skeleton" style="width: 26px; height: 26px; border-radius: 4px;"></span>
+                <span class="hvn-skeleton" style="width: 90px; height: 14px;"></span>
+                <span class="hvn-skeleton" style="width: 60px; height: 18px; border-radius: 6px;"></span>
+              </div>
+              <span class="hvn-skeleton" style="width: 60px; height: 18px; border-radius: 6px;"></span>
+            </div>
+            <div class="fmc-line-2">
+              <span class="hvn-skeleton" style="width: 110px; height: 14px;"></span>
+              <span class="hvn-skeleton" style="width: 90px; height: 12px;"></span>
+            </div>
+            <div class="fmc-line-3">
+              <span class="hvn-skeleton" style="width: 190px; height: 12px;"></span>
+            </div>
+          </div>
+        </div>
+        <div class="hvn-pagination-bar" id="logsPaginationBar" style="display: none;">
+          <span id="logsPaginationInfo">Showing 0 of 0 logs</span>
+          <button type="button" class="btn btn-secondary btn-sm" id="btnLoadMoreLogs" onclick="loadMoreLogs()">
+            <i class="bi bi-chevron-down"></i> Load More
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../assets/js/config.js?v=3.4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1" integrity="sha384-YieCqqg9gQufX7+5HcFvCEg/n3KUEdl8/Jb+A6J0npf1mB740VayvwKjTrtCeUoy" crossorigin="anonymous"></script>
+  <script src="../assets/js/supabase.js?v=3.4"></script>
+  <script src="../assets/js/auth.js?v=3.5"></script>
+  <script src="../assets/js/utils.js?v=3.4"></script>
+  <script src="../assets/js/layout.js?v=3.8"></script>
+
+  <script>
+    (function () {
+      'use strict';
+
+      let allLogsCache = [];
+      let currentLogFilter = 'all';
+      let currentSearchQuery = '';
+
+      function getPageSize() {
+        return window.innerWidth <= 768 ? 15 : 50;
+      }
+      let logsDisplayLimit = getPageSize();
+
+      window.loadAuditLogs = async function () {
+        const client = window.initHavenSupabase ? window.initHavenSupabase() : window.supabaseClient;
+        const tbody = document.getElementById('logsTableBody');
+        const mobileList = document.getElementById('logsMobileList');
+        if (!client) return;
+
+        try {
+          const { data, error } = await client
+            .from('audit_logs')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(200);
+
+          if (error) throw error;
+
+          allLogsCache = data || [];
+          updateLogFilterCounts();
+          renderLogsTable();
+        } catch (err) {
+          console.warn('Audit logs load failed:', err);
+          const safeMsg = (typeof window.hvnEscapeHtml === 'function') ? window.hvnEscapeHtml(err.message) : String(err.message || '');
+          if (tbody) tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--danger); padding: 28px;">Failed to load audit logs: ${safeMsg}</td></tr>`;
+          if (mobileList) mobileList.innerHTML = `<div style="text-align: center; color: var(--danger); padding: 24px 14px;">Failed to load audit logs: ${safeMsg}</div>`;
+        }
+      };
+
+      function matchesLogCategory(categoryRaw, filterKey) {
+        const c = String(categoryRaw || '').toLowerCase();
+        if (filterKey === 'server') {
+          return c.includes('console') || c.includes('power') || c.includes('server');
+        }
+        if (filterKey === 'orders') {
+          return c.includes('order') || c.includes('finance') || c.includes('sale') || c.includes('expense') || c.includes('shop') || c.includes('store');
+        }
+        if (filterKey === 'tickets') {
+          return c.includes('ticket');
+        }
+        if (filterKey === 'gallery') {
+          return c.includes('gallery') || c.includes('staff') || c.includes('security') || c.includes('user') || c.includes('setting') || c.includes('config');
+        }
+        return true;
+      }
+
+      function getFilteredLogs() {
+        let filtered = allLogsCache;
+        if (currentLogFilter !== 'all') {
+          filtered = filtered.filter(l => matchesLogCategory(l.category, currentLogFilter));
+        }
+        if (currentSearchQuery) {
+          filtered = filtered.filter(l =>
+            (l.staff_name && l.staff_name.toLowerCase().includes(currentSearchQuery)) ||
+            (l.action && l.action.toLowerCase().includes(currentSearchQuery)) ||
+            (l.category && l.category.toLowerCase().includes(currentSearchQuery)) ||
+            (l.target && l.target.toLowerCase().includes(currentSearchQuery))
+          );
+        }
+        return filtered;
+      }
+
+      const LOGS_CAT_META = {
+        all: { label: 'All Actions', dot: 'var(--primary)' },
+        server: { label: 'Server Console / Power', dot: 'var(--warning)' },
+        orders: { label: 'Store Orders', dot: '#38bdf8' },
+        tickets: { label: 'Tickets', dot: '#06b6d4' },
+        gallery: { label: 'Gallery & Staff', dot: '#c084fc' }
+      };
+
+      window.toggleLogsDropdown = function (e) {
+        if (e) e.stopPropagation();
+        const dd = document.getElementById('logsCategoryDropdown');
+        if (dd) dd.classList.toggle('open');
+      };
+
+      document.addEventListener('click', function (e) {
+        const dd = document.getElementById('logsCategoryDropdown');
+        if (dd && dd.classList.contains('open') && !dd.contains(e.target)) {
+          dd.classList.remove('open');
+        }
+      });
+
+      function syncLogsDropdownCount() {
+        const countMap = {
+          all: document.getElementById('countLogsAll')?.textContent || 0,
+          server: document.getElementById('countLogsServer')?.textContent || 0,
+          orders: document.getElementById('countLogsOrders')?.textContent || 0,
+          tickets: document.getElementById('countLogsTickets')?.textContent || 0,
+          gallery: document.getElementById('countLogsGallery')?.textContent || 0
+        };
+        const ddCount = document.getElementById('logsDropdownCount');
+        if (ddCount) ddCount.textContent = countMap[currentLogFilter] !== undefined ? countMap[currentLogFilter] : 0;
+      }
+
+      function updateLogFilterCounts() {
+        const allCount = allLogsCache.length;
+        const serverCount = allLogsCache.filter(l => matchesLogCategory(l.category, 'server')).length;
+        const ordersCount = allLogsCache.filter(l => matchesLogCategory(l.category, 'orders')).length;
+        const ticketsCount = allLogsCache.filter(l => matchesLogCategory(l.category, 'tickets')).length;
+        const galleryCount = allLogsCache.filter(l => matchesLogCategory(l.category, 'gallery')).length;
+
+        const elAll = document.getElementById('countLogsAll');
+        const elServer = document.getElementById('countLogsServer');
+        const elOrders = document.getElementById('countLogsOrders');
+        const elTickets = document.getElementById('countLogsTickets');
+        const elGallery = document.getElementById('countLogsGallery');
+        const elTotalBadge = document.getElementById('logsTotalCountBadge');
+
+        if (elAll) elAll.textContent = allCount;
+        if (elServer) elServer.textContent = serverCount;
+        if (elOrders) elOrders.textContent = ordersCount;
+        if (elTickets) elTickets.textContent = ticketsCount;
+        if (elGallery) elGallery.textContent = galleryCount;
+        if (elTotalBadge) elTotalBadge.textContent = allCount;
+
+        syncLogsDropdownCount();
+      }
+
+      // Helper: Single-expand exclusive accordion for Mobile Log Cards
+      window.toggleLogFmcCard = function (cardEl, evt) {
+        if (evt && evt.target && evt.target.closest('button, a, input, select, textarea')) {
+          return;
+        }
+        if (!cardEl) return;
+        const willExpand = !cardEl.classList.contains('is-expanded');
+        // Collapse all other expanded cards in the mobile list
+        const parent = cardEl.parentElement;
+        if (parent) {
+          parent.querySelectorAll('.fmc-card.is-expanded').forEach(c => {
+            if (c !== cardEl) c.classList.remove('is-expanded');
+          });
+        }
+        if (willExpand) {
+          cardEl.classList.add('is-expanded');
+        } else {
+          cardEl.classList.remove('is-expanded');
+        }
+      };
+
+      function renderLogsTable() {
+        const tbody = document.getElementById('logsTableBody');
+        const mobileList = document.getElementById('logsMobileList');
+        const pagBar = document.getElementById('logsPaginationBar');
+        const pagInfo = document.getElementById('logsPaginationInfo');
+        const pagBtn = document.getElementById('btnLoadMoreLogs');
+        const filtered = getFilteredLogs();
+
+        if (!filtered || filtered.length === 0) {
+          const emptyHtml = `
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 40px 16px; text-align: center;">
+              <div style="width: 42px; height: 42px; border-radius: 50%; background: var(--chip-bg); display: flex; align-items: center; justify-content: center; border: 1px solid var(--border);">
+                <i class="bi bi-shield-check" style="font-size: 1.25rem; color: var(--text-muted);"></i>
+              </div>
+              <div style="font-weight: 600; color: var(--text-main); font-size: 0.88rem;">No audit records found</div>
+              <div style="font-size: 0.74rem; color: var(--text-muted);">Try adjusting your category filter or search query.</div>
+            </div>
+          `;
+          if (tbody) tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 0;">${emptyHtml}</td></tr>`;
+          if (mobileList) mobileList.innerHTML = emptyHtml;
+          if (pagBar) pagBar.style.display = 'none';
+          return;
+        }
+
+        const totalFiltered = filtered.length;
+        const visibleRows = filtered.slice(0, logsDisplayLimit);
+
+        if (pagBar) {
+          const pageSize = getPageSize();
+          if (totalFiltered > pageSize) {
+            pagBar.style.display = 'flex';
+            if (pagInfo) pagInfo.textContent = `Showing ${visibleRows.length} of ${totalFiltered} logs`;
+            if (pagBtn) pagBtn.style.display = visibleRows.length < totalFiltered ? 'inline-flex' : 'none';
+          } else {
+            pagBar.style.display = 'none';
+          }
+        }
+
+        // A. Render Desktop 6-Column Table Rows (>= 769px)
+        if (tbody) {
+          tbody.innerHTML = visibleRows.map(l => {
+            const cat = l.category || 'General';
+            let catClass = 'cat-badge-orders';
+            if (cat.includes('Console') || cat.includes('Power') || cat.includes('Server')) {
+              catClass = 'cat-badge-server';
+            } else if (cat.includes('Ticket')) {
+              catClass = 'cat-badge-tickets';
+            } else if (cat.includes('Security') || cat.includes('Staff') || cat.includes('Setting')) {
+              catClass = 'cat-badge-security';
+            } else if (cat.includes('Gallery')) {
+              catClass = 'cat-badge-gallery';
+            }
+
+            const rawStaffIgn = l.staff_name || 'Steve';
+            const cleanStaffIgn = window.hvnCleanMcIgn ? window.hvnCleanMcIgn(rawStaffIgn) : (String(rawStaffIgn).replace(/^\.+/, '') || 'Steve');
+            const staffEsc = window.hvnEscapeHtml(l.staff_name || 'Staff');
+            const roleEsc = window.hvnEscapeHtml(l.staff_role || 'Staff');
+            const catEsc = window.hvnEscapeHtml(cat);
+            const actionEsc = window.hvnEscapeHtml(l.action || '-');
+            const targetEsc = window.hvnEscapeHtml(l.target || '-');
+            const resultEsc = window.hvnEscapeHtml(l.result || 'Success');
+
+            const isSuccess = resultEsc.toLowerCase().includes('success') || resultEsc === 'Delivered';
+            const isDanger = resultEsc.toLowerCase().includes('reject') || resultEsc.toLowerCase().includes('fail') || resultEsc.toLowerCase().includes('block');
+
+            const timeStr = l.created_at ? new Date(l.created_at).toLocaleString('en-US', {
+              month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit'
+            }) : '-';
+
+            return `
+              <tr>
+                <td style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); white-space: nowrap;">
+                  ${timeStr}
+                </td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <img src="https://mc-heads.net/avatar/${encodeURIComponent(cleanStaffIgn)}/24" style="width: 24px; height: 24px; border-radius: 4px;" alt="Avatar">
+                    <div style="text-align: left;">
+                      <strong style="color: var(--text-main); font-size: 0.88rem;">${staffEsc}</strong>
+                      <div style="font-size: 0.72rem; color: var(--text-muted);">${roleEsc}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge ${catClass}">
+                    ${catEsc}
+                  </span>
+                </td>
+                <td style="font-family: var(--font-mono); font-size: 0.8rem; font-weight: 600;">
+                  ${actionEsc}
+                </td>
+                <td style="font-size: 0.85rem; color: var(--text-main); max-width: 280px; word-break: break-all;">
+                  ${targetEsc}
+                </td>
+                <td>
+                  <span class="badge ${isSuccess ? 'badge-open' : (isDanger ? 'badge-closed' : 'badge-pending')}">
+                    <i class="bi ${isSuccess ? 'bi-check-circle-fill' : (isDanger ? 'bi-x-circle-fill' : 'bi-info-circle-fill')}"></i> ${resultEsc}
+                  </span>
+                </td>
+              </tr>
+            `;
+          }).join('');
+        }
+
+        // B. Render Mobile Compact Single-Expand Accordion Cards (<= 768px - Exact Match to Finance & Orders)
+        if (mobileList) {
+          mobileList.innerHTML = visibleRows.map(l => {
+            const cat = l.category || 'General';
+            let catClass = 'cat-badge-orders';
+            if (cat.includes('Console') || cat.includes('Power') || cat.includes('Server')) {
+              catClass = 'cat-badge-server';
+            } else if (cat.includes('Ticket')) {
+              catClass = 'cat-badge-tickets';
+            } else if (cat.includes('Security') || cat.includes('Staff') || cat.includes('Setting')) {
+              catClass = 'cat-badge-security';
+            } else if (cat.includes('Gallery')) {
+              catClass = 'cat-badge-gallery';
+            }
+
+            const rawStaffIgn = l.staff_name || 'Steve';
+            const cleanStaffIgn = window.hvnCleanMcIgn ? window.hvnCleanMcIgn(rawStaffIgn) : (String(rawStaffIgn).replace(/^\.+/, '') || 'Steve');
+            const staffEsc = window.hvnEscapeHtml(l.staff_name || 'Staff');
+            const roleEsc = window.hvnEscapeHtml(l.staff_role || 'Staff');
+            const catEsc = window.hvnEscapeHtml(cat);
+            const actionEsc = window.hvnEscapeHtml(l.action || '-');
+            const targetEsc = window.hvnEscapeHtml(l.target || '-');
+            const resultEsc = window.hvnEscapeHtml(l.result || 'Success');
+
+            const isSuccess = resultEsc.toLowerCase().includes('success') || resultEsc === 'Delivered';
+            const isDanger = resultEsc.toLowerCase().includes('reject') || resultEsc.toLowerCase().includes('fail') || resultEsc.toLowerCase().includes('block');
+            const resultBadgeClass = isSuccess ? 'badge-open' : (isDanger ? 'badge-closed' : 'badge-pending');
+            const resultIcon = isSuccess ? 'bi-check-circle-fill' : (isDanger ? 'bi-x-circle-fill' : 'bi-info-circle-fill');
+
+            const shortTime = l.created_at ? new Date(l.created_at).toLocaleString('en-US', {
+              month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+            }) : '-';
+
+            const fullTime = l.created_at ? new Date(l.created_at).toLocaleString('en-US', {
+              month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit'
+            }) : '-';
+
+            return `
+              <div class="fmc-card" onclick="window.toggleLogFmcCard(this, event)">
+                <!-- LINE 1: Staff Avatar + Name + Category | Result Badge -->
+                <div class="fmc-line-1">
+                  <div class="fmc-identity">
+                    <div class="fmc-avatar">
+                      <img src="https://mc-heads.net/avatar/${encodeURIComponent(cleanStaffIgn)}/26" alt="${staffEsc}"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                      <span style="display: none; font-size: 0.7rem; font-weight: 700;">${staffEsc.slice(0, 2).toUpperCase()}</span>
+                    </div>
+                    <span class="fmc-name" title="${staffEsc}">${staffEsc}</span>
+                    <span class="badge ${catClass}" style="font-size: 0.68rem; padding: 2px 7px;">${catEsc}</span>
+                  </div>
+                  <span class="badge ${resultBadgeClass}" style="font-size: 0.7rem; flex-shrink: 0;">
+                    <i class="bi ${resultIcon}"></i> ${resultEsc}
+                  </span>
+                </div>
+
+                <!-- LINE 2: Action Name (left) | Time + Chevron (right) -->
+                <div class="fmc-line-2">
+                  <div class="fmc-meta-left">
+                    <span class="fmc-action-text" title="${actionEsc}">${actionEsc}</span>
+                  </div>
+                  <div class="fmc-meta-right">
+                    <span class="fmc-date-label">${shortTime}</span>
+                    <i class="bi bi-chevron-down fmc-chevron"></i>
+                  </div>
+                </div>
+
+                <!-- LINE 3: Compact Target Preview -->
+                <div class="fmc-line-3" title="${targetEsc}">
+                  ${targetEsc}
+                </div>
+
+                <!-- ACCORDION DETAILS (Single-expand on Tap) -->
+                <div class="fmc-accordion">
+                  <div class="fmc-info-row">
+                    <span class="fmc-info-label">Timestamp</span>
+                    <span class="fmc-info-value mono">${fullTime}</span>
+                  </div>
+                  <div class="fmc-info-row">
+                    <span class="fmc-info-label">Staff Role</span>
+                    <span class="fmc-info-value">${roleEsc}</span>
+                  </div>
+                  <div class="fmc-info-row">
+                    <span class="fmc-info-label">Category</span>
+                    <span class="fmc-info-value"><span class="badge ${catClass}">${catEsc}</span></span>
+                  </div>
+                  <div class="fmc-info-row">
+                    <span class="fmc-info-label">Action</span>
+                    <span class="fmc-info-value mono" style="font-weight: 700; color: var(--text-main);">${actionEsc}</span>
+                  </div>
+                  <div class="fmc-info-row" style="flex-direction: column; align-items: flex-start; gap: 4px; margin-top: 6px;">
+                    <span class="fmc-info-label">Target / Command Details</span>
+                    <div style="width: 100%; font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-main); background: var(--bg-sunken); padding: 7px 10px; border-radius: 6px; border: 1px solid var(--border); word-break: break-all; white-space: pre-wrap;">${targetEsc}</div>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+
+      window.filterLogs = function (category) {
+        currentLogFilter = category || 'all';
+        logsDisplayLimit = getPageSize();
+
+        const meta = LOGS_CAT_META[currentLogFilter] || LOGS_CAT_META.all;
+        const dotEl = document.getElementById('logsDropdownDot');
+        const labelEl = document.getElementById('logsDropdownLabel');
+        const dd = document.getElementById('logsCategoryDropdown');
+
+        if (dotEl) dotEl.style.background = meta.dot;
+        if (labelEl) labelEl.textContent = meta.label;
+        if (dd) dd.classList.remove('open');
+
+        const menu = document.getElementById('logsDropdownMenu');
+        if (menu) {
+          menu.querySelectorAll('.hvn-custom-option').forEach(opt => {
+            opt.classList.toggle('active', opt.getAttribute('data-filter') === currentLogFilter);
+          });
+        }
+
+        syncLogsDropdownCount();
+        renderLogsTable();
+      };
+
+      window.handleLogSearch = function () {
+        const input = document.getElementById('logSearchInput');
+        const clearBtn = document.getElementById('logSearchClearBtn');
+        currentSearchQuery = (input ? input.value : '').toLowerCase().trim();
+        if (clearBtn) clearBtn.style.display = currentSearchQuery ? 'block' : 'none';
+        logsDisplayLimit = getPageSize();
+        renderLogsTable();
+      };
+
+      window.clearLogSearch = function () {
+        const input = document.getElementById('logSearchInput');
+        const clearBtn = document.getElementById('logSearchClearBtn');
+        if (input) input.value = '';
+        if (clearBtn) clearBtn.style.display = 'none';
+        currentSearchQuery = '';
+        logsDisplayLimit = getPageSize();
+        renderLogsTable();
+        if (input) input.focus();
+      };
+
+      window.loadMoreLogs = function () {
+        logsDisplayLimit += getPageSize();
+        renderLogsTable();
+      };
+
+      function sanitizeCsvCell(val) {
+        let str = String(val ?? '');
+        if (/^[=+\-@\t\r]/.test(str)) {
+          str = "'" + str;
+        }
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+
+      window.exportLogsCsv = function () {
+        const exportRows = getFilteredLogs();
+        if (!exportRows || exportRows.length === 0) {
+          if (window.hvnToast) window.hvnToast('No logs available in current view to export.', 'warning');
+          return;
+        }
+
+        const headers = ['Timestamp', 'Staff Name', 'Staff Role', 'Category', 'Action', 'Target', 'Result'];
+        const rows = exportRows.map(l => [
+          sanitizeCsvCell(l.created_at || ''),
+          sanitizeCsvCell(l.staff_name || ''),
+          sanitizeCsvCell(l.staff_role || ''),
+          sanitizeCsvCell(l.category || ''),
+          sanitizeCsvCell(l.action || ''),
+          sanitizeCsvCell(l.target || ''),
+          sanitizeCsvCell(l.result || '')
+        ]);
+
+        const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(e => e.join(','))].join('\r\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        const dateKey = window.hvnFormatLocalDateKey ? window.hvnFormatLocalDateKey(new Date()) : new Date().toISOString().slice(0, 10);
+        link.setAttribute('download', `HavenCraft_Audit_Logs_${dateKey}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        if (window.hvnToast) {
+          window.hvnToast('Audit logs exported to CSV successfully!', 'success');
+        }
+      };
+
+      // Auto-adapt display limit if viewport mode crosses breakpoint
+      let resizeTimer = null;
+      window.addEventListener('resize', function () {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          const expected = getPageSize();
+          if ((expected === 15 && logsDisplayLimit === 50) || (expected === 50 && logsDisplayLimit === 15)) {
+            logsDisplayLimit = expected;
+            renderLogsTable();
+          }
+        }, 200);
+      });
+
+      document.addEventListener('DOMContentLoaded', () => {
+        window.loadAuditLogs();
+
+        const debouncedLogsReload = (typeof window.hvnDebounce === 'function')
+          ? window.hvnDebounce(window.loadAuditLogs, 450)
+          : window.loadAuditLogs;
+
+        const client = window.initHavenSupabase ? window.initHavenSupabase() : window.supabaseClient;
+        if (client) {
+          client.channel('admin-audit-logs-realtime')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'audit_logs' }, () => {
+              debouncedLogsReload();
+            })
+            .subscribe();
+        }
+      });
+    })();
+  </script>
+</body>
+
+</html>

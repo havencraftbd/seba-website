@@ -1,0 +1,2230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff Profile & Account — HavenCraft Admin</title>
+  <link rel="icon" href="../logo/logo.svg" type="image/svg+xml">
+
+  <!-- Bootstrap Icons CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous">
+
+  <!-- Cropper.js for 1:1 Avatar Cropping -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.js"></script>
+
+  <!-- HavenCraft Admin Theme -->
+  <script src="../assets/js/theme.js?v=3.9"></script>
+  <link rel="stylesheet" href="../assets/css/admin.css?v=3.8">
+
+  <!-- Anti-FOUC Auth Guard (Zero-Flash Route Shield) -->
+  <script>
+    (function () {
+      var isFile = window.location.protocol === 'file:';
+      var rawPath = (window.location.pathname || '').replace(/\\/g, '/').toLowerCase();
+      var isSub = rawPath.includes('/users') || rawPath.includes('/tickets') ||
+        rawPath.includes('/orders') || rawPath.includes('/settings') ||
+        rawPath.includes('/shop') || rawPath.includes('/gallery') ||
+        rawPath.includes('/logs') || rawPath.includes('/profile') ||
+        rawPath.includes('/server') || rawPath.includes('/finance');
+      var pfx = isSub ? '../' : './';
+
+
+      var hasSession = false;
+      try {
+        for (var i = 0; i < localStorage.length; i++) {
+          var k = localStorage.key(i);
+          if (k && ((k.indexOf('sb-') === 0 && k.indexOf('-auth-token') !== -1) || k === 'supabase.auth.token')) {
+            var val = localStorage.getItem(k);
+            if (val && val !== 'null' && val !== 'undefined') {
+              var parsed = JSON.parse(val);
+              if (parsed && (parsed.access_token || parsed.user || (parsed.currentSession && parsed.currentSession.access_token))) {
+                hasSession = true;
+                break;
+              }
+            }
+          }
+        }
+      } catch (e) { }
+
+      if (!hasSession) {
+        window.location.replace(isFile ? pfx + 'login/index.html' : '/login');
+      }
+    })();
+  </script>
+
+  <style>
+    .profile-card-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      margin-top: 6px;
+    }
+
+    .role-badge-owner {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+    }
+
+    .role-badge-sr-admin,
+    .role-badge-co-owner {
+      background: rgba(249, 115, 22, 0.15);
+      color: #fb923c;
+      border: 1px solid rgba(249, 115, 22, 0.35);
+    }
+
+    .role-badge-manager {
+      background: rgba(168, 85, 247, 0.15);
+      color: #c084fc;
+      border: 1px solid rgba(168, 85, 247, 0.35);
+    }
+
+    .role-badge-developer {
+      background: rgba(99, 102, 241, 0.15);
+      color: #818cf8;
+      border: 1px solid rgba(99, 102, 241, 0.35);
+    }
+
+    .role-badge-admin {
+      background: var(--primary-dim);
+      color: var(--primary);
+      border: 1px solid var(--border-primary);
+    }
+
+    .role-badge-mod {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--info);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+    }
+
+    .role-badge-officer {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+
+    .role-badge-helper {
+      background: rgba(234, 179, 8, 0.15);
+      color: #facc15;
+      border: 1px solid rgba(234, 179, 8, 0.35);
+    }
+
+    .role-badge-builder {
+      background: rgba(132, 204, 22, 0.15);
+      color: #a3e635;
+      border: 1px solid rgba(132, 204, 22, 0.35);
+    }
+
+    .profile-ign-pill {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      background: var(--chip-bg);
+      border: 1px solid var(--border);
+      padding: 3px 10px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 8px;
+    }
+
+    /* Mobile Responsive 3-Tab Bar (Equal 3-column distribution, zero horizontal scroll, zero cut-off) */
+    .tab-label-short {
+      display: none;
+    }
+
+    .tab-label-full {
+      display: inline;
+    }
+
+    @media (max-width: 680px) {
+      .profile-nav-tabs {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        padding: 0 !important;
+        gap: 0 !important;
+        overflow-x: hidden !important;
+        width: 100% !important;
+      }
+
+      .profile-tab-link {
+        flex: 1 !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        justify-content: center !important;
+        padding: 13px 4px !important;
+        font-size: 0.8rem !important;
+        gap: 6px !important;
+        white-space: nowrap !important;
+        text-align: center !important;
+      }
+
+      .profile-tab-link i {
+        font-size: 0.9rem !important;
+      }
+
+      .tab-label-full {
+        display: none !important;
+      }
+
+      .tab-label-short {
+        display: inline !important;
+      }
+    }
+
+    @media (max-width: 390px) {
+      .profile-tab-link {
+        font-size: 0.73rem !important;
+        padding: 11px 2px !important;
+        gap: 4px !important;
+      }
+
+      .profile-tab-link i {
+        font-size: 0.8rem !important;
+      }
+    }
+
+    /* ===== Equal Height Baseline Alignment for Profile Cards ===== */
+    .profile-layout {
+      align-items: stretch !important;
+    }
+
+    .profile-sidebar-card {
+      display: flex !important;
+      flex-direction: column !important;
+      height: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    .profile-sidebar-card .profile-stats-row {
+      margin-top: auto !important;
+      margin-bottom: 0 !important;
+      width: 100% !important;
+    }
+
+    #staffUsersShortcutBox {
+      width: 100% !important;
+      margin-top: 16px !important;
+    }
+
+    .profile-layout > .card {
+      height: 100% !important;
+      box-sizing: border-box !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+
+    .profile-tab-content {
+      flex: 1 !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+
+    /* ===== Avatar Customizer & 1:1 Cropper Styles ===== */
+    .profile-avatar-wrap {
+      position: relative;
+      display: inline-block;
+      margin: 0 auto 12px auto;
+      cursor: pointer;
+    }
+
+    .profile-avatar-wrap:hover .profile-avatar-img {
+      filter: brightness(1.08);
+      box-shadow: 0 0 0 3px var(--primary), 0 8px 24px rgba(16, 185, 129, 0.35);
+    }
+
+    .avatar-camera-btn {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--primary);
+      border: 3px solid var(--bg-surface);
+      color: #041a12;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .avatar-camera-btn:hover {
+      transform: scale(1.12);
+      background: #34d399;
+      color: #000;
+    }
+
+    .avatar-source-pill {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      padding: 3px 10px;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .avatar-customizer-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      margin-bottom: 22px;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .avatar-customizer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .avatar-customizer-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .avatar-customizer-title i {
+      color: var(--primary);
+      font-size: 1.15rem;
+    }
+
+    .avatar-type-tag {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 6px;
+      background: rgba(16, 185, 129, 0.12);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    .avatar-mode-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.28);
+      padding: 4px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+    }
+
+    .avatar-mode-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 9px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .avatar-mode-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .avatar-mode-btn.active {
+      background: var(--bg-card);
+      color: var(--primary);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+      border-color: var(--border-primary);
+    }
+
+    .avatar-mode-panel {
+      padding: 16px 18px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+    }
+
+    .avatar-panel-flex {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    @media (max-width: 640px) {
+      .avatar-mode-tabs {
+        grid-template-columns: 1fr;
+      }
+
+      .avatar-panel-flex {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    .avatar-preview-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .preview-head-img {
+      width: 76px;
+      height: 76px;
+      border-radius: 12px;
+      border: 2px solid var(--border-primary);
+      background: #000;
+      image-rendering: pixelated;
+      object-fit: cover;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    }
+
+    .preview-head-img.custom-round {
+      border-radius: 50%;
+      image-rendering: auto;
+    }
+
+    .preview-sub {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .avatar-panel-controls {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .avatar-hint {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-top: 6px;
+      display: block;
+    }
+
+    .avatar-panel-actions {
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    /* Modals Backdrop & Animation */
+    .modal-backdrop-custom {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(8px);
+      z-index: 1060;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: modalFadeIn 0.2s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* Facebook / Instagram Style Avatar Picker Modal */
+    .avatar-modal-card {
+      background: #0a101a;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 580px;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      animation: modalSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalSlideUp {
+      from { opacity: 0; transform: translateY(14px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .avatar-modal-header {
+      padding: 16px 20px;
+      background: #0e1624;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .avatar-modal-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar-modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 24px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 2px 6px;
+      border-radius: 6px;
+      transition: color 0.15s ease;
+    }
+
+    .avatar-modal-close:hover {
+      color: #fff;
+    }
+
+    .avatar-modal-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .avatar-modal-subtitle {
+      font-size: 0.84rem;
+      color: var(--text-secondary);
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    .avatar-modal-footer {
+      padding: 14px 20px;
+      background: #0e1624;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    /* 1:1 Crop Modal */
+    .crop-modal-card {
+      background: #0a101a;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 520px;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .crop-modal-header {
+      padding: 16px 20px;
+      background: #0e1624;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .crop-modal-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .crop-modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 24px;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .crop-modal-close:hover {
+      color: #fff;
+    }
+
+    .crop-modal-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .crop-image-container {
+      width: 100%;
+      height: 300px;
+      background: #03060a;
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .crop-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .btn-crop-tool {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn-crop-tool:hover {
+      color: #fff;
+      border-color: var(--border-strong);
+    }
+
+    .crop-zoom-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      max-width: 240px;
+    }
+
+    .crop-zoom-wrap input[type="range"] {
+      flex: 1;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .crop-preview-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(16, 185, 129, 0.06);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      padding: 12px 16px;
+      border-radius: 8px;
+    }
+
+    .crop-circle-preview-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .crop-preview-circle {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid var(--primary);
+      background: #000;
+    }
+
+    .crop-meta-text {
+      flex: 1;
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .crop-meta-text strong {
+      color: #fff;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .crop-modal-footer {
+      padding: 14px 20px;
+      background: #0e1624;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="app-layout">
+    <!-- Content Header -->
+    <div class="content-header">
+      <h1 class="page-title">
+        <i class="bi bi-person-badge"></i>
+        <span>My Staff Profile</span>
+      </h1>
+      <ul class="breadcrumb-list">
+        <li><a href="../index.html">Home</a></li>
+        <li class="breadcrumb-separator">/</li>
+        <li><span>Profile</span></li>
+      </ul>
+    </div>
+
+    <!-- Profile Main 2-Column Grid -->
+    <div class="profile-layout">
+
+      <!-- Left Column: User Summary Card -->
+      <div class="profile-sidebar-card">
+        <div class="profile-avatar-wrap" onclick="openAvatarPickerModal()" title="Click to change profile picture">
+          <img id="profileUserAvatar" src="https://mc-heads.net/avatar/MHF_Steve/64" alt="Staff Avatar"
+            class="profile-avatar-img"
+            onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://minotar.net/helm/Steve/128.png';}">
+          <button type="button" class="avatar-camera-btn" onclick="event.stopPropagation(); openAvatarPickerModal();"
+            title="Change Profile Picture">
+            <i class="bi bi-camera-fill"></i>
+          </button>
+        </div>
+        <script>
+          (function () {
+            try {
+              const _c = JSON.parse(localStorage.getItem('hvn_staff_profile') || '{}');
+              const _el = document.getElementById('profileUserAvatar');
+              const _raw = _c.mc_ign || _c.minecraft_ign || _c.ign;
+              const _cl = _raw ? _raw.replace(/^\.+/, '') : 'Steve';
+              const _av = _c.avatarUrl || (_raw ? 'https://mc-heads.net/avatar/' + encodeURIComponent(_cl) + '/64' : '');
+              if (_el && _av) _el.src = _av;
+
+              const _pHead = document.getElementById('previewIgnHead');
+              if (_pHead && _av) _pHead.src = _av;
+
+              if (_c.name || _c.fullName) {
+                const _n = document.getElementById('profileNameDisplay');
+                if (_n) _n.textContent = _c.name || _c.fullName;
+              }
+              if (_raw) {
+                const _ign = document.getElementById('profileIgnText');
+                if (_ign) _ign.textContent = _raw;
+                const _ignL = document.getElementById('ignPreviewLabel');
+                if (_ignL) _ignL.textContent = 'IGN: ' + _raw;
+              }
+              if (_c.role) {
+                const _r = document.getElementById('profileRoleText');
+                if (_r) _r.textContent = _c.role;
+              }
+            } catch (_) { }
+          })();
+        </script>
+
+        <h2 id="profileNameDisplay" class="profile-name-main">Staff Member</h2>
+        <div id="profileRoleDisplay" class="profile-card-badge role-badge-mod">
+          <i class="bi bi-patch-check-fill"></i> <span id="profileRoleText">Staff Member</span>
+        </div>
+
+        <div id="profileIgnDisplay" class="profile-ign-pill">
+          <i class="bi bi-person-square" style="color: var(--primary);"></i>
+          <span id="profileIgnText">HavenCraft</span>
+        </div>
+
+        <div id="avatarSourceBadge" class="avatar-source-pill" onclick="openAvatarPickerModal()" style="cursor: pointer;"
+          title="Click to change avatar source">
+          <i class="bi bi-person-bounding-box"></i> <span id="avatarSourceText">Default IGN Skin</span>
+        </div>
+
+        <div id="profileEmailDisplay"
+          style="font-size: 0.78rem; color: var(--text-muted); margin-top: 10px; word-break: break-all;">
+          staff@havencraft.pro
+        </div>
+
+        <!-- Quick Stats Row -->
+        <div class="profile-stats-row">
+          <div class="profile-stat-col">
+            <div class="profile-stat-val" id="statTickets">--</div>
+            <div class="profile-stat-label">Tickets Open</div>
+          </div>
+          <div class="profile-stat-col">
+            <div class="profile-stat-val" id="statOrders">--</div>
+            <div class="profile-stat-label">Pending Orders</div>
+          </div>
+          <div class="profile-stat-col">
+            <div class="profile-stat-val" id="statLogs">--</div>
+            <div class="profile-stat-label">Actions</div>
+          </div>
+        </div>
+
+        <!-- Shortcut to Users Management for Privileged Staff -->
+        <div id="staffUsersShortcutBox"
+          style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); display: none;">
+          <a href="../users/index.html" class="btn btn-secondary btn-sm"
+            style="width: 100%; justify-content: center; font-size: 0.8rem;">
+            <i class="bi bi-people-fill"></i>
+            <span>Manage Staff Roster &rarr;</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Right Column: Tabbed Settings Card -->
+      <div class="card" style="margin: 0;">
+
+        <!-- Tabs Header -->
+        <div class="profile-nav-tabs">
+          <button type="button" class="profile-tab-link active" id="tabBtnSettings"
+            onclick="switchProfileTab('settings')">
+            <i class="bi bi-gear-fill"></i>
+            <span class="tab-label-full">Account Settings</span>
+            <span class="tab-label-short">Settings</span>
+          </button>
+          <button type="button" class="profile-tab-link" id="tabBtnSecurity" onclick="switchProfileTab('security')">
+            <i class="bi bi-shield-lock-fill"></i>
+            <span class="tab-label-full">Security & Password</span>
+            <span class="tab-label-short">Security</span>
+          </button>
+          <button type="button" class="profile-tab-link" id="tabBtnActivity" onclick="switchProfileTab('activity')">
+            <i class="bi bi-clock-history"></i>
+            <span class="tab-label-full">Activity Log</span>
+            <span class="tab-label-short">Activity</span>
+          </button>
+        </div>
+
+        <div class="card-body profile-tab-content">
+
+          <!-- TAB 1: SETTINGS FORM -->
+          <div id="paneSettings">
+            <form id="profileSettingsForm" onsubmit="saveProfileSettings(event)">
+              <div class="form-row-2col">
+                <div class="form-group">
+                  <label class="form-label" for="inputFullName">First & Last Name</label>
+                  <input type="text" id="inputFullName" class="form-control" placeholder="Your Full Name" required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="inputMinecraftIgn">Minecraft Username (IGN)</label>
+                  <div class="input-icon-group">
+                    <i class="bi bi-person-square"></i>
+                    <input type="text" id="inputMinecraftIgn" class="form-control" placeholder="Minecraft IGN" required
+                      oninput="previewIgnHead(this.value)">
+                  </div>
+                  <small style="font-size: 0.72rem; color: var(--text-muted);">Updates your avatar head live across
+                    dashboard and sidebar.</small>
+                </div>
+              </div>
+
+              <div class="form-row-2col">
+                <div class="form-group">
+                  <label class="form-label" for="inputEmail">Your Email</label>
+                  <div class="input-icon-group">
+                    <i class="bi bi-envelope"></i>
+                    <input type="email" id="inputEmail" class="form-control" readonly
+                      style="opacity: 0.8; background: var(--chip-bg); cursor: not-allowed;">
+                  </div>
+                  <small style="font-size: 0.72rem; color: var(--text-muted);"><i class="bi bi-shield-lock"></i> Fixed
+                    to your account login identity.</small>
+                </div>
+
+                <div class="form-group">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <label class="form-label" for="inputRole" style="margin: 0;">Assigned Role</label>
+                    <span style="font-size: 0.72rem; color: var(--warning);"><i class="bi bi-lock-fill"></i> Owner
+                      Controlled</span>
+                  </div>
+                  <input type="text" id="inputRole" class="form-control" disabled
+                    style="opacity: 0.75; cursor: not-allowed; background: var(--chip-bg);">
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 20px;">
+                <label class="form-label" for="inputDiscord">Discord Handle</label>
+                <div class="input-icon-group">
+                  <i class="bi bi-discord" style="color: #5865F2;"></i>
+                  <input type="text" id="inputDiscord" class="form-control" placeholder="username#0000">
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 10px;">
+                <button type="submit" id="btnSaveProfile" class="btn btn-primary">
+                  <i class="bi bi-check2-circle"></i>
+                  <span>Save changes</span>
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="loadStaffProfile()">
+                  <span>Cancel</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- TAB 2: SECURITY & PASSWORD -->
+          <div id="paneSecurity" style="display: none;">
+            <div
+              style="background: rgba(16, 185, 129, 0.06); border: 1px solid var(--border-primary); padding: 14px 18px; border-radius: var(--radius-md); margin-bottom: 20px;">
+              <strong style="color: var(--primary); display: flex; align-items: center; gap: 8px;">
+                <i class="bi bi-shield-lock-fill"></i> Change Account Password
+              </strong>
+              <p
+                style="font-size: 0.82rem; color: var(--text-muted); margin-top: 6px; line-height: 1.5; margin-bottom: 0;">
+                Verify your current password to set a new password. Updating synchronizes directly with your account
+                credentials.
+              </p>
+            </div>
+
+            <form id="passwordUpdateForm" onsubmit="handlePasswordUpdate(event)" style="max-width: 480px;">
+              <div class="form-group" style="margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                  <label class="form-label" for="currentPassword" style="margin-bottom: 0;">Current Password</label>
+                  <a href="javascript:void(0)" onclick="handleForgotPassword()" id="btnForgotCurrentPw"
+                    style="font-size: 0.76rem; color: var(--primary); text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; transition: color 0.15s ease;">
+                    <i class="bi bi-question-circle"></i>
+                    <span>Forgot password?</span>
+                  </a>
+                </div>
+                <div class="input-icon-group">
+                  <i class="bi bi-shield-lock"></i>
+                  <input type="password" id="currentPassword" class="form-control"
+                    placeholder="Enter your current password" required autocomplete="current-password">
+                </div>
+                <div class="form-error" id="currentPwError"
+                  style="color: var(--danger); font-size: 0.76rem; margin-top: 4px; display: none;">
+                  <i class="bi bi-exclamation-triangle"></i> <span id="currentPwErrorText">Current password is
+                    incorrect.</span>
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 16px;">
+                <label class="form-label" for="newPassword">New Password</label>
+                <div class="input-icon-group">
+                  <i class="bi bi-key-fill"></i>
+                  <input type="password" id="newPassword" class="form-control" placeholder="Minimum 8 characters"
+                    minlength="8" required autocomplete="new-password">
+                </div>
+                <div class="pw-meter" id="pwMeter" aria-hidden="true" style="margin-top: 8px;">
+                  <span></span><span></span><span></span><span></span>
+                </div>
+                <div class="pw-strength-label" id="pwStrengthLabel"
+                  style="font-size: 0.74rem; color: var(--text-muted); margin-top: 4px;"></div>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 20px;">
+                <label class="form-label" for="confirmPassword">Confirm New Password</label>
+                <div class="input-icon-group">
+                  <i class="bi bi-shield-check"></i>
+                  <input type="password" id="confirmPassword" class="form-control" placeholder="Re-enter new password"
+                    minlength="8" required autocomplete="new-password">
+                </div>
+                <div class="form-error" id="pwMismatchError"
+                  style="color: var(--danger); font-size: 0.76rem; margin-top: 4px; display: none;">
+                  <i class="bi bi-exclamation-triangle"></i> Passwords do not match.
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 10px;">
+                <button type="submit" id="btnUpdatePassword" class="btn btn-primary">
+                  <i class="bi bi-lock-fill"></i>
+                  <span>Update Password</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- TAB 3: ACTIVITY LOG (Loaded Live from Supabase audit_logs) -->
+          <div id="paneActivity" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div style="font-size: 0.86rem; font-weight: 700; color: var(--text-main);">
+                Your Recent Actions:
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="loadMyActivityLog()">
+                <i class="bi bi-arrow-repeat"></i> Refresh
+              </button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px;" id="activityLogContainer">
+              <div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 0.84rem;">
+                <i class="bi bi-arrow-repeat spin" style="font-size: 1.4rem; display: block; margin-bottom: 8px;"></i>
+                Loading your activity history...
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FACEBOOK / INSTAGRAM STYLE AVATAR PICKER MODAL -->
+  <div class="modal-backdrop-custom" id="avatarPickerModalBackdrop" style="display: none;"
+    onclick="handleAvatarBackdropClick(event)">
+    <div class="avatar-modal-card" onclick="event.stopPropagation()">
+      <div class="avatar-modal-header">
+        <div class="avatar-modal-title">
+          <i class="bi bi-camera-fill" style="color: var(--primary);"></i>
+          <span>Update Profile Picture</span>
+        </div>
+        <button type="button" class="avatar-modal-close" onclick="closeAvatarPickerModal()" title="Close">&times;</button>
+      </div>
+
+      <div class="avatar-modal-body">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+          <p class="avatar-modal-subtitle">
+            Choose how you want to set your profile picture:
+          </p>
+          <span class="avatar-type-tag" id="currentAvatarTypeTag">Active: Server Minecraft IGN</span>
+        </div>
+
+        <!-- 3 MODES SELECTOR TABS -->
+        <div class="avatar-mode-tabs">
+          <button type="button" class="avatar-mode-btn" id="modeBtnPremium" onclick="selectAvatarMode('premium')">
+            <i class="bi bi-gem"></i>
+            <span>Premium Java</span>
+          </button>
+          <button type="button" class="avatar-mode-btn" id="modeBtnCustom" onclick="selectAvatarMode('custom')">
+            <i class="bi bi-image"></i>
+            <span>Upload Photo</span>
+          </button>
+          <button type="button" class="avatar-mode-btn active" id="modeBtnIgn" onclick="selectAvatarMode('ign')">
+            <i class="bi bi-controller"></i>
+            <span>Server IGN</span>
+          </button>
+        </div>
+
+        <!-- OPTION 1: PREMIUM JAVA SKIN -->
+        <div class="avatar-mode-panel" id="panelPremium" style="display: none;">
+          <div class="avatar-panel-flex">
+            <div class="avatar-preview-box">
+              <img id="previewPremiumHead" src="https://mc-heads.net/avatar/MHF_Steve/64" alt="Premium Head"
+                class="preview-head-img"
+                onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://minotar.net/helm/Steve/128.png';}">
+              <span class="preview-sub">Live Head Preview</span>
+            </div>
+            <div class="avatar-panel-controls">
+              <label class="form-label" for="inputPremiumName">Minecraft Java Premium Username</label>
+              <div class="input-icon-group">
+                <i class="bi bi-gem" style="color: #38bdf8;"></i>
+                <input type="text" id="inputPremiumName" class="form-control"
+                  placeholder="e.g. Juel, Dream, Technoblade" oninput="onPremiumInput(this.value)">
+              </div>
+              <small class="avatar-hint">
+                Automatically fetches official Java skin head from Mojang and saves it to your staff profile.
+              </small>
+              <div class="avatar-panel-actions">
+                <button type="button" class="btn btn-primary btn-sm" id="btnSavePremiumAvatar"
+                  onclick="applyPremiumAvatar()">
+                  <i class="bi bi-check2-circle"></i> <span>Use Premium Skin</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- OPTION 2: UPLOAD PHOTO & 1:1 CROP -->
+        <div class="avatar-mode-panel" id="panelCustom" style="display: none;">
+          <div class="avatar-panel-flex">
+            <div class="avatar-preview-box">
+              <img id="previewCustomPhoto" src="https://mc-heads.net/avatar/MHF_Steve/64" alt="Custom Photo"
+                class="preview-head-img custom-round">
+              <span class="preview-sub">1:1 Crop Preview</span>
+            </div>
+            <div class="avatar-panel-controls">
+              <label class="form-label">Upload Custom Image & 1:1 Crop</label>
+              <p class="avatar-hint" style="margin-top: 0; margin-bottom: 12px;">
+                Upload any photo from your device. An interactive <strong>1:1 Square Cropper</strong> will open so you
+                can zoom, drag, and crop the perfect avatar.
+              </p>
+              <input type="file" id="fileAvatarUpload" accept="image/png,image/jpeg,image/webp,image/gif"
+                style="display: none;" onchange="handleAvatarFileSelect(this)">
+              <div class="avatar-panel-actions">
+                <button type="button" class="btn btn-primary btn-sm"
+                  onclick="document.getElementById('fileAvatarUpload').click()">
+                  <i class="bi bi-cloud-arrow-up-fill"></i> <span>Choose Image & Crop &rarr;</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- OPTION 3: DEFAULT MINECRAFT IGN -->
+        <div class="avatar-mode-panel" id="panelIgn">
+          <div class="avatar-panel-flex">
+            <div class="avatar-preview-box">
+              <img id="previewIgnHead" src="https://mc-heads.net/avatar/MHF_Steve/64" alt="IGN Head"
+                class="preview-head-img"
+                onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://minotar.net/helm/Steve/128.png';}">
+              <span class="preview-sub" id="ignPreviewLabel">IGN: JU3L_</span>
+            </div>
+            <div class="avatar-panel-controls">
+              <label class="form-label">Server Minecraft Username (IGN)</label>
+              <p class="avatar-hint" style="margin-top: 0; margin-bottom: 12px;">
+                Automatically fetches the Minecraft skin head corresponding to your <strong>Minecraft Username
+                  (IGN)</strong>.
+              </p>
+              <div class="avatar-panel-actions">
+                <button type="button" class="btn btn-secondary btn-sm" id="btnRestoreIgnAvatar"
+                  onclick="applyIgnAvatar()">
+                  <i class="bi bi-arrow-counterclockwise"></i> <span>Set Default IGN Skin</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="avatar-modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeAvatarPickerModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1:1 INTERACTIVE AVATAR CROP MODAL -->
+  <div class="modal-backdrop-custom" id="cropModalBackdrop" style="display: none;"
+    onclick="handleCropBackdropClick(event)">
+    <div class="crop-modal-card" onclick="event.stopPropagation()">
+      <div class="crop-modal-header">
+        <div class="crop-modal-title">
+          <i class="bi bi-crop" style="color: var(--primary);"></i>
+          <span>Crop Profile Picture (1:1 Square)</span>
+        </div>
+        <button type="button" class="crop-modal-close" onclick="closeCropModal()">&times;</button>
+      </div>
+
+      <div class="crop-modal-body">
+        <div class="crop-image-container">
+          <img id="cropTargetImage" src="" alt="To Crop" style="max-width: 100%; display: block;">
+        </div>
+
+        <!-- ZOOM & ROTATE TOOLBAR -->
+        <div class="crop-toolbar">
+          <button type="button" class="btn-crop-tool" onclick="rotateCrop(-90)" title="Rotate Left 90°"><i
+              class="bi bi-arrow-counterclockwise"></i></button>
+          <button type="button" class="btn-crop-tool" onclick="rotateCrop(90)" title="Rotate Right 90°"><i
+              class="bi bi-arrow-clockwise"></i></button>
+          <div class="crop-zoom-wrap">
+            <i class="bi bi-zoom-out" style="font-size: 13px; color: var(--text-muted);"></i>
+            <input type="range" id="cropZoomSlider" min="0.1" max="3" step="0.05" value="1"
+              oninput="onZoomSliderChange(this.value)">
+            <i class="bi bi-zoom-in" style="font-size: 13px; color: var(--text-muted);"></i>
+          </div>
+          <button type="button" class="btn-crop-tool" onclick="resetCrop()" title="Reset Zoom/Position"><i
+              class="bi bi-aspect-ratio"></i></button>
+        </div>
+
+        <div class="crop-preview-row">
+          <div class="crop-circle-preview-wrap">
+            <div id="cropPreviewCircle" class="crop-preview-circle"></div>
+            <span style="font-size: 11px; color: var(--text-muted);">Circle View</span>
+          </div>
+          <div class="crop-meta-text">
+            <strong>1:1 Aspect Ratio Lock</strong>
+            <p style="margin: 0; font-size: 0.76rem; color: var(--text-muted); line-height: 1.4;">
+              Drag to reposition and use the slider to adjust zoom. Saving will store a high-resolution 1:1 circular
+              profile picture.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="crop-modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeCropModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" id="btnSaveCroppedPhoto" onclick="saveCroppedAvatar()">
+          <i class="bi bi-check2-circle"></i> <span>Crop & Save Avatar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../assets/js/config.js?v=3.4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1"
+    integrity="sha384-YieCqqg9gQufX7+5HcFvCEg/n3KUEdl8/Jb+A6J0npf1mB740VayvwKjTrtCeUoy"
+    crossorigin="anonymous"></script>
+  <script src="../assets/js/supabase.js?v=3.4"></script>
+  <script src="../assets/js/auth.js?v=3.5"></script>
+  <script src="../assets/js/utils.js?v=3.4"></script>
+  <script src="../assets/js/layout.js?v=3.8"></script>
+
+  <script>
+    let activeUserId = null;
+
+    function switchProfileTab(tabId) {
+      document.getElementById('paneSettings').style.display = tabId === 'settings' ? 'block' : 'none';
+      document.getElementById('paneSecurity').style.display = tabId === 'security' ? 'block' : 'none';
+      document.getElementById('paneActivity').style.display = tabId === 'activity' ? 'block' : 'none';
+
+      document.getElementById('tabBtnSettings').classList.toggle('active', tabId === 'settings');
+      document.getElementById('tabBtnSecurity').classList.toggle('active', tabId === 'security');
+      document.getElementById('tabBtnActivity').classList.toggle('active', tabId === 'activity');
+
+      if (tabId === 'activity') {
+        loadMyActivityLog();
+      }
+    }
+
+    // ===== AVATAR & SKIN HEAD MANAGEMENT (3 OPTIONS) =====
+    let currentAvatarType = 'ign'; // 'ign', 'premium', 'custom'
+    let currentAvatarUrl = null;
+    let cropperInstance = null;
+    let premiumDebounceTimer = null;
+
+    function selectAvatarMode(mode) {
+      currentAvatarType = mode;
+      const btnPrem = document.getElementById('modeBtnPremium');
+      const btnCust = document.getElementById('modeBtnCustom');
+      const btnIgn = document.getElementById('modeBtnIgn');
+
+      if (btnPrem) btnPrem.classList.toggle('active', mode === 'premium');
+      if (btnCust) btnCust.classList.toggle('active', mode === 'custom');
+      if (btnIgn) btnIgn.classList.toggle('active', mode === 'ign');
+
+      const panPrem = document.getElementById('panelPremium');
+      const panCust = document.getElementById('panelCustom');
+      const panIgn = document.getElementById('panelIgn');
+
+      if (panPrem) panPrem.style.display = mode === 'premium' ? 'block' : 'none';
+      if (panCust) panCust.style.display = mode === 'custom' ? 'block' : 'none';
+      if (panIgn) panIgn.style.display = mode === 'ign' ? 'block' : 'none';
+
+      updateAvatarSourceUI(mode, currentAvatarUrl);
+    }
+
+    function updateAvatarSourceUI(mode, url, ignParam) {
+      const tag = document.getElementById('currentAvatarTypeTag');
+      const badge = document.getElementById('avatarSourceText');
+      let label = 'Server Minecraft IGN';
+      if (mode === 'premium') label = 'Premium Java Skin';
+      else if (mode === 'custom') label = 'Custom Photo (1:1)';
+
+      if (tag) tag.textContent = 'Active: ' + label;
+      if (badge) badge.textContent = label;
+
+      const ign = (ignParam || document.getElementById('inputMinecraftIgn')?.value || 'JU3L_').trim();
+      const ignLabel = document.getElementById('ignPreviewLabel');
+      if (ignLabel) ignLabel.textContent = `IGN: ${ign}`;
+
+      const ignHead = document.getElementById('previewIgnHead');
+      if (ignHead) {
+        const cleanIgn = window.hvnCleanMcIgn ? window.hvnCleanMcIgn(ign) : (ign.replace(/^\.+/, '') || 'Steve');
+        ignHead.src = `https://mc-heads.net/avatar/${encodeURIComponent(cleanIgn)}/64`;
+        ignHead.onerror = function () {
+          if (!this.dataset.fb) {
+            this.dataset.fb = '1';
+            this.src = `https://minotar.net/helm/${encodeURIComponent(cleanIgn)}/128.png`;
+          }
+        };
+      }
+
+      if (mode === 'premium' && url) {
+        const premImg = document.getElementById('previewPremiumHead');
+        if (premImg) premImg.src = url;
+      } else if (mode === 'custom' && url) {
+        const custImg = document.getElementById('previewCustomPhoto');
+        if (custImg) custImg.src = url;
+      }
+    }
+
+    function openAvatarPickerModal() {
+      const modal = document.getElementById('avatarPickerModalBackdrop');
+      if (modal) {
+        modal.style.display = 'flex';
+        selectAvatarMode(currentAvatarType || 'ign');
+        const ign = (document.getElementById('inputMinecraftIgn')?.value || '').trim();
+        if (ign) {
+          updateAvatarSourceUI(currentAvatarType, currentAvatarUrl, ign);
+        }
+      }
+    }
+
+    function closeAvatarPickerModal() {
+      const modal = document.getElementById('avatarPickerModalBackdrop');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function handleAvatarBackdropClick(e) {
+      if (e.target && e.target.id === 'avatarPickerModalBackdrop') {
+        closeAvatarPickerModal();
+      }
+    }
+
+    function handleCropBackdropClick(e) {
+      if (e.target && e.target.id === 'cropModalBackdrop') {
+        closeCropModal();
+      }
+    }
+
+    // Alias for backward compatibility
+    function scrollToAvatarSection() {
+      openAvatarPickerModal();
+    }
+
+    // --- OPTION 1: PREMIUM JAVA SKIN ---
+    function onPremiumInput(val) {
+      clearTimeout(premiumDebounceTimer);
+      const name = (val || '').trim();
+      const previewEl = document.getElementById('previewPremiumHead');
+      if (!name) {
+        if (previewEl) previewEl.src = 'https://mc-heads.net/avatar/MHF_Steve/64';
+        return;
+      }
+      premiumDebounceTimer = setTimeout(() => {
+        if (previewEl) {
+          previewEl.src = `https://mc-heads.net/avatar/${encodeURIComponent(name)}/64`;
+          previewEl.onerror = function () {
+            if (!this.dataset.fb) {
+              this.dataset.fb = '1';
+              this.src = `https://minotar.net/helm/${encodeURIComponent(name)}/128.png`;
+            }
+          };
+        }
+      }, 350);
+    }
+
+    async function applyPremiumAvatar() {
+      const name = (document.getElementById('inputPremiumName')?.value || '').trim();
+      if (!name) {
+        if (window.hvnToast) window.hvnToast('Please enter a valid Minecraft Java Premium username.', 'warning');
+        return;
+      }
+
+      const btn = document.getElementById('btnSavePremiumAvatar');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> <span>Saving...</span>';
+      }
+
+      const newAvatarUrl = `https://mc-heads.net/avatar/${encodeURIComponent(name)}/64`;
+      await saveAvatarToDatabase(newAvatarUrl, 'premium');
+
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-check2-circle"></i> <span>Applied!</span>';
+        setTimeout(() => {
+          btn.innerHTML = '<i class="bi bi-check2-circle"></i> <span>Use Premium Skin</span>';
+          closeAvatarPickerModal();
+        }, 500);
+      } else {
+        closeAvatarPickerModal();
+      }
+      if (window.hvnToast) window.hvnToast('Premium Minecraft skin head applied!', 'success');
+    }
+
+    // --- OPTION 2: CUSTOM PHOTO UPLOAD & 1:1 CROP ---
+    function handleAvatarFileSelect(input) {
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+      if (!file.type.startsWith('image/')) {
+        if (window.hvnToast) window.hvnToast('Please select a valid image file (JPG, PNG, WebP).', 'warning');
+        input.value = '';
+        return;
+      }
+
+      closeAvatarPickerModal();
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        openCropModal(e.target.result);
+      };
+      reader.readAsDataURL(file);
+      input.value = '';
+    }
+
+    function openCropModal(imageSrc) {
+      const modal = document.getElementById('cropModalBackdrop');
+      const targetImg = document.getElementById('cropTargetImage');
+      const zoomSlider = document.getElementById('cropZoomSlider');
+      if (zoomSlider) zoomSlider.value = 1;
+
+      targetImg.src = imageSrc;
+      modal.style.display = 'flex';
+
+      if (cropperInstance) {
+        cropperInstance.destroy();
+        cropperInstance = null;
+      }
+
+      targetImg.onload = function () {
+        if (typeof Cropper !== 'undefined') {
+          cropperInstance = new Cropper(targetImg, {
+            aspectRatio: 1,
+            viewMode: 1,
+            dragMode: 'move',
+            autoCropArea: 0.92,
+            restore: false,
+            guides: true,
+            center: true,
+            highlight: false,
+            cropBoxMovable: true,
+            cropBoxResizable: true,
+            toggleDragModeOnDblclick: false,
+            preview: '#cropPreviewCircle'
+          });
+        }
+      };
+    }
+
+    function closeCropModal() {
+      const modal = document.getElementById('cropModalBackdrop');
+      if (modal) modal.style.display = 'none';
+      if (cropperInstance) {
+        cropperInstance.destroy();
+        cropperInstance = null;
+      }
+    }
+
+    function rotateCrop(deg) {
+      if (cropperInstance) cropperInstance.rotate(deg);
+    }
+
+    function resetCrop() {
+      if (cropperInstance) cropperInstance.reset();
+      const zoomSlider = document.getElementById('cropZoomSlider');
+      if (zoomSlider) zoomSlider.value = 1;
+    }
+
+    function onZoomSliderChange(val) {
+      const zoomVal = parseFloat(val);
+      if (cropperInstance) cropperInstance.zoomTo(zoomVal);
+    }
+
+    async function saveCroppedAvatar() {
+      const btn = document.getElementById('btnSaveCroppedPhoto');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> <span>Processing...</span>';
+
+      try {
+        let croppedCanvas;
+        if (cropperInstance) {
+          croppedCanvas = cropperInstance.getCroppedCanvas({
+            width: 256,
+            height: 256,
+            imageSmoothingEnabled: true,
+            imageSmoothingQuality: 'high'
+          });
+        } else {
+          const targetImg = document.getElementById('cropTargetImage');
+          croppedCanvas = document.createElement('canvas');
+          croppedCanvas.width = 256;
+          croppedCanvas.height = 256;
+          const ctx = croppedCanvas.getContext('2d');
+          const minDim = Math.min(targetImg.naturalWidth, targetImg.naturalHeight);
+          ctx.drawImage(
+            targetImg,
+            (targetImg.naturalWidth - minDim) / 2,
+            (targetImg.naturalHeight - minDim) / 2,
+            minDim, minDim,
+            0, 0, 256, 256
+          );
+        }
+
+        const blob = await new Promise(resolve => croppedCanvas.toBlob(resolve, 'image/webp', 0.88));
+        const dataUrlFallback = croppedCanvas.toDataURL('image/webp', 0.88);
+
+        let finalUrl = dataUrlFallback;
+        const client = window.initHavenSupabase ? window.initHavenSupabase() : window.supabaseClient;
+
+        if (client && client.storage && activeUserId && blob) {
+          try {
+            const filePath = `staff-${activeUserId}-${Date.now()}.webp`;
+            const { data: uploadData, error: uploadErr } = await client.storage
+              .from('avatars')
+              .upload(filePath, blob, {
+                contentType: 'image/webp',
+                upsert: true
+              });
+
+            if (!uploadErr && uploadData) {
+              const { data: publicRes } = client.storage.from('avatars').getPublicUrl(filePath);
+              if (publicRes && publicRes.publicUrl) {
+                finalUrl = publicRes.publicUrl;
+              }
+            }
+          } catch (storageErr) {
+            console.warn('Storage upload notice, falling back to data URL:', storageErr);
+          }
+        }
+
+        await saveAvatarToDatabase(finalUrl, 'custom');
+        closeCropModal();
+        if (window.hvnToast) window.hvnToast('Profile picture cropped and saved successfully!', 'success');
+
+      } catch (err) {
+        console.error('Crop save error:', err);
+        if (window.hvnToast) window.hvnToast('Failed to save cropped image: ' + err.message, 'danger');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-check2-circle"></i> <span>Crop & Save Avatar</span>';
+      }
+    }
+
+    // --- OPTION 3: DEFAULT MINECRAFT IGN ---
+    async function applyIgnAvatar() {
+      const ign = (document.getElementById('inputMinecraftIgn')?.value || '').trim() || 'HavenCraft';
+      const avatarIgn = window.hvnCleanMcIgn ? window.hvnCleanMcIgn(ign) : (ign.replace(/^\.+/, '') || 'Steve');
+      const defaultUrl = `https://mc-heads.net/avatar/${encodeURIComponent(avatarIgn)}/64`;
+
+      const btn = document.getElementById('btnRestoreIgnAvatar');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> <span>Saving...</span>';
+      }
+
+      await saveAvatarToDatabase(defaultUrl, 'ign');
+
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-arrow-counterclockwise"></i> <span>Set Default IGN Skin</span>';
+      }
+      closeAvatarPickerModal();
+      if (window.hvnToast) window.hvnToast('Default server IGN skin head restored!', 'success');
+    }
+
+    // Modal Escape Key Listener
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        closeCropModal();
+        closeAvatarPickerModal();
+      }
+    });
+
+    // --- UNIFIED HELPER: SAVE TO DATABASE & SYNC EVERYWHERE ---
+    async function saveAvatarToDatabase(url, type) {
+      currentAvatarType = type;
+      currentAvatarUrl = url;
+
+      const client = window.initHavenSupabase ? window.initHavenSupabase() : window.supabaseClient;
+      if (client && activeUserId) {
+        try {
+          await client.from('staff_profiles').update({
+            avatar_url: url,
+            avatar_type: type,
+            updated_at: new Date().toISOString()
+          }).eq('id', activeUserId);
+        } catch (e) {
+          console.warn('Database avatar update notice:', e);
+        }
+      }
+
+      // Update UI on profile page
+      const profAvatar = document.getElementById('profileUserAvatar');
+      if (profAvatar) profAvatar.src = url;
+
+      const staffAvatar = document.getElementById('staffUserAvatar');
+      if (staffAvatar) staffAvatar.src = url;
+
+      // Update preview card
+      if (type === 'premium') {
+        const pImg = document.getElementById('previewPremiumHead');
+        if (pImg) pImg.src = url;
+      } else if (type === 'custom') {
+        const cImg = document.getElementById('previewCustomPhoto');
+        if (cImg) cImg.src = url;
+      } else {
+        const iImg = document.getElementById('previewIgnHead');
+        if (iImg) iImg.src = url;
+      }
+
+      selectAvatarMode(type);
+
+      // Local session cache
+      try {
+        const saved = JSON.parse(localStorage.getItem('hvn_staff_profile') || '{}');
+        saved.avatarUrl = url;
+        saved.avatarType = type;
+        localStorage.setItem('hvn_staff_profile', JSON.stringify(saved));
+      } catch (_) { }
+
+      // In-memory verified profile
+      if (window.havenStaffProfile && window.havenStaffProfile._verified === true) {
+        window.havenStaffProfile = Object.freeze({
+          ...window.havenStaffProfile,
+          avatarUrl: url,
+          avatarType: type
+        });
+      }
+    }
+
+    function previewIgnHead(ign) {
+      const clean = (ign || '').trim();
+      const avatarIgn = window.hvnCleanMcIgn ? window.hvnCleanMcIgn(clean) : (clean.replace(/^\.+/, '') || 'Steve');
+      const ignTextEl = document.getElementById('profileIgnText');
+      if (ignTextEl) ignTextEl.textContent = clean;
+
+      const ignPreviewHead = document.getElementById('previewIgnHead');
+      if (ignPreviewHead) {
+        ignPreviewHead.src = `https://mc-heads.net/avatar/${encodeURIComponent(avatarIgn)}/64`;
+        ignPreviewHead.onerror = function () {
+          if (!this.dataset.fb) {
+            this.dataset.fb = '1';
+            this.src = `https://minotar.net/helm/${encodeURIComponent(avatarIgn)}/128.png`;
+          }
+        };
+      }
+
+      const ignLabel = document.getElementById('ignPreviewLabel');
+      if (ignLabel) ignLabel.textContent = `IGN: ${clean}`;
+
+      // Only update main avatar if current mode is 'ign'
+      if (currentAvatarType === 'ign') {
+        const avatarEl = document.getElementById('profileUserAvatar');
+        if (avatarEl) {
+          avatarEl.src = `https://mc-heads.net/avatar/${encodeURIComponent(avatarIgn)}/64`;
+          avatarEl.onerror = function () {
+            if (!this.dataset.fb) {
+              this.dataset.fb = '1';
+              this.src = `https://minotar.net/helm/${encodeURIComponent(avatarIgn)}/128.png`;
+            }
+          };
+        }
+        currentAvatarUrl = `https://mc-heads.net/avatar/${encodeURIComponent(avatarIgn)}/64`;
+      }
+    }
+
+    // Load active staff profile live from Supabase (cryptographically verified)
+    async function loadStaffProfile() {
+      const client = window.initHavenSupabase ? window.initHavenSupabase() : window.supabaseClient;
+      if (!client || !client.auth) return;
+
+      try {
+        if (window.hvnAuth && typeof window.hvnAuth.waitForProfile === 'function') {
+          await window.hvnAuth.waitForProfile();
+        }
+
+        const { data: { session } } = await client.auth.getSession();
+        if (!session || !session.access_token) return;
+
+        const { data: userRes, error: userErr } = await client.auth.getUser(session.access_token);
+        const verifiedUser = (!userErr && userRes && userRes.user) ? userRes.user : null;
+        if (!verifiedUser) return;
+
+        activeUserId = verifiedUser.id;
+        const userEmail = (verifiedUser.email || '').trim().toLowerCase();
+        const isOwner = window.hvnIsOwnerEmail ? window.hvnIsOwnerEmail(userEmail) : false;
+
+        // Fetch row from staff_profiles
+        const { data: profile } = await client
+          .from('staff_profiles')
+          .select('*')
+          .eq('id', activeUserId)
+          .maybeSingle();
+
+        const p = profile || {};
+        const fullName = p.full_name || (isOwner ? 'Juel' : userEmail.split('@')[0]);
+        const ign = p.minecraft_ign || (isOwner ? 'JU3L_' : 'HavenCraft');
+        const avatarIgn = window.hvnCleanMcIgn ? window.hvnCleanMcIgn(ign) : (ign.replace(/^\.+/, '') || 'Steve');
+        const role = isOwner ? 'Owner' : (p.role || 'Moderator');
+        const discord = p.discord || 'Not linked';
+
+        // Avatar configuration
+        currentAvatarType = p.avatar_type || 'ign';
+        currentAvatarUrl = p.avatar_url;
+        if (!currentAvatarUrl) {
+          currentAvatarUrl = `https://mc-heads.net/avatar/${encodeURIComponent(avatarIgn)}/64`;
+        }
+
+        // Update form fields
+        document.getElementById('inputFullName').value = fullName;
+        document.getElementById('inputMinecraftIgn').value = ign;
+        document.getElementById('inputEmail').value = userEmail;
+        document.getElementById('inputRole').value = role;
+        document.getElementById('inputDiscord').value = discord;
+
+        // If premium mode, extract username into inputPremiumName
+        if (currentAvatarType === 'premium' && currentAvatarUrl) {
+          const match = currentAvatarUrl.match(/avatar\/([^/]+)/);
+          if (match && match[1]) {
+            const inputPrem = document.getElementById('inputPremiumName');
+            if (inputPrem) inputPrem.value = decodeURIComponent(match[1]);
+          }
+        }
+
+        // Update summary card safely
+        document.getElementById('profileNameDisplay').textContent = fullName;
+        document.getElementById('profileRoleText').textContent = role;
+        document.getElementById('profileIgnText').textContent = ign;
+        document.getElementById('profileEmailDisplay').textContent = userEmail;
+        
+        const profAvatarEl = document.getElementById('profileUserAvatar');
+        if (profAvatarEl) {
+          profAvatarEl.src = currentAvatarUrl;
+          profAvatarEl.onerror = function () {
+            if (!this.dataset.fb && currentAvatarType === 'ign') {
+              this.dataset.fb = '1';
+              this.src = `https://minotar.net/helm/${encodeURIComponent(avatarIgn)}/128.png`;
+            }
+          };
+        }
+
+        selectAvatarMode(currentAvatarType);
+        updateAvatarSourceUI(currentAvatarType, currentAvatarUrl, ign);
+
+        // Role badge styling
+        const roleEl = document.getElementById('profileRoleDisplay');
+        roleEl.className = 'profile-card-badge';
+        if (role === 'Owner') roleEl.classList.add('role-badge-owner');
+        else if (role === 'Sr-Admin' || role === 'Co-Owner') roleEl.classList.add('role-badge-sr-admin');
+        else if (role === 'Manager') roleEl.classList.add('role-badge-manager');
+        else if (role === 'Developer') roleEl.classList.add('role-badge-developer');
+        else if (role === 'Admin' || role === 'Administrator') roleEl.classList.add('role-badge-admin');
+        else if (role === 'Mod' || role === 'Moderator') roleEl.classList.add('role-badge-mod');
+        else if (role === 'Helper') roleEl.classList.add('role-badge-helper');
+        else if (role === 'Builder') roleEl.classList.add('role-badge-builder');
+        else roleEl.classList.add('role-badge-officer');
+
+        // Show Manage Staff link if Owner or has users permission
+        const hasUsersPerm = isOwner || (p.permissions && p.permissions.users === true);
+        const shortcutBox = document.getElementById('staffUsersShortcutBox');
+        if (shortcutBox) {
+          shortcutBox.style.display = hasUsersPerm ? 'block' : 'none';
+        }
+
+        await loadQuickStats(client, ign, fullName, isOwner, p.permissions || {});
+      } catch (err) {
+        console.warn('Failed to load profile:', err);
+      }
+    }
+
+    async function loadQuickStats(client, ignParam, fullNameParam, isOwnerParam, permsParam) {
+      const statTicketsEl = document.getElementById('statTickets');
+      const statOrdersEl = document.getElementById('statOrders');
+      const statLogsEl = document.getElementById('statLogs');
+
+      const verifiedProfile = (window.havenStaffProfile && window.havenStaffProfile._verified === true) ? window.havenStaffProfile : {};
+      const ign = (ignParam || verifiedProfile.ign || verifiedProfile.minecraftIgn || '').trim();
+      const fullName = (fullNameParam || verifiedProfile.fullName || verifiedProfile.name || '').trim();
+      const isOwner = Boolean(isOwnerParam || verifiedProfile.role === 'Owner');
+      const perms = permsParam || verifiedProfile.permissions || {};
+
+      const canViewTickets = isOwner || Boolean(perms.tickets);
+      const canViewOrders = isOwner || Boolean(perms.orders || perms.finance);
+
+      try {
+        let logsPromise = Promise.resolve({ count: 0, error: null });
+        const cleanIgn = ign.replace(/[,"'()\\]/g, '').trim();
+        const cleanName = fullName.replace(/[,"'()\\]/g, '').trim();
+
+        if (cleanIgn && cleanIgn !== 'Staff') {
+          let logsQuery = client.from('audit_logs').select('id', { count: 'exact', head: true });
+          if (cleanName && cleanName !== cleanIgn) {
+            logsQuery = logsQuery.in('staff_name', [cleanIgn, cleanName]);
+          } else {
+            logsQuery = logsQuery.eq('staff_name', cleanIgn);
+          }
+          logsPromise = logsQuery;
+        }
+
+        const [ticketsRes, ordersRes, logsRes] = await Promise.allSettled([
+          canViewTickets
+            ? client.from('tickets').select('id', { count: 'exact', head: true }).eq('status', 'open')
+            : Promise.resolve({ count: 0, error: null }),
+          canViewOrders
+            ? client.from('store_orders').select('id', { count: 'exact', head: true }).eq('status', 'pending')
+            : Promise.resolve({ count: 0, error: null }),
+          logsPromise
+        ]);
+
+        if (statTicketsEl) {
+          if (ticketsRes.status === 'fulfilled' && !ticketsRes.value.error && typeof ticketsRes.value.count === 'number') {
+            statTicketsEl.textContent = ticketsRes.value.count;
+          } else {
+            statTicketsEl.textContent = '0';
+          }
+        }
+
+        if (statOrdersEl) {
+          if (ordersRes.status === 'fulfilled' && !ordersRes.value.error && typeof ordersRes.value.count === 'number') {
+            statOrdersEl.textContent = ordersRes.value.count;
+          } else {
+            statOrdersEl.textContent = '0';
+          }
+        }
+
+        if (statLogsEl) {
+          if (logsRes.status === 'fulfilled' && !logsRes.value.error && typeof logsRes.value.count === 'number') {
+            statLogsEl.textContent = logsRes.value.count;
+          } else {
+            statLogsEl.textContent = '0';
+          }
+        }
+      } catch (e) {
+        console.warn('loadQuickStats fallback:', e);
+        if (statTicketsEl && statTicketsEl.textContent === '--') statTicketsEl.textContent = '0';
+        if (statOrdersEl && statOrdersEl.textContent === '--') statOrdersEl.textContent = '0';
+        if (statLogsEl && statLogsEl.textContent === '--') statLogsEl.textContent = '0';
+      }
+    }
+
+    // Save profile settings to Supabase
+    async function saveProfileSettings(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSaveProfile');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> <span>Saving...</span>';
+
+      const fullName = document.getElementById('inputFullName').value.trim();
+      const ign = document.getElementById('inputMinecraftIgn').value.trim();
+      const discord = document.getElementById('inputDiscord').value.trim();
+
+      const client = window.initHavenSupabase ? window.initHavenSupabase() : window.supabaseClient;
+      if (!client || !activeUserId) {
+        if (window.hvnToast) window.hvnToast('Database connection not ready.', 'danger');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-check2-circle"></i> <span>Save changes</span>';
+        return;
+      }
+
+      try {
+        const { error } = await client
+          .from('staff_profiles')
+          .update({
+            full_name: fullName,
+            minecraft_ign: ign,
+            discord: discord,
+            avatar_url: currentAvatarUrl,
+            avatar_type: currentAvatarType,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', activeUserId);
+
+        if (error) throw error;
+
+        // Update local session cache (non-sensitive display fields only)
+        const saved = JSON.parse(localStorage.getItem('hvn_staff_profile') || '{}');
+        saved.fullName = fullName;
+        saved.name = fullName;
+        saved.minecraftIgn = ign;
+        saved.ign = ign;
+        saved.discord = discord;
+        saved.avatarUrl = currentAvatarUrl;
+        saved.avatarType = currentAvatarType;
+        localStorage.setItem('hvn_staff_profile', JSON.stringify(saved));
+
+        if (window.havenStaffProfile && window.havenStaffProfile._verified === true) {
+          window.havenStaffProfile = Object.freeze({
+            ...window.havenStaffProfile,
+            fullName: fullName,
+            name: fullName,
+            minecraftIgn: ign,
+            ign: ign,
+            discord: discord,
+            avatarUrl: currentAvatarUrl,
+            avatarType: currentAvatarType
+          });
+        }
+
+        // Update avatar in navbar and sidebar live
+        const avatarEl = document.getElementById('staffUserAvatar');
+        const nameEl = document.getElementById('staffUserName');
+        if (avatarEl && currentAvatarUrl) avatarEl.src = currentAvatarUrl;
+        if (nameEl) nameEl.textContent = fullName;
+
+        previewIgnHead(ign);
+        document.getElementById('profileNameDisplay').textContent = fullName;
+
+        if (window.hvnToast) {
+          window.hvnToast('Profile updated successfully in database!', 'success');
+        }
+
+        btn.innerHTML = '<i class="bi bi-check2-circle"></i> <span>Saved!</span>';
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="bi bi-check2-circle"></i> <span>Save changes</span>';
+        }, 1500);
+
+      } catch (err) {
+        console.error('Profile update failed:', err);
+        if (window.hvnToast) {
+          window.hvnToast(`Update failed: ${err.message}`, 'danger');
+        } else {
+          alert('Update failed: ' + err.message);
+        }
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-check2-circle"></i> <span>Save changes</span>';
+      }
+    }
+
+    // Password strength evaluator
+    function scorePassword(pw) {
+      let score = 0;
+      if (pw.length >= 6) score++;
+      if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) score++;
+      if (/\d/.test(pw)) score++;
+      if (/[^a-zA-Z0-9]/.test(pw)) score++;
+      return score;
+    }
+
+    function renderPwStrength() {
+      const pw = document.getElementById('newPassword').value;
+      const meter = document.getElementById('pwMeter');
+      const label = document.getElementById('pwStrengthLabel');
+      if (!meter || !label) return;
+      const bars = meter.querySelectorAll('span');
+      if (!pw) {
+        bars.forEach(b => { b.className = ''; });
+        label.textContent = '';
+        return;
+      }
+      const score = scorePassword(pw);
+      const names = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+      bars.forEach((b, i) => { b.className = i < score ? 'on-' + score : ''; });
+      label.textContent = names[score] || '';
+    }
+
+    let forgotCooldownTimer = null;
+
+    async function handleForgotPassword() {
+      const btn = document.getElementById('btnForgotCurrentPw');
+      if (btn && btn.getAttribute('data-cooldown') === 'true') {
+        return;
+      }
+
+      try {
+        const client = window.initHavenSupabase ? window.initHavenSupabase() : window.supabaseClient;
+        if (!client || !client.auth) throw new Error('Authentication service unavailable. Please refresh.');
+
+        const { data: { user }, error: userError } = await client.auth.getUser();
+        if (userError || !user || !user.email) {
+          throw new Error('Unable to retrieve staff account email. Please re-login.');
+        }
+
+        if (btn) {
+          btn.style.pointerEvents = 'none';
+          btn.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> <span>Sending link...</span>';
+        }
+
+        let redirectTo;
+        if (window.location.protocol === 'file:') {
+          redirectTo = window.location.href.replace(/profile\/.*$/i, 'login/setup-password.html');
+        } else {
+          redirectTo = window.location.origin + '/login/setup-password.html';
+        }
+
+        const { error } = await client.auth.resetPasswordForEmail(user.email, { redirectTo: redirectTo });
+        if (error) throw error;
+
+        // Log audit event
+        if (typeof window.hvnLogAudit === 'function') {
+          const staffName = (window.havenStaffProfile && (window.havenStaffProfile.ign || window.havenStaffProfile.name)) || user.email;
+          window.hvnLogAudit('Security', 'PASSWORD_RESET_LINK_SENT', staffName, 'Success', {
+            email: user.email,
+            source: 'profile_tab'
+          });
+        }
+
+        if (window.hvnToast) {
+          window.hvnToast('Password recovery link sent to ' + user.email + '! Check your inbox or spam.', 'success', 7000);
+        }
+
+        // Start 60-second cooldown on the button to prevent spamming
+        if (btn) {
+          btn.setAttribute('data-cooldown', 'true');
+          btn.style.pointerEvents = 'none';
+          btn.style.opacity = '0.75';
+          let countdown = 60;
+          btn.innerHTML = '<i class="bi bi-clock-history"></i> <span>Resend in ' + countdown + 's</span>';
+
+          if (forgotCooldownTimer) clearInterval(forgotCooldownTimer);
+          forgotCooldownTimer = setInterval(() => {
+            countdown--;
+            if (countdown > 0) {
+              btn.innerHTML = '<i class="bi bi-clock-history"></i> <span>Resend in ' + countdown + 's</span>';
+            } else {
+              clearInterval(forgotCooldownTimer);
+              btn.removeAttribute('data-cooldown');
+              btn.style.pointerEvents = 'auto';
+              btn.style.opacity = '1';
+              btn.innerHTML = '<i class="bi bi-question-circle"></i> <span>Forgot password?</span>';
+            }
+          }, 1000);
+        }
+
+      } catch (err) {
+        console.error('Forgot password error:', err);
+        let errorMsg = err.message || 'Failed to send recovery link.';
+
+        // Detect email rate limit
+        if (errorMsg.toLowerCase().includes('rate limit')) {
+          errorMsg = 'Email request limit reached! Please wait a few minutes or check your inbox/spam for the previous email.';
+        }
+
+        if (window.hvnToast) {
+          window.hvnToast(errorMsg, 'danger', 7000);
+        } else {
+          alert('Notice: ' + errorMsg);
+        }
+
+        if (btn) {
+          btn.style.pointerEvents = 'auto';
+          btn.style.opacity = '1';
+          btn.innerHTML = '<i class="bi bi-question-circle"></i> <span>Forgot password?</span>';
+        }
+      }
+    }
+
+    // Backwards-compatible alias
+    function handleForgotCurrentPassword() {
+      return handleForgotPassword();
+    }
+
+    async function handlePasswordUpdate(e) {
+      e.preventDefault();
+      const currentPw = (document.getElementById('currentPassword')?.value || '').trim();
+      const p1 = document.getElementById('newPassword').value;
+      const p2 = document.getElementById('confirmPassword').value;
+      const errEl = document.getElementById('pwMismatchError');
+      const curErrEl = document.getElementById('currentPwError');
+      const curErrText = document.getElementById('currentPwErrorText');
+
+      if (curErrEl) curErrEl.style.display = 'none';
+      if (errEl) errEl.style.display = 'none';
+
+      if (!currentPw) {
+        if (curErrEl && curErrText) {
+          curErrText.textContent = 'Please enter your current password.';
+          curErrEl.style.display = 'block';
+        }
+        document.getElementById('currentPassword')?.focus();
+        return;
+      }
+
+      if (p1.length < 8) {
+        if (window.hvnToast) {
+          window.hvnToast('New password must be at least 8 characters long.', 'warning');
+        } else {
+          alert('New password must be at least 8 characters long.');
+        }
+        document.getElementById('newPassword')?.focus();
+        return;
+      }
+
+      if (p1 !== p2) {
+        if (errEl) errEl.style.display = 'block';
+        document.getElementById('confirmPassword').focus();
+        return;
+      }
+
+      if (p1 === currentPw) {
+        if (window.hvnToast) {
+          window.hvnToast('New password cannot be the same as your current password.', 'warning');
+        } else {
+          alert('New password cannot be the same as your current password.');
+        }
+        document.getElementById('newPassword')?.focus();
+        return;
+      }
+
+      const btn = document.getElementById('btnUpdatePassword');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="bi bi-shield-check spin"></i> <span>Verifying...</span>';
+
+      try {
+        const client = window.initHavenSupabase ? window.initHavenSupabase() : window.supabaseClient;
+        if (!client || !client.auth) throw new Error('Authentication service unavailable. Please refresh.');
+
+        // Step 1: Get current authenticated user session
+        const { data: { user }, error: userError } = await client.auth.getUser();
+        if (userError || !user || !user.email) {
+          throw new Error('Active session not found. Please log in again.');
+        }
+
+        // Step 2: Verify current password by re-authenticating with Supabase
+        const { error: verifyError } = await client.auth.signInWithPassword({
+          email: user.email,
+          password: currentPw
+        });
+
+        if (verifyError) {
+          if (curErrEl && curErrText) {
+            curErrText.textContent = 'Current password is incorrect. Please try again.';
+            curErrEl.style.display = 'block';
+          }
+          document.getElementById('currentPassword')?.focus();
+          throw new Error('Current password is incorrect.');
+        }
+
+        // Step 3: Update live Supabase Auth password (enforcing current_password at API level)
+        btn.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> <span>Updating...</span>';
+        const { error: updateError } = await client.auth.updateUser({
+          password: p1,
+          current_password: currentPw
+        });
+        if (updateError) throw updateError;
+
+        // Reset form inputs
+        document.getElementById('currentPassword').value = '';
+        document.getElementById('newPassword').value = '';
+        document.getElementById('confirmPassword').value = '';
+        renderPwStrength();
+
+        // Audit Log Entry
+        if (typeof window.hvnLogAudit === 'function') {
+          const staffName = (window.havenStaffProfile && (window.havenStaffProfile.ign || window.havenStaffProfile.name)) || user.email;
+          window.hvnLogAudit('Security', 'PASSWORD_CHANGE', staffName, 'Success', {
+            email: user.email,
+            verified: true
+          });
+        }
+
+        if (window.hvnToast) {
+          window.hvnToast('Password updated successfully!', 'success');
+        } else {
+          alert('Password updated successfully!');
+        }
+
+        btn.innerHTML = '<i class="bi bi-check2"></i> <span>Password Saved!</span>';
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="bi bi-lock-fill"></i> <span>Update Password</span>';
+        }, 2000);
+
+      } catch (err) {
+        console.error('Password update error:', err);
+        if (window.hvnToast) {
+          window.hvnToast(err.message || 'Password update failed', 'danger');
+        } else {
+          alert('Error: ' + err.message);
+        }
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-lock-fill"></i> <span>Update Password</span>';
+      }
+    }
+
+    // Load recent activity from audit_logs (strictly scoped to verified staff user)
+    async function loadMyActivityLog() {
+      const container = document.getElementById('activityLogContainer');
+      const client = window.initHavenSupabase ? window.initHavenSupabase() : window.supabaseClient;
+      if (!client) return;
+
+      if (window.hvnAuth && typeof window.hvnAuth.waitForProfile === 'function') {
+        await window.hvnAuth.waitForProfile();
+      }
+
+      const verifiedProfile = (window.havenStaffProfile && window.havenStaffProfile._verified === true)
+        ? window.havenStaffProfile
+        : {};
+      const inputIgn = (document.getElementById('inputMinecraftIgn')?.value || '').trim();
+      const inputName = (document.getElementById('inputFullName')?.value || '').trim();
+
+      const ign = (verifiedProfile.ign || verifiedProfile.minecraftIgn || inputIgn || '').trim();
+      const fullName = (verifiedProfile.fullName || verifiedProfile.name || inputName || '').trim();
+
+      const cleanIgn = ign.replace(/[,"'()\\]/g, '').trim();
+      const cleanName = fullName.replace(/[,"'()\\]/g, '').trim();
+
+      if (!cleanIgn || cleanIgn === 'Staff') {
+        container.innerHTML = `
+          <div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 0.84rem;">
+            <i class="bi bi-journal-x" style="font-size: 1.6rem; display: block; margin-bottom: 6px;"></i>
+            No recent audit actions recorded yet.
+          </div>
+        `;
+        return;
+      }
+
+      try {
+        let query = client
+          .from('audit_logs')
+          .select('*');
+
+        if (cleanName && cleanName !== cleanIgn) {
+          query = query.in('staff_name', [cleanIgn, cleanName]);
+        } else {
+          query = query.eq('staff_name', cleanIgn);
+        }
+
+        const { data, error } = await query
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+          container.innerHTML = `
+            <div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 0.84rem;">
+              <i class="bi bi-journal-x" style="font-size: 1.6rem; display: block; margin-bottom: 6px;"></i>
+              No recent audit actions recorded yet.
+            </div>
+          `;
+          return;
+        }
+
+        let html = '';
+        data.forEach(log => {
+          const time = new Date(log.created_at).toLocaleString('en-US', {
+            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+          });
+
+          html += `
+            <div style="display: flex; gap: 12px; align-items: center; padding: 12px 14px; background: var(--panel-tint); border: 1px solid var(--border); border-radius: var(--radius-sm);">
+              <div style="width: 34px; height: 34px; border-radius: 8px; background: var(--primary-dim); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">
+                <i class="bi ${log.category === 'Server Console' ? 'bi-terminal' : (log.category === 'Server Power' ? 'bi-power' : 'bi-shield-check')}"></i>
+              </div>
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 0.84rem; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  ${window.hvnEscapeHtml(log.action || log.category)}: ${window.hvnEscapeHtml(log.target)}
+                </div>
+                <div style="font-size: 0.74rem; color: var(--text-muted);">
+                  By: <strong>${window.hvnEscapeHtml(log.staff_name)}</strong> (${window.hvnEscapeHtml(log.staff_role || 'Staff')})
+                </div>
+              </div>
+              <span style="font-size: 0.72rem; font-family: var(--font-mono); color: var(--text-muted); flex-shrink: 0;">
+                ${time}
+              </span>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+      } catch (err) {
+        container.innerHTML = `
+          <div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">
+            Unable to fetch live audit history.
+          </div>
+        `;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', async function () {
+      try {
+        const _c = JSON.parse(localStorage.getItem('hvn_staff_profile') || '{}');
+        const _raw = _c.mc_ign || _c.minecraft_ign || _c.ign || '';
+        if (_raw) previewIgnHead(_raw);
+      } catch (_) { }
+
+      document.getElementById('currentPassword')?.addEventListener('input', function () {
+        const curErrEl = document.getElementById('currentPwError');
+        if (curErrEl) curErrEl.style.display = 'none';
+      });
+      document.getElementById('newPassword')?.addEventListener('input', renderPwStrength);
+      document.getElementById('confirmPassword')?.addEventListener('input', function () {
+        const pwMismatchEl = document.getElementById('pwMismatchError');
+        if (pwMismatchEl) pwMismatchEl.style.display = 'none';
+      });
+      await loadStaffProfile();
+      await loadMyActivityLog();
+    });
+  </script>
+</body>
+
+</html>

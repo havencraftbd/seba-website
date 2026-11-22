@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en" class="hvn-public-page">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — HavenCraft Admin</title>
+  <link rel="icon" href="../logo/logo.svg" type="image/svg+xml">
+
+  <!-- Fonts: Manrope (body) & Montserrat (headings/buttons) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Montserrat:wght@500;600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous">
+
+  <!-- HavenCraft Admin Theme -->
+  <script src="../assets/js/theme.js?v=3.9"></script>
+  <link rel="stylesheet" href="../assets/css/admin.css?v=3.8">
+
+  <style>
+    /* ================================================================
+       HAVENCRAFT SMP — SENIOR UI / UNSLOPPED STAFF LOGIN
+       Aesthetics: Quiet Chrome, Deep Emerald Accent, Tactile Depth, Zero Slop
+       ================================================================ */
+
+    :root {
+      --bg: #070911;
+      --primary: #00c896;
+      --primary-hover: #00dfa7;
+      --primary-rgb: 0, 200, 150;
+      --on-primary: #041410;
+
+      --card-bg: rgba(11, 16, 27, 0.88);
+      --card-border: rgba(255, 255, 255, 0.08);
+
+      --fg: #f8fafc;
+      --fg-muted: #94a3b8;
+      --fg-dim: #64748b;
+
+      --input-bg: rgba(14, 20, 34, 0.72);
+      --input-border: rgba(255, 255, 255, 0.09);
+
+      --discord: #5865F2;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #070911 radial-gradient(circle at 50% 30%, rgba(0, 200, 150, 0.06) 0%, transparent 65%);
+      font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+      color: var(--fg);
+      padding: 24px 16px;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ---- Master Card ---- */
+    .login-master-box {
+      width: 100%;
+      max-width: 940px;
+      min-height: 540px;
+      background: var(--card-bg);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.75);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      overflow: hidden;
+      margin: auto;
+    }
+
+    /* ================================================================
+       LEFT SHOWCASE PANE (MINIMAL, CLEAN ARTWORK)
+       ================================================================ */
+    .showcase-pane {
+      position: relative;
+      padding: 40px 36px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background:
+        linear-gradient(to right, rgba(9, 14, 24, 0) 0%, rgba(9, 14, 24, 0.08) 45%, rgba(9, 14, 24, 0.65) 78%, #090e18 100%),
+        linear-gradient(180deg, rgba(7, 9, 17, 0.2) 0%, rgba(7, 9, 17, 0.6) 65%, rgba(7, 9, 17, 0.95) 100%),
+        url('../assets/img/login_hero.jpg') center/cover no-repeat;
+      border-right: none;
+    }
+
+    .brand-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      width: fit-content;
+    }
+
+    .brand-badge-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: none;
+      flex-shrink: 0;
+    }
+
+    .brand-badge-icon img {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .brand-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: #ffffff;
+    }
+
+    .brand-title span {
+      color: var(--primary);
+    }
+
+    .showcase-bottom-text {
+      position: relative;
+      z-index: 2;
+    }
+
+    .showcase-bottom-text h2 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.65rem;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+      line-height: 1.3;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+
+    .showcase-bottom-text h2 span {
+      color: var(--primary);
+    }
+
+    .showcase-bottom-text p {
+      font-size: 0.84rem;
+      color: var(--fg-muted);
+      line-height: 1.55;
+    }
+
+    /* ================================================================
+       RIGHT FORM PANE (CLEAN & GORGEOUS)
+       ================================================================ */
+    .form-pane {
+      padding: 44px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: #090e18;
+    }
+
+    .form-header {
+      margin-bottom: 24px;
+    }
+
+    .form-header h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.65rem;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    .form-header p {
+      font-size: 0.85rem;
+      color: var(--fg-muted);
+      line-height: 1.5;
+    }
+
+    /* Alert */
+    .auth-alert {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      margin-bottom: 18px;
+      border: 1px solid transparent;
+      line-height: 1.4;
+    }
+
+    .auth-alert.danger {
+      display: flex;
+      background: rgba(239, 68, 68, 0.12);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+    }
+
+    .auth-alert.success {
+      display: flex;
+      background: rgba(0, 200, 150, 0.12);
+      border-color: rgba(0, 200, 150, 0.35);
+      color: #6ee7b7;
+    }
+
+    /* Form Fields */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+
+    .label-row label,
+    .form-group>label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--fg-muted);
+    }
+
+    .forgot-link {
+      font-size: 0.76rem;
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.15s ease;
+    }
+
+    .forgot-link:hover {
+      color: var(--primary-hover);
+      text-decoration: underline;
+    }
+
+    .input-box {
+      position: relative;
+    }
+
+    .input-box i.lead-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--fg-dim);
+      font-size: 0.95rem;
+      pointer-events: none;
+    }
+
+    .input-box input {
+      width: 100%;
+      height: 44px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      padding: 0 40px;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    .input-box input::placeholder {
+      color: var(--fg-dim);
+    }
+
+    .input-box input:focus {
+      background: rgba(14, 20, 34, 0.95);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 200, 150, 0.15);
+    }
+
+    .toggle-pass {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--fg-dim);
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 6px;
+      transition: color 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .toggle-pass:hover,
+    .toggle-pass:focus-visible {
+      color: var(--fg-muted);
+      outline: none;
+    }
+
+    /* Remember Checkbox */
+    .remember-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .remember-row input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border: 1px solid var(--input-border);
+      border-radius: 4px;
+      background: var(--input-bg);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .remember-row input[type="checkbox"]:checked {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .remember-row input[type="checkbox"]:checked::after {
+      content: '';
+      width: 4px;
+      height: 8px;
+      border: solid #041410;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+      margin-bottom: 2px;
+    }
+
+    .remember-row label {
+      font-size: 0.8rem;
+      color: var(--fg-muted);
+      cursor: pointer;
+    }
+
+    /* ---- Primary Login Button ---- */
+    .btn-login {
+      width: 100%;
+      height: 44px;
+      background: var(--primary);
+      color: var(--on-primary);
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      letter-spacing: 0.2px;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      transition: background 0.15s ease, transform 0.08s ease;
+    }
+
+    .btn-login:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-login:active {
+      transform: scale(0.985) translateY(1px);
+    }
+
+    .btn-login:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ---- Divider ---- */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .divider span {
+      font-size: 0.74rem;
+      color: var(--fg-dim);
+      font-weight: 500;
+    }
+
+    /* ---- OAuth Secondary Login Buttons ---- */
+    .oauth-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn-oauth {
+      width: 100%;
+      height: 43px;
+      background: rgba(255, 255, 255, 0.03);
+      color: #f1f5f9;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      font-size: 0.87rem;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.08s ease;
+    }
+
+    .btn-oauth:active {
+      transform: scale(0.985) translateY(1px);
+    }
+
+    .btn-oauth:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-oauth--google:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.075);
+      border-color: rgba(255, 255, 255, 0.24);
+      color: #ffffff;
+    }
+
+    .btn-oauth--discord:hover:not(:disabled) {
+      background: rgba(88, 101, 242, 0.14);
+      border-color: rgba(88, 101, 242, 0.4);
+      color: #ffffff;
+    }
+
+    .btn-oauth--discord i {
+      font-size: 1.08rem;
+      color: #818cf8;
+    }
+
+    .btn-oauth--discord:hover:not(:disabled) i {
+      color: #93c5fd;
+    }
+
+    .oauth-google-icon {
+      width: 17px;
+      height: 17px;
+      flex-shrink: 0;
+    }
+
+    /* ---- Footer Note ---- */
+    .form-footer {
+      text-align: center;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .form-footer a {
+      font-size: 0.8rem;
+      color: var(--fg-dim);
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .form-footer a:hover {
+      color: var(--primary);
+    }
+
+    /* Request Access Info Modal (Replaces amateur browser alert) */
+    .hvn-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(8px);
+      z-index: 1060;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      animation: modalFadeIn 0.2s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    .hvn-modal-card {
+      background: #0c1422;
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 460px;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      animation: modalSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .hvn-modal-header {
+      padding: 16px 20px;
+      background: #0e1726;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .hvn-modal-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hvn-modal-close {
+      background: transparent;
+      border: none;
+      color: var(--fg-dim);
+      font-size: 22px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 2px 6px;
+      border-radius: 6px;
+      transition: color 0.15s ease;
+    }
+
+    .hvn-modal-close:hover {
+      color: #fff;
+    }
+
+    .hvn-modal-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .step-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 12px;
+      border-radius: 8px;
+    }
+
+    .step-number {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(0, 200, 150, 0.15);
+      color: var(--primary);
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step-text {
+      font-size: 0.82rem;
+      color: var(--fg-muted);
+      line-height: 1.45;
+    }
+
+    .step-text strong {
+      color: #ffffff;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .hvn-modal-footer {
+      padding: 14px 20px;
+      background: #0e1726;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    /* Spinner */
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .spin {
+      animation: spin 0.8s linear infinite;
+      display: inline-block;
+    }
+
+    /* Responsive */
+    @media (max-width: 820px) {
+      body {
+        padding: 20px 14px;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .login-master-box {
+        grid-template-columns: 1fr;
+        width: 100%;
+        max-width: 420px;
+        min-height: auto;
+        border-radius: 14px;
+        margin: auto;
+      }
+
+      .showcase-pane {
+        padding: 24px 20px 20px;
+        min-height: 140px;
+        border-right: none;
+        border-bottom: none;
+        background:
+          linear-gradient(180deg, rgba(7, 9, 17, 0.15) 0%, rgba(9, 14, 24, 0.45) 55%, #090e18 100%),
+          url('../assets/img/login_hero.jpg') center 25%/cover no-repeat;
+      }
+
+      .showcase-bottom-text {
+        display: none;
+      }
+
+      .form-pane {
+        padding: 26px 20px 22px;
+      }
+
+      .form-header {
+        margin-bottom: 20px;
+      }
+
+      .form-header h1 {
+        font-size: 1.45rem;
+      }
+    }
+
+    @media (max-width: 420px) {
+      body {
+        padding: 12px 10px;
+      }
+
+      .form-pane {
+        padding: 22px 16px 20px;
+      }
+
+      .showcase-pane {
+        padding: 20px 16px;
+      }
+    }
+
+    /* Chrome autofill would paint white/yellow over the dark inputs — force dark fill */
+    .input-box input:-webkit-autofill,
+    .input-box input:-webkit-autofill:hover,
+    .input-box input:-webkit-autofill:focus {
+      -webkit-text-fill-color: var(--fg);
+      caret-color: var(--fg);
+      -webkit-box-shadow: 0 0 0 1000px #101728 inset;
+      transition: background-color 9999s ease-in-out 0s;
+    }
+
+    /* Entrance animation (matches dashboard v3.4 polish) */
+    @keyframes authFadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .login-master-box {
+      animation: authFadeUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .form-pane>* {
+      animation: authFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .form-pane>*:nth-child(2) {
+      animation-delay: 0.06s;
+    }
+
+    .form-pane>*:nth-child(3) {
+      animation-delay: 0.12s;
+    }
+
+    .form-pane>*:nth-child(4) {
+      animation-delay: 0.18s;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .login-master-box,
+      .form-pane>* {
+        animation: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Master Card Box -->
+  <div class="login-master-box">
+
+    <!-- LEFT SHOWCASE PANE -->
+    <div class="showcase-pane">
+      <!-- Brand Link -->
+      <a href="../index.html" class="brand-link" title="HavenCraft SMP">
+        <div class="brand-badge-icon">
+          <img src="../logo/logo.svg" alt="HavenCraft" width="34" height="34"
+            style="display: block; object-fit: contain;">
+        </div>
+        <div class="brand-title">Haven<span>Craft</span></div>
+      </a>
+
+      <!-- Minimal Bottom Copy -->
+      <div class="showcase-bottom-text">
+        <h2>Staff Administration<br><span>Portal.</span></h2>
+        <p>Authorized staff only. Access infrastructure, moderation, and player support operations.</p>
+      </div>
+    </div>
+
+    <!-- RIGHT AUTHENTICATION PANE -->
+    <div class="form-pane">
+      <!-- Header -->
+      <div class="form-header">
+        <h1>Staff Sign In</h1>
+        <p>Enter your credentials to access the console.</p>
+      </div>
+
+      <!-- Alert -->
+      <div id="loginAlert" class="auth-alert">
+        <i id="loginAlertIcon" class="bi bi-exclamation-triangle-fill"></i>
+        <span id="loginAlertText">Invalid credentials.</span>
+      </div>
+
+      <!-- Email / Password Form -->
+      <form id="staffLoginForm">
+
+        <!-- Email Field -->
+        <div class="form-group">
+          <label for="loginEmail">Email address</label>
+          <div class="input-box">
+            <i class="bi bi-envelope lead-icon"></i>
+            <input type="email" id="loginEmail" placeholder="name@havencraft.pro" required autocomplete="email">
+          </div>
+        </div>
+
+        <!-- Password Field -->
+        <div class="form-group">
+          <div class="label-row">
+            <label for="loginPassword">Password</label>
+            <a href="setup-password.html" id="linkForgotPassword" class="forgot-link">Forgot password?</a>
+          </div>
+          <div class="input-box">
+            <i class="bi bi-lock lead-icon"></i>
+            <input type="password" id="loginPassword" placeholder="••••••••••••" required
+              autocomplete="current-password">
+            <button type="button" class="toggle-pass" id="togglePassBtn" onclick="togglePasswordVisibility()"
+              aria-label="Toggle password visibility">
+              <i class="bi bi-eye" id="togglePassIcon"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Remember Me Checkbox -->
+        <div class="remember-row" onclick="toggleRemember(event)">
+          <input type="checkbox" id="rememberCheck" checked>
+          <label for="rememberCheck">Keep me signed in</label>
+        </div>
+
+        <!-- Primary Login Button -->
+        <button type="submit" id="btnLoginSubmit" class="btn-login">
+          <span>Sign in</span>
+          <i class="bi bi-arrow-right"></i>
+        </button>
+
+      </form>
+
+      <!-- Subtle Divider -->
+      <div class="divider">
+        <span>or continue with</span>
+      </div>
+
+      <!-- OAuth Login Buttons (Google + Discord) -->
+      <div class="oauth-actions">
+        <button type="button" id="btnGoogleLogin" onclick="loginWithGoogle()" class="btn-oauth btn-oauth--google"
+          title="Sign in with Google">
+          <svg class="oauth-google-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="#4285F4"
+              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+            <path fill="#34A853"
+              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+            <path fill="#FBBC05"
+              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+            <path fill="#EA4335"
+              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+          </svg>
+          <span>Continue with Google</span>
+        </button>
+
+        <button type="button" id="btnDiscordLogin" onclick="loginWithDiscord()" class="btn-oauth btn-oauth--discord"
+          title="Sign in with Discord">
+          <i class="bi bi-discord"></i>
+          <span>Continue with Discord</span>
+        </button>
+      </div>
+
+      <!-- Footer Note -->
+      <div class="form-footer">
+        <a href="#" onclick="showRequestAccessInfo(event)">
+          Need staff access? View instructions &rarr;
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Request Access Instructions Modal -->
+  <div class="hvn-modal-backdrop" id="requestAccessModal" style="display: none;"
+    onclick="closeRequestAccessModal(event)">
+    <div class="hvn-modal-card" onclick="event.stopPropagation()">
+      <div class="hvn-modal-header">
+        <div class="hvn-modal-title">
+          <i class="bi bi-shield-check" style="color: var(--primary);"></i>
+          <span>Staff Access Instructions</span>
+        </div>
+        <button type="button" class="hvn-modal-close" onclick="closeRequestAccessModal()" title="Close">&times;</button>
+      </div>
+      <div class="hvn-modal-body">
+        <div class="step-item">
+          <div class="step-number">1</div>
+          <div class="step-text">
+            <strong>Submit staff profile</strong>
+            Click "Continue with Google" or "Continue with Discord" to authenticate and submit your staff account
+            details.
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">2</div>
+          <div class="step-text">
+            <strong>Pending review queue</strong>
+            Your profile enters the secure verification roster awaiting leadership review.
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">3</div>
+          <div class="step-text">
+            <strong>Staff verification</strong>
+            Server administration will review and assign your department role permissions.
+          </div>
+        </div>
+      </div>
+      <div class="hvn-modal-footer">
+        <button type="button" class="btn btn-secondary"
+          style="padding: 7px 16px; font-size: 0.82rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 6px; cursor: pointer;"
+          onclick="closeRequestAccessModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../assets/js/config.js?v=3.4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1"
+    integrity="sha384-YieCqqg9gQufX7+5HcFvCEg/n3KUEdl8/Jb+A6J0npf1mB740VayvwKjTrtCeUoy"
+    crossorigin="anonymous"></script>
+  <script src="../assets/js/supabase.js?v=3.4"></script>
+  <script src="../assets/js/auth.js?v=3.5"></script>
+
+  <script>
+    // Password visibility toggle
+    window.togglePasswordVisibility = function () {
+      const passInput = document.getElementById('loginPassword');
+      const passIcon = document.getElementById('togglePassIcon');
+      if (!passInput) return;
+
+      if (passInput.type === 'password') {
+        passInput.type = 'text';
+        passIcon.className = 'bi bi-eye-slash';
+      } else {
+        passInput.type = 'password';
+        passIcon.className = 'bi bi-eye';
+      }
+    };
+
+    window.toggleRemember = function (e) {
+      if (e.target.tagName !== 'INPUT') {
+        const c = document.getElementById('rememberCheck');
+        if (c) c.checked = !c.checked;
+      }
+    };
+
+    // Need access info modal
+    window.showRequestAccessInfo = function (e) {
+      if (e) e.preventDefault();
+      const modal = document.getElementById('requestAccessModal');
+      if (modal) modal.style.display = 'flex';
+    };
+
+    window.closeRequestAccessModal = function (e) {
+      if (e && e.target && e.target !== e.currentTarget && !e.target.classList.contains('hvn-modal-close') && e.target.tagName !== 'BUTTON') {
+        return;
+      }
+      const modal = document.getElementById('requestAccessModal');
+      if (modal) modal.style.display = 'none';
+    };
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        const modal = document.getElementById('requestAccessModal');
+        if (modal && modal.style.display === 'flex') {
+          modal.style.display = 'none';
+        }
+      }
+    });
+
+    // Shared alert helper
+    window.showLoginAlert = function (variant, message, isLoading) {
+      const alertBox = document.getElementById('loginAlert');
+      const alertIcon = document.getElementById('loginAlertIcon');
+      const alertText = document.getElementById('loginAlertText');
+      if (!alertBox || !alertText) return;
+
+      if (variant === 'hide' || !variant) {
+        alertBox.className = 'auth-alert';
+        alertBox.style.display = 'none';
+        return;
+      }
+
+      alertBox.className = `auth-alert ${variant}`;
+      if (alertIcon) {
+        if (isLoading) {
+          alertIcon.className = 'bi bi-arrow-repeat spin';
+        } else if (variant === 'success') {
+          alertIcon.className = 'bi bi-check-circle-fill';
+        } else {
+          alertIcon.className = 'bi bi-exclamation-triangle-fill';
+        }
+      }
+      alertText.textContent = message;
+      alertBox.style.display = 'flex';
+    };
+
+    // Shared OAuth login handler (Google / Discord)
+    const OAUTH_PROVIDERS = {
+      google: {
+        label: 'Google',
+        btnId: 'btnGoogleLogin',
+        oauthOptions: {
+          queryParams: { prompt: 'select_account' }
+        }
+      },
+      discord: {
+        label: 'Discord',
+        btnId: 'btnDiscordLogin',
+        oauthOptions: {
+          scopes: 'identify email'
+        }
+      }
+    };
+
+    window.loginWithOAuth = async function (providerKey) {
+      const cfg = OAUTH_PROVIDERS[providerKey];
+      if (!cfg) return;
+
+      const client = window.initHavenSupabase ? window.initHavenSupabase() : window.supabaseClient;
+
+      if (!client || !client.auth) {
+        window.showLoginAlert('danger', 'Authentication service is initializing. Please try again.');
+        return;
+      }
+
+      const activeBtn = document.getElementById(cfg.btnId);
+      const otherBtn = document.getElementById(providerKey === 'google' ? 'btnDiscordLogin' : 'btnGoogleLogin');
+      const originalHtml = activeBtn ? activeBtn.innerHTML : '';
+
+      if (activeBtn) {
+        activeBtn.disabled = true;
+        activeBtn.innerHTML = `<i class="bi bi-arrow-repeat spin"></i> <span>Connecting ${cfg.label}...</span>`;
+      }
+      if (otherBtn) otherBtn.disabled = true;
+
+      try {
+        const origin = (window.location.origin && window.location.origin.startsWith('http'))
+          ? window.location.origin
+          : 'https://admin.havencraft.pro';
+        const redirectUrl = `${origin}/login/index.html`;
+
+        const rememberCheck = document.getElementById('rememberCheck');
+        const keepSignedIn = rememberCheck ? rememberCheck.checked : true;
+        try {
+          sessionStorage.setItem('hvn_tab_session_active', '1');
+          if (keepSignedIn) {
+            localStorage.removeItem('hvn_ephemeral_session');
+          } else {
+            localStorage.setItem('hvn_ephemeral_session', '1');
+          }
+        } catch (e) { }
+
+        const { error } = await client.auth.signInWithOAuth({
+          provider: providerKey,
+          options: {
+            redirectTo: redirectUrl,
+            ...cfg.oauthOptions
+          }
+        });
+        if (error) throw error;
+      } catch (err) {
+        if (activeBtn) {
+          activeBtn.disabled = false;
+          if (originalHtml) activeBtn.innerHTML = originalHtml;
+        }
+        if (otherBtn) otherBtn.disabled = false;
+        window.showLoginAlert('danger', `${cfg.label} login failed: ` + (err.message || 'Check OAuth configuration.'));
+      }
+    };
+
+    window.loginWithGoogle = function () { return window.loginWithOAuth('google'); };
+    window.loginWithDiscord = function () { return window.loginWithOAuth('discord'); };
+
+    // OAuth redirect detection (supports both PKCE ?code= and implicit #access_token=)
+    document.addEventListener('DOMContentLoaded', function () {
+      const hash = window.location.hash || '';
+      const search = window.location.search || '';
+      const hasCallbackError = hash.includes('error=') || search.includes('error=');
+      const hasAuthPayload = hash.includes('access_token=')
+        || hash.includes('refresh_token=')
+        || new URLSearchParams(search).has('code');
+
+      if (hasAuthPayload && !hasCallbackError) {
+        window.showLoginAlert('success', 'Verifying session...', true);
+        window.addEventListener('hvnAuthUnauthenticated', function () {
+          try {
+            if (window.history && window.history.replaceState && window.location.protocol !== 'file:') {
+              window.history.replaceState({}, document.title, window.location.pathname);
+            }
+          } catch (e) { }
+          window.showLoginAlert('danger', 'Sign-in session expired or could not be verified. Please sign in again.');
+        }, { once: true });
+      }
+
+      let errorMsg = null;
+      if (hash && hash.includes('error=')) {
+        const hashParams = new URLSearchParams(hash.replace(/^#/, ''));
+        errorMsg = hashParams.get('error_description') || hashParams.get('error');
+      } else if (search && search.includes('error=')) {
+        const queryParams = new URLSearchParams(search);
+        errorMsg = queryParams.get('error_description') || queryParams.get('error');
+      }
+
+      if (errorMsg) {
+        const cleanMsg = decodeURIComponent(errorMsg.replace(/\+/g, ' '));
+        window.showLoginAlert('danger', cleanMsg || 'Authentication was cancelled or failed.');
+      }
+    });
+
+    // Email and password login
+    document.addEventListener('DOMContentLoaded', function () {
+      const forgotLink = document.getElementById('linkForgotPassword');
+      if (forgotLink && window.location.protocol !== 'file:') {
+        forgotLink.href = '/login/setup-password.html';
+      }
+
+      const form = document.getElementById('staffLoginForm');
+      const submitBtn = document.getElementById('btnLoginSubmit');
+
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+
+        window.showLoginAlert('hide');
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> <span>Logging in...</span>';
+
+        try {
+          const rememberCheck = document.getElementById('rememberCheck');
+          const keepSignedIn = rememberCheck ? rememberCheck.checked : true;
+          try {
+            sessionStorage.setItem('hvn_tab_session_active', '1');
+            if (keepSignedIn) {
+              localStorage.removeItem('hvn_ephemeral_session');
+            } else {
+              localStorage.setItem('hvn_ephemeral_session', '1');
+            }
+          } catch (e) { }
+
+          await window.hvnAuth.login(email, password);
+          window.showLoginAlert('success', 'Login successful! Loading panel...');
+          setTimeout(() => {
+            const isFile = window.location.protocol === 'file:';
+            window.location.replace(isFile ? '../index.html' : '/');
+          }, 350);
+        } catch (err) {
+          window.showLoginAlert('danger', err.message || 'Invalid email or password.');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span>Sign in</span> <i class="bi bi-arrow-right"></i>';
+        }
+      });
+    });
+  </script>
+
+</body>
+
+</html>
