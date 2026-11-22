@@ -1,0 +1,220 @@
+# ============================================================
+# HavenCore - Main Configuration
+# ============================================================
+# Welcome to HavenCore!
+# 
+# Module-specific configurations are located in their respective folders:
+# - plugins/HavenCore/HavenSync/config.yml
+# - plugins/HavenCore/Leaderboard/config.yml
+# 
+# Core system settings can be configured below.
+
+core:
+  debug-mode: false
+  module-loading-delay-ticks: 20
+  
+  # Plugin Prefix (Changing this will automatically update all messages across HavenCore)
+  prefix: "&#92bed8&lHavenCraft &#666666&l» &7"
+
+# ============================================================
+# Admin Home GUI Configuration
+# ============================================================
+admin-home:
+  # GUI Titles
+  titles:
+    list: "&8Homes: &0{player}"
+    action: "&8Home Action: &0{home}"
+    team-action: "&8Team Home: &0{team}"
+    confirm: "&8Confirm Deletion?"
+    
+  # Team Home Custom Settings
+  team-home:
+    title: "&6&lTeam Home &7({team})"
+
+  # Material types for items (Must be valid Bukkit Material names)
+  items:
+    home-compass: "BLUE_BED"
+    team-home: "BEACON"
+    tp-admin: "ENDER_PEARL"
+    send-player: "MINECART"
+    send-team: "MINECART"
+    update-loc: "ANVIL"
+    delete-home: "TNT"
+    go-back: "ARROW"
+    confirm-delete: "LIME_CONCRETE"
+    cancel-delete: "RED_CONCRETE"
+    filler-glass: "GRAY_STAINED_GLASS_PANE"
+
+  # Lore configurations (Colors and text)
+  lore:
+    home-compass:
+      - "&8&m-------------------------"
+      - "&8» &7World: &b{world}"
+      - "&8» &7Location: &f{x}, {y}, {z}"
+      - "&8» &7Rotation: &8Yaw: &f{yaw}° &8| Pitch: &f{pitch}°"
+      - "&8&m-------------------------"
+      - "&e Click to open Action Menu"
+    team-home:
+      - "&8&m-------------------------"
+      - "&8» &7Team: &e{team}"
+      - "&8» &7World: &b{world}"
+      - "&8» &7Location: &f{x}, {y}, {z}"
+      - "&8» &7Rotation: &8Yaw: &f{yaw}° &8| Pitch: &f{pitch}°"
+      - "&8&m-------------------------"
+      - "&e Click to open Team Home Actions"
+    tp-admin:
+      - "&7Teleport directly to this home location."
+    send-player:
+      - "&7Teleport &e{player} &7to their own home."
+      - "&7(Only works if player is online)"
+    send-team:
+      - "&7Teleport online &e{team} &7members to their team home."
+    update-loc:
+      - "&7Relocates this home to your current"
+      - "&7location."
+    update-team-loc:
+      - "&7Relocates &e{team}&7's home to your"
+      - "&7current location."
+    delete-home:
+      - "&7Permanently deletes this home from"
+      - "&7the player's Essentials data."
+    delete-team-home:
+      - "&7Permanently deletes &e{team}&7's home"
+      - "&7from BetterTeams data."
+    go-back:
+      - "&7Return to home selection menu."
+    confirm-delete:
+      - "&7Clicking this will delete the home"
+      - "&e{home} &7permanently!"
+    cancel-delete:
+      - "&7Abort deletion and go back."
+
+# ============================================================
+# OP Security Configuration (Anti-Abuse & Anti-Hijack)
+# ============================================================
+op-security:
+  enabled: true
+  
+  # De-OP player instantly when they leave or get kicked from server
+  deop-on-quit: true
+  
+  # De-OP player instantly when they join server (No player joins with OP active)
+  deop-on-join: true
+  
+  # Restrict in-game /op command so regular OP staff cannot OP others
+  restrict-op-command: true
+  
+  # Restrict in-game /deop command (set to false to allow /deop command in-game)
+  restrict-deop-command: false
+  
+  # Restrict console /op command so console can ONLY OP players listed in allowed-op-issuers
+  restrict-console-op-targets: true
+  
+  # List of player names allowed to receive/issue OP (Only players in this list can be OPed via Console or /opauth)
+  allowed-op-issuers:
+    - JU3L_
+    
+  # Enable password-protected /opauth command to safely gain OP in-game
+  use-op-password: false
+  
+  # Secret password required for /opauth <password>
+  op-password: "ChangeThisSecretPassword123!"
+  
+  # Log security events to console
+  log-events: true
+  
+  # Custom security messages
+  messages:
+    deop-on-join-notice: "&cYour OP status was automatically removed for security on join."
+    deop-on-quit-log: "&cPlayer &e{player} &cwas de-OPed upon leaving the server."
+    deop-on-join-log: "&cPlayer &e{player} &cwas de-OPed upon joining the server."
+    op-command-blocked: "&cYou are not authorized to use the /op command."
+    deop-command-blocked: "&cYou are not authorized to use the /deop command."
+    op-command-blocked-log: "&cPlayer &e{player} &ctried to execute: &f{command}"
+    console-op-blocked-log: "&cThe /op command is blocked."
+    console-op-unauthorized-target-log: "&cCannot grant OP to &e{player}&c! Access denied."
+    opauth-disabled: "&cThe /opauth command system is currently disabled."
+    opauth-wrong-password: "&cIncorrect security password."
+    opauth-success: "&aSecurity authentication successful! You have been granted OP status."
+    opauth-success-log: "&aPlayer &e{player} &cauthenticated using /opauth and gained OP."
+    opauth-usage: "&cUsage: /opauth <password>"
+
+# ============================================================
+# Team EnderChest Anti-Dupe & Security Protection
+# ============================================================
+team-echest-security:
+  enabled: true
+  
+  # Lock shared team chest so only 1 player can view/edit it at any given time.
+  # This 100% eliminates race-conditions and concurrent shift-click duplication exploits.
+  single-viewer-lock: true
+  
+  # Active click & drag interceptor fail-safe if multiple viewers somehow bypass opening
+  click-protection: true
+  
+  # Cooldown between opening team chest to prevent macro / packet spam flooding
+  cooldown:
+    enabled: true
+    cooldown-ms: 750
+    
+  # Forcibly close team chest when player teleports (/tpa, /home, /spawn, etc.)
+  close-on-teleport: true
+  
+  # Forcibly close team chest when player takes damage in combat
+  close-on-damage: true
+  
+  # Forcibly close team chest when player changes world
+  close-on-world-change: true
+
+  # ============================================================
+  # Kick / Leave / Unauthorized Access Protection & Punishment
+  # ============================================================
+  # Forcibly close team chest when player gets kicked (/team kick <player>)
+  close-on-team-kick: true
+
+  # Forcibly close team chest when player leaves team (/team leave)
+  close-on-team-leave: true
+
+  # Forcibly close team chest when team is disbanded (/team disband)
+  close-on-team-disband: true
+
+  # Real-time team membership verification on every click/drag in shared echest
+  validate-team-membership: true
+
+  # Punishment Actions when a kicked/non-member tries to steal/dupe items from team echest
+  punishment:
+    enabled: true
+    # Commands executed by console (%player% and %reason% are dynamically replaced)
+    # Examples:
+    #   - "tempban %player% 3d %reason%"
+    #   - "ban %player% %reason%"
+    #   - "warn %player% %reason%"
+    #   - "kick %player% %reason%"
+    commands:
+      - "tempban %player% 3h %reason%"
+    # Broadcast security alert to online staff members
+    notify-staff: true
+    staff-permission: "havencore.security.notify"
+  
+  # Log anti-dupe security alerts to console
+  log-events: true
+  
+  # Title keywords used to identify team enderchests
+  matched-titles:
+    - team enderchest
+    - team chest
+    - team echest
+    - team's chest
+    - team's enderchest
+    - "[team]"
+    
+  # Custom notifications
+  messages:
+    already-in-use: "&cTeam member &e{player} &cis currently viewing the team chest! Please wait until they finish."
+    cooldown: "&cPlease wait a moment before opening the team chest again."
+    conflict-detected: "&cMultiple viewers detected on shared chest. Access suspended for safety."
+    closed-on-combat: "&cYour team chest was closed due to taking damage."
+    not-in-team: "&c[Security] You are no longer a member of this team! Your chest access has been terminated."
+    punish-reason: "Attempting to steal/dupe items from Team EnderChest after being kicked."
+    staff-alert: "&c&l[ALERT] &e{player} &7attempted to take items from a team chest after being kicked! Auto-punished."
+

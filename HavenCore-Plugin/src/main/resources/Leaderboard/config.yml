@@ -1,0 +1,56 @@
+# HavenLeaderboard Configuration
+# How often the in-memory ranking lists are rebuilt from raw stats
+rank-build-interval-seconds: 30
+
+# How often online players are sampled for playtime/kills/deaths/money
+online-refresh-interval-seconds: 120
+
+# How many top players should be cached per category
+cache-size: 250
+
+# True to sort top highest first, False to sort lowest first
+sort-descending: true
+
+# Category toggles (set false to disable a category from GUI/cache)
+enabled-statistics:
+  money: true
+  playtime: true
+  player_kills: true
+  deaths: true
+  blocks_broken: true
+  blocks_placed: true
+  mobs_killed: true
+  shards: true
+
+# Startup preload of offline players from world stats files
+# This runs fully async — zero TPS impact
+preload:
+  enabled: true
+  # Maximum number of offline players to preload
+  max-players: 1000
+
+# ---------------------------------
+# PlaceholderAPI Placeholders
+# ---------------------------------
+# You can use these placeholders anywhere PlaceholderAPI is supported (e.g. GUIs, Scoreboards, Holograms).
+# 
+# Player Stats:
+# %havencore_kills%          - Total player kills
+# %havencore_deaths%         - Total deaths
+# %havencore_blocks_broken%  - Total blocks broken
+# %havencore_blocks_placed%  - Total blocks placed
+# %havencore_mobs_killed%    - Total mob kills
+# %havencore_money%          - Current money balance
+# %havencore_playtime%       - Playtime (formatted automatically, e.g. 5d 2h)
+# %havencore_shards%         - Current shards balance
+# 
+# Leaderboard Ranks:
+# %havencore_kills_rank%          - Rank in Player Kills
+# %havencore_deaths_rank%         - Rank in Deaths
+# %havencore_blocks_broken_rank%  - Rank in Blocks Broken
+# %havencore_blocks_placed_rank%  - Rank in Blocks Placed
+# %havencore_mobs_killed_rank%    - Rank in Mob Kills
+# %havencore_money_rank%          - Rank in Money
+# %havencore_playtime_rank%       - Rank in Playtime
+# %havencore_shards_rank%         - Rank in Shards
+# ---------------------------------------------------------

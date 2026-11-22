@@ -1,0 +1,11 @@
+﻿# In-game prefix (supports hex colors with &#RRGGBB)
+prefix: "&#92bed8&lLeaderboard &#666666&l» &7"
+
+# Console prefix (plain text, no color codes)
+console-prefix: "Leaderboard •"
+
+no-permission: "&cYou do not have permission to do this."
+no-console: "&cThis command can only be used by players."
+reloaded: "&aPlugin reloaded successfully!"
+loading-data: "&7Please wait, caching data..."
+category-disabled: "&cThis leaderboard category is currently disabled by server settings."

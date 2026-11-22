@@ -1,0 +1,70 @@
+# ============================================================
+# HavenSync Isolated Configuration
+# ============================================================
+# This configuration is strictly separated into two independent systems.
+# If one system is disabled or misconfigured, it will not affect the other.
+
+# ============  Vote Sync =================
+vote-sync:
+  enabled: true
+  supabase_url: "https://your-project.supabase.co"
+  api_key: "ey..."
+  # Network Settings for Votes
+  connect_timeout_ms: 5000
+  read_timeout_ms: 5000
+  # Sync Logic
+  sync_interval_ticks: 6000  # Check cache every 5 mins
+  duplicate_window_seconds: 300 # Prevent duplicate votes from same IP/User within 5 mins
+  debug: false
+
+  # ── Table & Column Mapping ──────────────────────────────────
+  # Customize the Supabase table name and column names below.
+  # The plugin will send data using these exact names.
+  # This allows you to use any Supabase schema without modifying code.
+  table: "votes_log"
+  columns:
+    player_uuid: "player_uuid"
+    username: "username"
+    site: "site"
+
+# ============  LeaderBoard Sync =================
+
+leaderboard-sync:
+  enabled: true
+  supabase_url: "https://your-project.supabase.co"
+  api_key: "ey..."
+
+  # Network Settings for Leaderboard
+  connect_timeout_ms: 8000 # Can be slower than votes
+  read_timeout_ms: 8000
+
+  # Sync Logic
+  sync_interval_ticks: 12000 # Check cache every 10 mins (less frequent is fine for LB)
+  max_batch_size: 50       # Send up to 50 players per request
+  # Historical sync loads all offline player data and pushes to Supabase at startup.
+  # Runs fully async in throttled batches — zero TPS impact.
+
+  startup_historical_sync_enabled: true
+  startup_historical_sync_delay_ticks: 200
+  startup_historical_sync_batch_size: 300
+  startup_historical_sync_batch_interval_ticks: 20
+  debug: false
+
+
+  # ── Table & Column Mapping ──────────────────────────────────
+  # Customize the Supabase table name and column names below.
+  table: "player_stats"
+
+  # The column used for upsert conflict resolution (ON CONFLICT).
+  upsert_conflict_key: "uuid"
+  columns:
+    uuid: "uuid"
+    username: "username"
+    money: "money"
+    playtime_sec: "playtime_sec"
+    kills: "kills"
+    deaths: "deaths"
+    block_break: "block_break"
+    block_place: "block_place"
+    mobs_killed: "mobs_killed"
+    shards: "shards"

@@ -1,0 +1,67 @@
+﻿# ============================================================
+# HavenCore - Combat System Configuration
+# ============================================================
+# Permissions:
+# - havencore.combat.bypass (Players with this permission will never be tagged in combat)
+
+enabled: false
+
+# Combat Tag duration in seconds
+duration-seconds: 15
+
+# Worlds where combat system tagging and restrictions are active
+# Simply add or remove world names here and run /havencore reload
+enabled-worlds:
+  - "world"
+  # - "world_nether"
+  # - "world_the_end"
+
+# Combat Logging Prevention (Punish players who disconnect in combat)
+kill-on-logout: true
+
+# Flight and Elytra restrictions during combat
+disable-flight: false
+disable-elytra: false
+
+# Block teleport events (plugin-based/menu teleports) while in combat
+block-teleport-events: true
+
+# Blocked commands while in combat (All teleport and escape commands)
+blocked-commands:
+  - spawn
+  - home
+  - homes
+  - sethome
+  - delhome
+  - tp
+  - tpa
+  - tpaccept
+  - tpdeny
+  - tpahere
+  - tpahereaccept
+  - team home
+  - team tp
+  - team teleport
+  - back
+  - warp
+  - ahome
+  - adminhome
+  - wild
+  - rtp
+  - fly
+  - logout
+
+# Action Bar display settings
+display:
+  actionbar-enabled: true
+  actionbar-format: "&#FF9900⚔ &cIn Combat: &#FFFF55{time}s &#FF9900⚔"
+
+# Custom Messages (Supports Color Codes & Hex Colors e.g. &#FF9900)
+messages:
+  prefix: "&#92bed8&lCombat &#666666&l» &7"
+  tagged-attacker: "&7You attacked &#FFFF55{victim}&7! You are now in combat for &#FF9900{time}s&7."
+  tagged-victim: "&7You were attacked by &#FFFF55{attacker}&7! You are now in combat for &#FF9900{time}s&7."
+  command-blocked: "&cYou cannot use teleportation or escape commands while in combat!"
+  teleport-blocked: "&cTeleportation is disabled while you are in combat!"
+  combat-expired: "&aYou are no longer in combat."
+  combat-logged: "&#FFFF55{player} &ccombat logged and was killed!"

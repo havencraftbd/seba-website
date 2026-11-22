@@ -1,0 +1,361 @@
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  HavenPunish — GUI Layout Configuration
+#  Every slot, material, name, and lore is fully editable.
+#  Add/remove items as you wish!
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# ┌─────────────────────────────────────────┐
+# │         MAIN PUNISHMENT MENU            │
+# │  Slot Layout (3 rows = 27 slots):       │
+# │  [ 0][ 1][ 2][ 3][ 4][ 5][ 6][ 7][ 8] │
+# │  [ 9][10][11][12][13][14][15][16][17]   │
+# │  [18][19][20][21][22][23][24][25][26]   │
+# └─────────────────────────────────────────┘
+main-menu:
+  title: "&8&l⚖ Punish — {player}"
+  rows: 3
+  filler:
+    enabled: true
+    material: BLACK_STAINED_GLASS_PANE
+    name: " "
+
+  # Target player head — shown at BOTTOM row
+  target-head:
+    slot: 26
+    material: PLAYER_HEAD
+    fetch-skin: false # Set to true for premium servers to show player heads, false for cracked servers to prevent lag
+    name: "&e&l{player}"
+    lore:
+      - "&8━━━━━━━━━━━━━━━━━━━━"
+      - "&7UUID: &f{uuid}"
+      - ""
+      - "&7Select a punishment type above."
+      - "&8━━━━━━━━━━━━━━━━━━━━"
+
+  # Punishment type buttons — TOP & MIDDLE rows
+  buttons:
+    tempmute:
+      slot: 10
+      material: BELL
+      name: "&e&l🔇 TempMute"
+      lore:
+        - "&7Temporarily mute this player."
+        - "&7Select a duration next."
+        - ""
+        - "&eClick to select"
+      permission: "punish.mute"
+    
+    mute:
+      slot: 11
+      material: NOTE_BLOCK
+      name: "&6&l🔇 Mute"
+      lore:
+        - "&7Permanently mute this player."
+        - "&7They won't be able to chat."
+        - ""
+        - "&eClick to select"
+      permission: "punish.mute"
+
+    tempban:
+      slot: 12
+      material: IRON_DOOR
+      name: "&c&l🚫 TempBan"
+      lore:
+        - "&7Temporarily ban this player."
+        - "&7Select a duration next."
+        - ""
+        - "&eClick to select"
+      permission: "punish.ban"
+
+    ban:
+      slot: 13
+      material: BARRIER
+      name: "&c&l🚫 Ban"
+      lore:
+        - "&7Permanently ban this player."
+        - "&7They cannot join the server."
+        - ""
+        - "&eClick to select"
+      permission: "punish.ban"
+
+    ipban:
+      slot: 14
+      material: BEDROCK
+      name: "&4&l🌐 IP-Ban"
+      lore:
+        - "&7IP-ban this player."
+        - "&cThis affects ALL accounts"
+        - "&con this IP address!"
+        - ""
+        - "&eClick to select"
+      permission: "punish.ipban"
+
+    warn:
+      slot: 15
+      material: PAPER
+      name: "&e&l⚠ Warn"
+      lore:
+        - "&7Issue a warning to this player."
+        - ""
+        - "&eClick to select"
+      permission: "punish.warn"
+
+    kick:
+      slot: 16
+      material: LEATHER_BOOTS
+      name: "&a&l👢 Kick"
+      lore:
+        - "&7Kick this player from the server."
+        - ""
+        - "&eClick to select"
+      permission: "punish.kick"
+
+  # Close button — BOTTOM row
+  close:
+    slot: 18
+    material: BARRIER
+    name: "&c&lClose"
+
+
+# ┌─────────────────────────────────────────┐
+# │       DURATION SELECTION MENU           │
+# │  Slot Layout (4 rows = 36 slots):       │
+# │  [ 0][ 1][ 2][ 3][ 4][ 5][ 6][ 7][ 8] │
+# │  [ 9][10][11][12][13][14][15][16][17]   │
+# │  [18][19][20][21][22][23][24][25][26]   │
+# │  [27][28][29][30][31][32][33][34][35]   │
+# └─────────────────────────────────────────┘
+duration-menu:
+  title: "&8&l⏱ Select Duration"
+  rows: 3
+  filler:
+    enabled: true
+    material: BLACK_STAINED_GLASS_PANE
+
+  # Info item — BOTTOM row (editable slot)
+  info:
+    slot: 26
+    material: CLOCK
+    name: "&e&l⏱ Select Duration"
+    lore:
+      - "&7Punishment: &f{action}"
+      - "&7Target: &f{player}"
+      - ""
+      - "&7Choose a duration above."
+
+  # Duration presets — each with explicit slot
+  # ✏ Add/remove entries freely! Just give each a unique key and slot.
+  presets:
+    15m:
+      slot: 1
+      value: "15m"
+      display: "&a&l15 Minutes"
+      material: LIME_DYE
+      lore:
+        - "&7Duration: &f15m"
+        - ""
+        - "&eClick to select"
+    30m:
+      slot: 2
+      value: "30m"
+      display: "&a&l30 Minutes"
+      material: LIME_DYE
+      lore:
+        - "&7Duration: &f30m"
+        - ""
+        - "&eClick to select"
+    1h:
+      slot: 3
+      value: "1h"
+      display: "&e&l1 Hour"
+      material: LIME_DYE
+      lore:
+        - "&7Duration: &f1h"
+        - ""
+        - "&eClick to select"
+    6h:
+      slot: 5
+      value: "6h"
+      display: "&e&l6 Hours"
+      material: YELLOW_DYE
+      lore:
+        - "&7Duration: &f6h"
+        - ""
+        - "&eClick to select"
+    12h:
+      slot: 6
+      value: "12h"
+      display: "&e&l12 Hours"
+      material: YELLOW_DYE
+      lore:
+        - "&7Duration: &f12h"
+        - ""
+        - "&eClick to select"
+    1d:
+      slot: 7
+      value: "1d"
+      display: "&6&l1 Day"
+      material: YELLOW_DYE
+      lore:
+        - "&7Duration: &f1d"
+        - ""
+        - "&eClick to select"
+    3d:
+      slot: 10
+      value: "3d"
+      display: "&6&l3 Days"
+      material: ORANGE_DYE
+      lore:
+        - "&7Duration: &f3d"
+        - ""
+        - "&eClick to select"
+    7d:
+      slot: 12
+      value: "7d"
+      display: "&c&l7 Days"
+      material: ORANGE_DYE
+      lore:
+        - "&7Duration: &f7d"
+        - ""
+        - "&eClick to select"
+    15d:
+      slot: 14
+      value: "15d"
+      display: "&c&l15 Days"
+      material: RED_DYE
+      lore:
+        - "&7Duration: &f15d"
+        - ""
+        - "&eClick to select"
+
+    30d:
+      slot: 16
+      value: "30d"
+      display: "&c&l30 Days"
+      material: RED_DYE
+      lore:
+        - "&7Duration: &f30d"
+        - ""
+        - "&eClick to select"
+
+  # Custom duration button — BOTTOM row
+  custom:
+    slot: 22
+    material: NAME_TAG
+    name: "&b&l✏ Custom Duration"
+    lore:
+      - "&7Type a custom duration in chat."
+      - "&7Examples: &f10m&7, &f2h&7, &f5d"
+      - ""
+      - "&eClick to type"
+
+  # Back button — BOTTOM row
+  back:
+    slot: 18
+    material: ARROW
+    name: "&c&l← Back"
+
+
+# ┌─────────────────────────────────────────┐
+# │        REASON SELECTION MENU            │
+# │  Slot Layout (4 rows = 36 slots):       │
+# │  [ 0][ 1][ 2][ 3][ 4][ 5][ 6][ 7][ 8]   │
+# │  [ 9][10][11][12][13][14][15][16][17]   │
+# │  [18][19][20][21][22][23][24][25][26]   │
+# └─────────────────────────────────────────┘
+reason-menu:
+  title: "&8&l📝 Select Reason"
+  rows: 3
+  filler:
+    enabled: true
+    material: BLACK_STAINED_GLASS_PANE
+
+  # Info item — BOTTOM row (editable slot)
+  info:
+    slot: 26
+    material: WRITABLE_BOOK
+    name: "&e&l📝 Select Reason"
+    lore:
+      - "&7Action: &f{action}"
+      - "&7Target: &f{player}"
+      - "&7Duration: &f{duration}"
+      - ""
+      - "&7Choose a reason above."
+
+  # Back button — BOTTOM row
+  back:
+    slot: 18
+    material: ARROW
+    name: "&c&l← Back"
+
+
+# ┌─────────────────────────────────────────┐
+# │        CONFIRMATION SCREEN              │
+# │  Slot Layout (3 rows = 27 slots):       │
+# │  [ 0][ 1][ 2][ 3][ 4][ 5][ 6][ 7][ 8]   │
+# │  [ 9][10][11][12][13][14][15][16][17]   │
+# │  [18][19][20][21][22][23][24][25][26]   │
+# └─────────────────────────────────────────┘
+confirm-menu:
+  title: "&8&l⚖ Confirm Punishment"
+  rows: 3
+  filler:
+    enabled: true
+    material: BLACK_STAINED_GLASS_PANE
+
+  # Punishment summary — BOTTOM row (editable slot!)
+  summary:
+    slot: 22
+    material: MAP
+    name: "&e&l⚖ Punishment Summary"
+    lore:
+      - ""
+      - "&7Target: &f{player}"
+      - "&7Action: &f{action}"
+      - "&7Duration: &f{duration}"
+      - "&7Reason: &f{reason}"
+      - "&7Silent: {silent}"
+      - ""
+      - "&7Command: &8{command}"
+
+  # Confirm button
+  confirm:
+    slot: 11
+    material: LIME_WOOL
+    name: "&a&l✔ CONFIRM"
+    lore:
+      - "&7Execute this punishment."
+      - ""
+      - "&aClick to confirm"
+
+  # Cancel button
+  cancel:
+    slot: 15
+    material: RED_WOOL
+    name: "&c&l✖ CANCEL"
+    lore:
+      - "&7Cancel and return to menu."
+      - ""
+      - "&cClick to cancel"
+
+  # Silent toggle
+  silent:
+    slot: 13
+    material-on: LIME_DYE
+    material-off: GRAY_DYE
+    name-on: "&a&lSilent: ON"
+    name-off: "&7&lSilent: OFF"
+    lore:
+      - "&7When silent, only staff see the"
+      - "&7punishment broadcast."
+      - ""
+      - "&eClick to toggle"
+
+# Sound configurations
+# Bukkit sound names (e.g. UI_BUTTON_CLICK, BLOCK_CHEST_OPEN, BLOCK_CHEST_CLOSE, BLOCK_NOTE_BLOCK_BASS)
+# Or Minecraft sound keys (e.g. ui.button.click, block.chest.open, block.chest.close, block.note_block.bass)
+sounds:
+  open: "BLOCK_CHEST_OPEN"
+  click: "UI_BUTTON_CLICK"
+  close: "BLOCK_CHEST_CLOSE"
+  error: "BLOCK_NOTE_BLOCK_BASS"

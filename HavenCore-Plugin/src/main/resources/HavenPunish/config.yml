@@ -1,0 +1,22 @@
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  HavenPunish — Configuration
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Enable or disable the punishment module
+enabled: true
+
+# Require LiteBans to be installed (recommended: true)
+require-litebans: true
+
+# Default silent mode for punishments
+# When true, punishment broadcasts are staff-only by default
+default-silent: false
+
+# Allow punishing offline players
+allow-offline: true
+
+# Cooldown between punishments in seconds (prevents spam-clicking)
+cooldown: 10
+
+# Players with this permission cannot be punished via the GUI
+exempt-permission: "punish.exempt"

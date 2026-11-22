@@ -1,0 +1,129 @@
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  HavenSettings - Messages
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# All messages support & color codes and hex colors (&#RRGGBB).
+# Changing the prefix here will update BOTH console & in-game messages.
+
+# In-game prefix (supports hex colors)
+# Format: prefix • message
+prefix: "&#92bed8&lSettings &#666666&l» &7"
+tpa-prefix: "&#92bed8&lTPA &#666666&l» &7"
+
+# Console prefix (plain text, no color codes)
+console-prefix: "HavenSettings •"
+
+# Toggle messages
+toggled-on: "&aYou have &lenabled &a{setting}."
+toggled-off: "&cYou have &ldisabled &c{setting}."
+
+# Command blocked messages
+msg-blocked: "&cYou have private messages disabled. Enable them in /settings."
+tpa-blocked: "&cYou have TPA disabled. Enable it in /settings."
+tpahere-blocked: "&cYou have TPAHere disabled. Enable it in /settings."
+custom-blocked: "&cThis command is currently disabled in your settings."
+target-blocked: "&cThat player has TPA disabled."
+target-tpahere-blocked: "&cThat player has TPAHere disabled."
+
+# Permission denied
+no-permission: "&cYou don't have permission to use this."
+no-console: "&cThis command is for players only."
+player-not-found: "&cPlayer not found."
+
+# Night vision
+night-vision-applied: "&aNight vision enabled."
+night-vision-removed: "&cNight vision disabled."
+
+# Scoreboard
+scoreboard-shown: "&aScoreboard shown."
+scoreboard-hidden: "&cScoreboard hidden."
+
+# TPA (Essentials integration)
+tpa-enabled: "&aTPA requests enabled."
+tpa-disabled: "&cTPA requests disabled."
+tpahere-enabled: "&aTPAHere requests enabled."
+tpahere-disabled: "&cTPAHere requests disabled."
+tpa-confirmation-enabled: "&aTPA confirmation popup enabled."
+tpa-confirmation-disabled: "&cTPA confirmation popup disabled."
+
+# Public Chat
+public-chat-enabled: "&aPublic chat enabled."
+public-chat-disabled: "&cPublic chat disabled."
+
+# Settings opened
+settings-opened: "&7Opening settings..."
+
+# Reload
+reload-success: "&aHavenSettings reloaded successfully!"
+
+# Custom TPA Messages
+# --------------------------------------------------
+# Placeholders available for TPA messages:
+#   {player}  - The name of the player who sent the request
+#   {world}   - The name of the world the requester is currently in
+#   {block}   - The name of the block the requester is standing on (Title Case)
+#   {timeout} - The TPA request timeout duration in seconds (retrieved from EssentialsX)
+# --------------------------------------------------
+tpa-request-message: "&#92bed8{player} &7has requested to teleport to you."
+tpa-request-location: "&7Location: &c&l{world} &8(&7Block: &f{block}&8) &8| &7Timeout: &c{timeout}s"
+tpa-request-here-message: "&#92bed8{player} &7has requested you to teleport to them."
+tpa-accept-button: "&a&l[ACCEPT]"
+tpa-accept-hover: "&7Click to accept teleport request"
+tpa-deny-button: "&c&l[DENY]"
+tpa-deny-hover: "&7Click to deny teleport request"
+tpa-button-spacing: "     "
+tpa-bedrock-instructions: "&7Type: &e/tpaccept &7or &e/tpdeny &7to respond"
+tpa-request-sent-success: "&aTeleport request sent to &e{player}&a."
+tpa-request-sent-all-success: "&aTeleport request sent to all online players."
+
+# TPA World Warning / Confirmation Messages
+# --------------------------------------------------
+# Additional placeholders:
+#   {world_display}  - Configured display name for the world (e.g. NETHER, END)
+#   {keep_inventory} - Current KeepInventory status in that world (ON / OFF)
+#   {delay}          - EssentialsX teleport warmup delay in seconds
+#   {portal}         - Detected portal type when portal protection cancels a TPA (e.g. NETHER PORTAL, END PORTAL)
+# --------------------------------------------------
+keep-inventory-on: "ON"
+keep-inventory-off: "OFF"
+
+# Popup shown to requester on /tpa <player> when accepter is in a warned world
+tpa-popup:
+  title: "&f&lTELEPORT CONFIRMATION"
+  body:
+    - "&cWARNING! &7- &fYou are about to teleport to &a'{player}'&f."
+    - "&fThis player is in the &c{world_display}&f. &eKeep Inventory &fis &e{keep_inventory} &fthere."
+    - "&fYou can be &ctrapped &for &ckilled &fand lose all your items."
+    - ""
+    - "&fAre you sure you want to teleport?"
+  accept-button: "&a&lACCEPT"
+  accept-hover: "&7Click to accept teleport"
+  deny-button: "&c&lDENY"
+  deny-hover: "&7Click to deny teleport"
+
+# Popup shown to accepter on /tpahere <player> when requester is in a warned world
+tpahere-popup:
+  title: "&f&lTELEPORT CONFIRMATION"
+  body:
+    - "&cWARNING! &7- &a'{player}' &fwants to teleport you over."
+    - "&fThis player is in the &c{world_display}&f. &eKeep Inventory &fis &e{keep_inventory} &fthere."
+    - "&fYou can be &ctrapped &for &ckilled &fand lose all your items."
+    - ""
+    - "&fAre you sure you want to teleport?"
+  accept-button: "&a&lACCEPT"
+  accept-hover: "&7Click to accept teleport"
+  deny-button: "&c&lDENY"
+  deny-hover: "&7Click to deny teleport"
+
+tpa-popup-bedrock-instructions: "&7Type: &e{accept_cmd} &7to accept or &e{deny_cmd} &7to deny"
+
+# World Confirmation Status & Cancellation Messages
+tpa-world-notify-message: "&c&lWarning! &e{player} &7is in &c&l{world_display} &8(&7Block: &f{block}&8)&7! Move to cancel teleport."
+tpa-world-waiting-message: "&7Waiting for &e{player} &7to confirm teleporting to &c&l{world_display}&7..."
+tpa-world-cancelled-requester: "&c&lCancelled! &7Request to &e{player} &7was cancelled."
+tpa-world-cancelled-target: "&c&lCancelled! &e{player} &7cancelled the teleport request."
+tpa-world-no-pending: "&cYou do not have any pending teleport confirmation."
+tpa-world-confirm-expired: "&cThat teleport request has expired or is no longer available."
+tpa-world-warmup-cancelled-teleportee: "&c&lCancelled! &e{player} &7moved to &c&l{world_display} &7before teleport."
+tpa-world-warmup-cancelled-target: "&c&lCancelled! &7Destination changed to &c&l{world_display} &7for &e{player}&7."
+tpa-portal-cancelled-teleportee: "&c&lCancelled! &e{player} &7is too close to the &c&l{portal}&7."
+tpa-portal-cancelled-target: "&c&lCancelled! &7Move away from the &c&l{portal} &7(&e{player}&7)."

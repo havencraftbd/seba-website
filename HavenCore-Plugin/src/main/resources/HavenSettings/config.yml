@@ -1,0 +1,64 @@
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  HavenSettings - Configuration
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Enable/disable the entire settings module
+enabled: true
+
+# Default values for new players
+defaults:
+  private-message: true
+  tpa: true
+  tpahere: false
+  tpa-confirmation: true
+  scoreboard: true
+  night-vision: false
+  public-chat: true
+
+# Customize TPA request messages with interactive hover and click buttons.
+# When enabled, HavenSettings intercepts EssentialsX TPA commands and sends custom interactive messages.
+# If disabled, default EssentialsX TPA messages and native command execution will be used.
+custom-tpa-messages:
+  enabled: true
+
+# Cancel TPA/TPAHere teleports when the destination is inside or near a portal block (prevents Overworld portal traps)
+# radius: Horizontal distance in blocks around the destination (0.45 = inside/touching, 1.0 = adjacent 1 block, 2.0 = 2 blocks)
+tpa-portal-protection:
+  enabled: true
+  radius: 1.0
+
+# Warn or require confirmation when accepting a TPA/TPAHere request involving specific worlds (e.g. Nether, End).
+tpa-world-warning:
+  enabled: true
+  # Mode options:
+  #   DIALOG  - Shows centered popup UI (Paper Dialog on Java 1.21.6+, Floodgate ModalForm on Bedrock, chat fallback for < 1.21.6)
+  #   CONFIRM - Always uses chat confirmation buttons
+  #   NOTIFY  - Immediately lets /tpaccept proceed and sends a chat warning message
+  mode: "DIALOG"
+
+  # Independent popup toggles for /tpa and /tpahere
+  popups:
+  # Shows popup to requester (/tpa Player2) when Player2 accepts inside a warned world
+    tpa:
+      enabled: true
+  # Shows popup to accepter (/tpahere Player2) when requester is inside a warned world
+    tpahere:
+      enabled: true
+
+  # Worlds that trigger this warning/confirmation and their {world_display} label
+  worlds:
+    world_nether:
+      display-name: "NETHER"
+    world_the_end:
+      display-name: "END"
+    world_end:
+      display-name: "END"
+
+# Restrict specific items from being used/equipped without permission
+# Permission format: havensettings.use.<item_name_in_lowercase> (e.g., havensettings.use.elytra)
+# OPs automatically bypass this restriction.
+restricted-items:
+  enabled: true
+  message: "&cYou do not have permission to use this item!"
+  items:
+    - ELYTRA

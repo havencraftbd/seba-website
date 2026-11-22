@@ -1,0 +1,6 @@
+# Sounds to use when clicking in the GUI
+# Bukkit sound names for 1.21.1: UI_BUTTON_CLICK, ENTITY_EXPERIENCE_ORB_PICKUP, etc.
+gui-click: "UI_BUTTON_CLICK"
+gui-open: "BLOCK_CHEST_OPEN"
+gui-close: "BLOCK_CHEST_CLOSE"
+gui-error: "BLOCK_NOTE_BLOCK_BASS"
