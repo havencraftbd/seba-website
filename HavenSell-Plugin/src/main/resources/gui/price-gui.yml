@@ -1,0 +1,144 @@
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  HavenSell - Price GUI Configuration
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# ─────────────────────────────────────────
+# Category Menu Settings
+# ─────────────────────────────────────────
+
+# Category menu title
+title: "&8&lPrice Guide"
+
+# Category menu rows (1-6)
+# Change this to resize the category menu
+# Make sure your category slots fit within: rows × 9
+rows: 4
+
+# Filler for empty slots in category menu
+filler:
+  enabled: true
+  material: BLACK_STAINED_GLASS_PANE
+  name: " "
+
+# ─────────────────────────────────────────
+# Item List Settings (inside a category)
+# ─────────────────────────────────────────
+
+# Item list title when viewing a category
+# Placeholder: {category} = category display name
+item-title: "&8&l{category}"
+
+# Item list rows (2-6, last row = navigation bar)
+item-rows: 6
+
+# ─────────────────────────────────────────
+# Categories
+# ─────────────────────────────────────────
+# Each category maps to a price file in /plugins/HavenSell/price/
+#
+# Options:
+#   file:     The price YAML file name (must exist in price/ folder)
+#   material: The icon material shown in the category menu
+#   name:     Display name (supports & color codes)
+#   lore:     Optional lore lines for the category icon
+#   slot:     The slot position in the category menu (0-based)
+#
+# ┌────────────────────────────────────────┐
+# │  Slot Map (4 rows = 36 slots):        │
+# │                                        │
+# │  Row 1:  0  1  2  3  4  5  6  7  8    │
+# │  Row 2:  9  10 11 12 13 14 15 16 17   │
+# │  Row 3:  18 19 20 21 22 23 24 25 26   │
+# │  Row 4:  27 28 29 30 31 32 33 34 35   │
+# └────────────────────────────────────────┘
+#
+# To change the layout:
+#   1. Change 'rows' above to set the menu size
+#   2. Change each category's 'slot' value
+#   3. Make sure slots are within: 0 to (rows × 9 - 1)
+#
+# You can add/remove categories freely.
+# If a file doesn't exist, the category will be skipped safely.
+# ─────────────────────────────────────────
+
+categories:
+  blocks:
+    file: blocks.yml
+    material: BRICKS
+    name: "&a⬛ Blocks"
+    lore:
+      - "&7Browse building blocks,"
+      - "&7decorations & redstone."
+    slot: 10
+
+  ores:
+    file: ores.yml
+    material: DIAMOND_ORE
+    name: "&b💎 Ores & Minerals"
+    lore:
+      - "&7Browse ores, ingots"
+      - "&7and raw materials."
+    slot: 12
+
+  crops:
+    file: crops.yml
+    material: WHEAT
+    name: "&e🌾 Crops & Food"
+    lore:
+      - "&7Browse farmable items"
+      - "&7and food products."
+    slot: 14
+
+  mobs:
+    file: mobs.yml
+    material: ROTTEN_FLESH
+    name: "&c🗡 Mob Drops"
+    lore:
+      - "&7Browse mob loot"
+      - "&7and combat drops."
+    slot: 16
+
+  fish:
+    file: fish.yml
+    material: COD
+    name: "&3🐟 Fish"
+    lore:
+      - "&7Browse fish and"
+      - "&7fishing loot."
+    slot: 19
+
+  natural:
+    file: natural.yml
+    material: OAK_SAPLING
+    name: "&2🌿 Natural"
+    lore:
+      - "&7Browse flowers, saplings,"
+      - "&7dyes and natural items."
+    slot: 21
+
+  tools:
+    file: tools.yml
+    material: DIAMOND_PICKAXE
+    name: "&6⚒ Tools & Equipment"
+    lore:
+      - "&7Browse tools, weapons,"
+      - "&7and armor."
+    slot: 23
+
+  potions:
+    file: potions.yml
+    material: BREWING_STAND
+    name: "&d🧪 Potions & Brewing"
+    lore:
+      - "&7Browse potion ingredients"
+      - "&7and brewing materials."
+    slot: 25
+
+  books:
+    file: books.yml
+    material: ENCHANTED_BOOK
+    name: "&5📖 Enchanted Books"
+    lore:
+      - "&7Browse enchanted books"
+      - "&7and their values."
+    slot: 22

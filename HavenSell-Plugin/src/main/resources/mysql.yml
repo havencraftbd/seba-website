@@ -1,0 +1,21 @@
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  HavenSell - MySQL Configuration
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Set to true to use MySQL instead of YAML flat files
+enabled: false
+
+# MySQL connection settings
+host: "localhost"
+port: 3306
+database: "havensell"
+username: "root"
+password: "password"
+
+# Table name for player sell data
+table: "havensell_playerdata"
+
+# Connection pool settings
+pool:
+  max-connections: 10
+  connection-timeout: 5000

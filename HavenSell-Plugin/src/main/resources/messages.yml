@@ -1,0 +1,77 @@
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  HavenSell - Messages Configuration
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Supports color codes (&).
+
+prefix: "&#92bed8&lSell &#666666&l» &7"
+
+# Sent when items are sold (chat message)
+# Placeholders: {amount}, {money}, {symbol}
+sell-success: "&aYou sold &f{amount} &aitems for &6{symbol}{money}&a!"
+
+# Title Display (shown after selling)
+# Title line (big text) - Placeholders: {symbol}, {money}
+sell-success-title: "&a+{symbol}{money}"
+
+# Subtitle line - Placeholders: {amount}
+sell-success-subtitle: "&7You sold &f{amount} &7items"
+
+# Sent when no sellable items are found
+no-items: "&cNo sellable items found in the GUI."
+
+# Sent when the plugin is reloaded
+reload-success: "&aHavenSell has been reloaded successfully!"
+
+# Sent when player doesn't have permission
+no-permission: "&cNo permission."
+
+# Sent when command is run from console
+players-only: "&cThis command can only be used by players."
+
+# Sent when economy is not available
+economy-error: "&cEconomy system is not available. Please contact an admin."
+
+# Sent when a target player has no history
+no-history: "&cNo sell history found for &f{player}&c."
+
+# Sent when target player is not found
+player-not-found: "&cCould not find player data for &f{player}&c."
+
+# Sent when the sell system is globally disabled
+sell-disabled: "&cSell system is disabled."
+
+# Sent when player is on cooldown for /sell all
+# Placeholders: {seconds}
+sell-all-cooldown: "&cPlease wait &e{seconds}s &cbefore using /sell all again."
+
+# ─────────────────────────────────────────
+# Price Check Messages (/sell price)
+# ─────────────────────────────────────────
+
+# Sent when player holds nothing in hand
+# Used by /sell price
+price-no-item: "&cHold an item in your hand."
+
+# Sent when the held item has no sell price
+price-no-value: "&cThis item has no sell price."
+
+# Shows the per-item price
+# Placeholders: {symbol}, {price}
+price-per-item: "&7Sell Price: &a{symbol}{price} &7each"
+
+# Shows the total value of the stack
+# Placeholders: {symbol}, {total}, {amount}
+price-stack: "&7Stack ({amount}): &a{symbol}{total}"
+
+# ─────────────────────────────────────────
+# Sell Axe Messages
+# ─────────────────────────────────────────
+sell-axe-given: "&aYou have given a Sell Axe to &f{player} &a(Uses: {uses}, Expiry: {expiry})."
+sell-axe-received: "&aYou received a Sell Axe! (Uses: {uses}, Expiry: {expiry})"
+sell-axe-expired: "&cThis Sell Axe has expired!"
+sell-axe-broken: "&cYour Sell Axe has run out of uses and broke!"
+sell-axe-no-items: "&cThere are no sellable items in this chest."
+sell-axe-no-access: "&cYou do not have permission to open this chest."
+sell-axe-cooldown: "&cPlease wait a moment before using the Sell Axe again."
+sell-axe-mainhand-only: "&cPlease hold the Sell Axe in your main hand."
+

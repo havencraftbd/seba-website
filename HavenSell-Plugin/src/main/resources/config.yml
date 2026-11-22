@@ -1,0 +1,96 @@
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  HavenSell - Configuration
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# General Settings
+# ─────────────────────────────────────────
+# Global sell system toggle
+# Set to false to disable /sell for all players instantly (reloadable)
+sell:
+  enabled: true
+
+# Sell behavior
+# If true, items are automatically sold when the GUI is closed
+sell-on-close: true
+
+# ─────────────────────────────────────────
+# Command Cooldowns
+# Set cooldown time in seconds for commands (0 to disable)
+cooldowns:
+  # Cooldown for /sell all in seconds
+  sell-all: 10
+
+# ─────────────────────────────────────────
+# Shulker Box Support
+# If enabled, selling a shulker box will calculate its contents as well
+shulker-support:
+  enabled: true
+
+# ─────────────────────────────────────────
+# Number Abbreviation System
+# Formats large numbers: 1000 → 1K, 1000000 → 1M, etc.
+abbreviations:
+  enabled: true
+  # Order: K, M, B, T (do not change order)
+  formats:
+    - K
+    - M
+    - B
+    - T
+
+# ─────────────────────────────────────────
+# Title Display (shown after selling)
+title:
+  enabled: true
+  # Title line (big text) - Placeholders: {symbol} {money}
+  title: "&a+{symbol}{money}"
+  # Subtitle line - Placeholders: {amount}
+  subtitle: "&7You sold &f{amount} &7items"
+  # Timings (in ticks, 20 ticks = 1 second)
+  fade-in: 10
+  stay: 40
+  fade-out: 10
+
+# ─────────────────────────────────────────
+# Sound effects
+sounds:
+  sell-success: "ENTITY_PLAYER_LEVELUP"
+  gui-open: "BLOCK_CHEST_OPEN"
+  gui-close: "BLOCK_CHEST_CLOSE"
+  no-items: "ENTITY_VILLAGER_NO"
+
+# ─────────────────────────────────────────
+# Currency format
+currency:
+  symbol: "$"
+  # Number of decimal places (used when abbreviations are disabled)
+  decimals: 2
+
+# ─────────────────────────────────────────
+# Sell Axe (Chest Selling Tool)
+# ─────────────────────────────────────────
+sell-axe:
+  enabled: true
+  # Default item material (e.g. DIAMOND_AXE, GOLDEN_AXE)
+  material: DIAMOND_AXE
+  # Custom Name of the axe. Color codes supported.
+  name: "&#92bed8&lSell Axe &7({uses})"
+  # Lore of the axe. Placeholders: {uses}, {expiry}
+  lore:
+    - "&7Right-click a chest to sell its contents."
+    - ""
+    - "&7Remaining Uses: &e{uses}"
+    - "&7Expiry: &b{expiry}"
+    - ""
+    - "&8&oA farm helper tool."
+  # Default uses given if uses are not specified in command
+  default-uses: 100
+  # Date format for the {expiry} placeholder
+  date-format: "yyyy-MM-dd HH:mm"
+  # Text for {expiry} placeholder when the axe has no expiry
+  never-expire-text: "Never"
+  # Text for {uses} placeholder when the axe has unlimited uses
+  unlimited-uses-text: "Unlimited"
+  # Sound played on a successful Sell Axe use
+  sound: "ENTITY_PLAYER_LEVELUP"
+
