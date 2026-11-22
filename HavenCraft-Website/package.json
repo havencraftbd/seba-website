@@ -1,0 +1,21 @@
+{
+  "name": "havencraft",
+  "version": "1.0.0",
+  "description": "HavenCraft SMP official website and web app",
+  "private": true,
+  "scripts": {
+    "build": "node build.js",
+    "bundle": "node build.js",
+    "watch": "node build.js --watch"
+  },
+  "keywords": [
+    "minecraft",
+    "smp",
+    "bangladesh"
+  ],
+  "author": "HavenCraft Team",
+  "license": "ISC",
+  "devDependencies": {
+    "terser": "^5.51.2"
+  }
+}

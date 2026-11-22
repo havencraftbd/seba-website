@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Gradients UNCHANGED from logo-original.svg (same IDs, same colors) -->
+    <linearGradient id="iso-top" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2DD4BF" />
+      <stop offset="45%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#0284C7" />
+    </linearGradient>
+
+    <linearGradient id="iso-left" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2DD4BF" />
+      <stop offset="38%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#0369A1" />
+    </linearGradient>
+
+    <linearGradient id="iso-right" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0284C7" />
+      <stop offset="100%" stop-color="#0C4A6E" />
+    </linearGradient>
+
+    <linearGradient id="iso-inner-dark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#075985" />
+      <stop offset="100%" stop-color="#082F49" />
+    </linearGradient>
+
+    <linearGradient id="iso-inner-lit" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0EA5E9" />
+      <stop offset="100%" stop-color="#075985" />
+    </linearGradient>
+
+    <linearGradient id="gold-top" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FEF08A" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+
+    <linearGradient id="gold-left" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+
+    <linearGradient id="gold-right" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#92400E" />
+    </linearGradient>
+  </defs>
+
+  <!--
+    HAVENCRAFT LOGO (Edge-to-Edge Optimized for Browser Tabs & App Shortcuts):
+    - Scaled 1.2494x and centered at (256, 256)
+    - Full artwork height: 484px (94.5% of 512px canvas), Top/Bottom safe-margin: 14px
+    - Full artwork width : 439.8px (85.9% of 512px canvas), Left/Right safe-margin: 36.1px
+    - True 30-degree isometric angles and proportions 100% mathematically preserved
+  -->
+
+  <!-- 1. INNER VAULT DEPTH WALLS -->
+  <!-- Left Pillar Inner Receding Wall -->
+  <polygon fill="url(#iso-inner-dark)" points="93.6,226.6 141.1,199.3 141.1,392.7 93.6,420" />
+  <!-- Right Pillar Inner Lit Wall -->
+  <polygon fill="url(#iso-inner-lit)" opacity="0.82" points="418.4,226.6 370.9,199.3 370.9,392.7 418.4,420" />
+  <!-- Roof Underside Left & Right Vault Ceilings -->
+  <polygon fill="url(#iso-right)" points="93.6,174.2 256,80.3 256,132.8 93.6,226.6" />
+  <polygon fill="url(#iso-inner-dark)" points="256,80.3 418.4,174.2 418.4,226.6 256,132.8" />
+
+  <!-- 2. OUTER PROTECTIVE BASTION STRUCTURE (30° Isometric Precision) -->
+  <!-- Top Protective Canopy (Roof) -->
+  <polygon fill="url(#iso-top)" points="256,14 475.9,140.9 418.4,174.2 256,80.3 93.6,174.2 36.1,140.9" />
+  <!-- Left Fortress Pillar (Outer Face) -->
+  <polygon fill="url(#iso-left)" points="36.1,140.9 93.6,174.2 93.6,420 36.1,386.8" />
+  <!-- Right Fortress Pillar (Outer Face) -->
+  <polygon fill="url(#iso-right)" points="475.9,140.9 418.4,174.2 418.4,420 475.9,386.8" />
+
+  <!-- 3. GOLDEN THRESHOLD PORTAL -->
+  <!-- Threshold Top Diamond Floor -->
+  <polygon fill="url(#gold-top)" points="256,372.1 340,420 256,468 172,420" />
+  <!-- Threshold Left Step Bevel -->
+  <polygon fill="url(#gold-left)" points="172,420 256,468 256,498 172,450" />
+  <!-- Threshold Right Step Bevel -->
+  <polygon fill="url(#gold-right)" points="340,420 256,468 256,498 340,450" />
+
+  <!-- 4. FLOATING SANCTUARY CORE -->
+  <!-- Core Top Facet -->
+  <polygon fill="url(#gold-top)" points="256,176.4 327.5,213.9 256,251.4 184.5,213.9" />
+  <!-- Core Left Lit Facet -->
+  <polygon fill="url(#gold-left)" points="184.5,213.9 256,251.4 256,336.3 184.5,298.9" />
+  <!-- Core Right Shaded Facet -->
+  <polygon fill="url(#gold-right)" points="327.5,213.9 256,251.4 256,336.3 327.5,298.9" />
+</svg>

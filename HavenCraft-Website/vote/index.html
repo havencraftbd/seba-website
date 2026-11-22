@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-sanctuary="core">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vote | HavenCraft SMP (Daily Crate Keys &amp; Leaderboards)</title>
+  <meta name="description" content="Vote across 8 server listing sites for HavenCraft SMP to track live cooldowns, earn vote crate keys, shards, and climb the monthly Wall of Fame." />
+  <meta name="theme-color" content="#0B131B" />
+
+  <link rel="canonical" href="https://havencraft.pro/vote/" />
+  <link rel="icon" type="image/svg+xml" href="../logo/icon.svg" />
+  <link rel="icon" type="image/png" sizes="512x512" href="../logo/logo.png" />
+  <link rel="manifest" href="../manifest.json" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Fira+Code:wght@500;600&family=Hind+Siliguri:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="../assets/css/style.css?v=255" />
+  <link rel="stylesheet" href="../assets/css/vote.css?v=254" />
+
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="../assets/js/core.js?v=255"></script>
+  <script defer src="../assets/js/utils.js?v=254"></script>
+  <script defer src="../assets/js/navbar.js?v=255"></script>
+  <script defer src="./config.js?v=254"></script>
+  <script defer src="./validation.js?v=254"></script>
+  <script defer src="./cooldown.js?v=254"></script>
+  <script defer src="./supabase.js?v=254"></script>
+  <script defer src="./ui.js?v=254"></script>
+  <script defer src="./vote.js?v=254"></script>
+  <script defer src="../assets/js/ticket-chat.js?v=255"></script>
+  <script defer src="../assets/js/components.js?v=254"></script>
+</head>
+<body>
+  <div id="navbar-placeholder"></div>
+
+  <main id="main-content">
+    <header class="operate-header">
+      <div class="container">
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+          <a href="../">Home</a>
+          <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+          <span>Vote</span>
+        </nav>
+
+        <div class="operate-header-row">
+          <div>
+            <h1>Daily Vote Console</h1>
+            <p class="subtitle">
+              Track your exact cooldowns across 8 server listing sites and claim in-game Vote Keys, Shards, and monthly Wall of Fame crowns.
+            </p>
+          </div>
+          <a href="../leaderboard/" class="btn btn-secondary btn-sm">
+            <i class="fa-solid fa-trophy" aria-hidden="true"></i> Server Stats Board
+          </a>
+        </div>
+
+        <div class="vote-console-grid">
+          <div class="vote-lookup-card">
+            <label for="usernameInput" class="vote-lookup-label">Check Cooldowns &amp; Lookup IGN</label>
+            <div class="vote-input-group">
+              <input
+                type="text"
+                id="usernameInput"
+                class="vote-input"
+                placeholder="Enter exact Minecraft username (e.g. JU3L or .BedrockName)"
+                maxlength="24"
+                autocomplete="off"
+              />
+              <button type="button" class="btn btn-primary" id="checkVotesBtn">
+                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> Check Status
+              </button>
+            </div>
+          </div>
+
+          <div class="vote-reminder-card" id="voteReminderBox">
+            <div class="vote-reminder-row">
+              <div class="vote-reminder-copy">
+                <div class="vote-reminder-title">Cooldown Alerts</div>
+                <p>Get notified when a site cooldown resets.</p>
+              </div>
+              <button type="button" class="btn-reminder" id="btnVoteReminder">
+                <i class="fa-solid fa-bell" aria-hidden="true"></i>
+                <span id="reminderBtnText">Enable Alerts</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="status-notification" id="statusNotification" role="region" aria-live="polite"></div>
+      </div>
+    </header>
+
+    <section class="vote-workspace">
+      <div class="container">
+        <div class="vote-tab-bar" role="tablist" aria-label="Vote Sections">
+          <button type="button" class="tab-btn active" data-tab="voting-sites" role="tab" aria-selected="true">
+            <i class="fa-solid fa-list-check" aria-hidden="true"></i> Voting Sites (8)
+          </button>
+          <button type="button" class="tab-btn" data-tab="leaderboards" role="tab" aria-selected="false">
+            <i class="fa-solid fa-ranking-star" aria-hidden="true"></i> Top Voters
+          </button>
+          <button type="button" class="tab-btn" data-tab="rewards" role="tab" aria-selected="false">
+            <i class="fa-solid fa-gift" aria-hidden="true"></i> Voting Rewards
+          </button>
+          <button type="button" class="tab-btn" data-tab="wall-of-fame" role="tab" aria-selected="false">
+            <i class="fa-solid fa-crown" aria-hidden="true"></i> Wall of Fame
+          </button>
+        </div>
+
+        <!-- Tab 1: Voting Sites -->
+        <div class="tab-content active" id="tab-voting-sites">
+          <div class="vote-panel-head">
+            <div>
+              <h2>Official Listing Portals</h2>
+              <p>Enter your IGN above to inspect live cooldowns and enable reset alerts for every voting portal.</p>
+            </div>
+          </div>
+          <div class="vote-sites-grid" id="voteSitesGrid"></div>
+        </div>
+
+        <!-- Tab 2: Top Voters Leaderboard -->
+        <div class="tab-content" id="tab-leaderboards">
+          <div class="vote-panel-head">
+            <div>
+              <h2>Voter Leaderboards</h2>
+              <p>Monthly champions earn bonus store vouchers and exclusive title tags.</p>
+            </div>
+          </div>
+
+          <div class="subtab-row" role="tablist" aria-label="Leaderboard Timeframe">
+            <button type="button" class="leaderboard-tab active" data-lb-tab="monthly">Monthly</button>
+            <button type="button" class="leaderboard-tab" data-lb-tab="weekly">Weekly</button>
+            <button type="button" class="leaderboard-tab" data-lb-tab="daily">Daily</button>
+            <button type="button" class="leaderboard-tab" data-lb-tab="alltime">All-Time</button>
+          </div>
+
+          <div class="leaderboard-list" id="leaderboard-list"></div>
+        </div>
+
+        <!-- Tab 3: Rewards Breakdown -->
+        <div class="tab-content" id="tab-rewards">
+          <div class="vote-panel-head">
+            <div>
+              <h2>Guaranteed Vote Drops &amp; Streaks</h2>
+              <p>Every confirmed vote credits your account in real time while online.</p>
+            </div>
+          </div>
+
+          <div class="rewards-grid">
+            <article class="reward-card">
+              <div class="reward-card-head">
+                <i class="fa-solid fa-key" aria-hidden="true"></i>
+                <h3>1x Vote Crate Key</h3>
+              </div>
+              <p>Open the Vote Crate at spawn (<code>/warp crates</code>) for tools, enchantment books, and money notes.</p>
+              <span class="reward-tag">Per Vote</span>
+            </article>
+
+            <article class="reward-card">
+              <div class="reward-card-head">
+                <i class="fa-solid fa-coins" aria-hidden="true"></i>
+                <h3>Economy Coins &amp; Shards</h3>
+              </div>
+              <p>Receive survival balance boosts and Vote Shards convertible into seasonal gear upgrades.</p>
+              <span class="reward-tag">Instant Credit</span>
+            </article>
+
+            <article class="reward-card">
+              <div class="reward-card-head">
+                <i class="fa-solid fa-fire-flame-curved" aria-hidden="true"></i>
+                <h3>Vote Party &amp; Streaks</h3>
+              </div>
+              <p>Combined server votes trigger realm-wide Vote Parties dropping bonus rewards to all online players.</p>
+              <span class="reward-tag">Realm Event</span>
+            </article>
+          </div>
+        </div>
+
+        <!-- Tab 4: Wall of Fame -->
+        <div class="tab-content" id="tab-wall-of-fame">
+          <div class="vote-panel-head">
+            <div>
+              <h2>Top Voter Wall of Fame</h2>
+              <p>Players with the highest vote counts across HavenCraft seasons.</p>
+            </div>
+          </div>
+
+          <div class="subtab-row" role="tablist" aria-label="Wall of Fame Period">
+            <button type="button" class="leaderboard-tab wof-tab active" data-wof-tab="alltime">All-Time Legends</button>
+            <button type="button" class="leaderboard-tab wof-tab" data-wof-tab="monthly">This Month Top 3</button>
+          </div>
+
+          <div class="wall-of-fame-showcase" id="wall-of-fame-list"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="footer-placeholder"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

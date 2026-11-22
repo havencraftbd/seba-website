@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-sanctuary="core">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>24/7 Support Desk | HavenCraft SMP</title>
+  <meta name="description" content="Open a live support ticket with the HavenCraft SMP staff team. Real-time chat bridge directly to our Discord staff desk for store orders, bug reports, and ban appeals." />
+  <meta name="keywords" content="HavenCraft support, HavenCraft ticket, Minecraft server help Bangladesh, HavenCraft Discord support" />
+  <meta name="theme-color" content="#0B131B" />
+  <link rel="canonical" href="https://havencraft.pro/support/" />
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "HavenCraft 24/7 Support Desk",
+      "url": "https://havencraft.pro/support/",
+      "description": "Real-time live web support desk bridged directly to HavenCraft staff on Discord.",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "HavenCraft SMP",
+        "url": "https://havencraft.pro/"
+      }
+    }
+  </script>
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="24/7 Live Support Desk | HavenCraft SMP" />
+  <meta property="og:description" content="Need help with a store rank, bug, or ban appeal? Open a real-time ticket directly with HavenCraft staff." />
+  <meta property="og:image" content="https://havencraft.pro/logo/logo.png" />
+  <meta property="og:url" content="https://havencraft.pro/support/" />
+  <meta property="og:site_name" content="HavenCraft SMP" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="24/7 Live Support Desk | HavenCraft SMP" />
+  <meta name="twitter:description" content="Real-time chat desk bridged directly to our Discord staff team." />
+  <meta name="twitter:image" content="https://havencraft.pro/logo/logo.png" />
+
+  <link rel="icon" href="../logo/icon.svg" type="image/svg+xml" />
+  <link rel="icon" type="image/png" sizes="512x512" href="../logo/logo.png" />
+  <link rel="manifest" href="../manifest.json" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Fira+Code:wght@500;600&family=Hind+Siliguri:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="../assets/css/style.css?v=256" />
+  <link rel="stylesheet" href="../assets/css/support.css?v=256" />
+
+  <script defer src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"></script>
+</head>
+<body>
+  <div id="navbar-placeholder"></div>
+
+  <main id="main-content">
+    <header class="operate-header support-page-header">
+      <div class="container">
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+          <a href="../">Home</a>
+          <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+          <span>Support Desk</span>
+        </nav>
+
+        <div class="support-header-inner">
+          <h1 id="supportHeroTitle">Support Desk</h1>
+          <div class="support-live-pill" id="supportLivePill" aria-label="Support response time">
+            <span class="support-live-dot" aria-hidden="true"></span>
+            <span id="supportLivePillTxt">অনলাইন · ২–৫ মিনিটে রিপ্লাই</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="container support-wrapper">
+      <div class="support-desk-grid">
+        <div class="support-main-col">
+          <div class="support-container-card" id="contactFormSection">
+            <div class="support-desk-topbar" id="supportDeskTopbar">
+              <div class="support-desk-heading">
+                <i class="fa-solid fa-headset" id="deskTopbarIcon" aria-hidden="true"></i>
+                <span id="deskTopbarTitle">নতুন টিকেট</span>
+              </div>
+
+              <div class="support-desk-actions">
+                <button type="button" class="support-switch-mode-btn" id="btnSwitchSupportMode" onclick="toggleLookupView(!window.__isLookupMode)">
+                  <i class="fa-solid fa-ticket" id="iconSwitchSupportMode" aria-hidden="true"></i>
+                  <span id="txtSwitchSupportMode">আগের টিকেট</span>
+                </button>
+
+                <div class="lang-toggle-bar lang-toggle-bar--header" id="deskTopLangBar" data-active="bn" role="group" aria-label="Language selection">
+                  <span class="lang-toggle-glider" aria-hidden="true"></span>
+                  <button type="button" class="lang-toggle-btn active" id="deskTopLangBn" onclick="window.hvnSwitchSupportLang ? window.hvnSwitchSupportLang('bn') : (window.deskSetLanguage && window.deskSetLanguage('bn'))">বাংলা</button>
+                  <button type="button" class="lang-toggle-btn" id="deskTopLangEn" onclick="window.hvnSwitchSupportLang ? window.hvnSwitchSupportLang('en') : (window.deskSetLanguage && window.deskSetLanguage('en'))">EN</button>
+                </div>
+              </div>
+            </div>
+
+            <div id="newTicketView"></div>
+
+            <div id="lookupTicketView" style="display: none;">
+              <div class="lookup-view-header">
+                <p id="lookupHeaderDesc">
+                  আপনার টিকেট কোড এবং নিরাপত্তার জন্য রেজিস্ট্রেশন করা ইমেইল প্রদান করুন।
+                </p>
+              </div>
+
+              <div id="lookupInlineAlert" class="support-inline-alert" role="alert" tabindex="-1" style="display: none;"></div>
+
+              <div class="support-form-grid">
+                <div class="form-group">
+                  <label for="lookupCode" id="lookupCodeLabel">Ticket Code *</label>
+                  <input type="text" id="lookupCode" placeholder="e.g. HC-1000" style="text-transform: uppercase;" autocomplete="off" />
+                </div>
+                <div class="form-group">
+                  <label for="lookupEmail" id="lookupEmailLabel">রেজিস্ট্রেশন করা ইমেইল (Security Check) *</label>
+                  <input type="email" id="lookupEmail" placeholder="yourname@gmail.com" autocomplete="email" />
+                </div>
+              </div>
+
+              <button type="button" class="form-submit-btn" id="lookupSubmitBtn" onclick="handleLookupTicket()">
+                <i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i>
+                <span id="lookupBtnText">চ্যাট লোড করুন</span>
+              </button>
+            </div>
+
+            <div id="ticketChatRoom" style="display: none;"></div>
+          </div>
+        </div>
+
+        <aside class="support-side-col" aria-label="Quick help and server info">
+          <div class="support-side-card">
+            <button type="button" class="support-quick-ip" onclick="if(typeof copyIP==='function') copyIP(this)" aria-label="Copy server IP mc.havencraft.pro">
+              <div class="quick-ip-meta">
+                <span class="quick-ip-label">Server IP</span>
+                <strong class="quick-ip-val copy-btn-text server-ip">mc.havencraft.pro</strong>
+              </div>
+              <span class="quick-ip-port">Bedrock: <strong class="bedrock-port">2025</strong></span>
+            </button>
+            <a href="https://dc.havencraft.pro" target="_blank" rel="noopener noreferrer" class="support-discord-link">
+              <i class="fa-brands fa-discord" aria-hidden="true"></i>
+              <span id="sideDiscordBtnText">ডিসকর্ড সাপোর্ট</span>
+              <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+            </a>
+
+            <div class="support-side-divider"></div>
+
+            <div class="support-deflection-grid" id="supportDeflectionGrid">
+              <details class="support-faq-card" id="faqCardPayment">
+                <summary>
+                  <i class="fa-solid fa-credit-card" aria-hidden="true"></i>
+                  <span class="faq-q">পেমেন্ট ও ডেলিভারি</span>
+                  <i class="fa-solid fa-chevron-down faq-chevron" aria-hidden="true"></i>
+                </summary>
+                <p class="faq-a">bKash/Nagad পেমেন্ট কনফার্ম হতে সাধারণত ৫–১৫ মিনিট সময় লাগে। TrxID সাথে রাখুন।</p>
+              </details>
+
+              <details class="support-faq-card" id="faqCardPassword">
+                <summary>
+                  <i class="fa-solid fa-key" aria-hidden="true"></i>
+                  <span class="faq-q">পাসওয়ার্ড রিসেট</span>
+                  <i class="fa-solid fa-chevron-down faq-chevron" aria-hidden="true"></i>
+                </summary>
+                <p class="faq-a">সার্ভারে <code>/changepassword</code> ব্যবহার করুন অথবা টিকিটে আপনার IGN জানান।</p>
+              </details>
+
+              <details class="support-faq-card" id="faqCardClaim">
+                <summary>
+                  <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i>
+                  <span class="faq-q">ল্যান্ড ক্লেইম</span>
+                  <i class="fa-solid fa-chevron-down faq-chevron" aria-hidden="true"></i>
+                </summary>
+                <p class="faq-a">ইন-গেমে <code>/claim</code> বা Golden Shovel দিয়ে জায়গা ক্লেইম করুন।</p>
+              </details>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-placeholder"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="../assets/js/core.js?v=255"></script>
+  <script defer src="../assets/js/utils.js?v=254"></script>
+  <script defer src="../assets/js/navbar.js?v=255"></script>
+  <script defer src="../assets/js/ticket-chat.js?v=256"></script>
+  <script defer src="../assets/js/support.js?v=256"></script>
+  <script defer src="../assets/js/components.js?v=254"></script>
+</body>
+</html>

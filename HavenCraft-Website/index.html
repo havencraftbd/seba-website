@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-sanctuary="core">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HavenCraft SMP | Bangladesh 24/7 Minecraft Java &amp; Bedrock Server</title>
+  <meta name="description"
+    content="HavenCraft SMP is a 24/7 Bangladesh-hosted Minecraft Survival server supporting Java 1.21.11 and Bedrock crossplay. Connect at mc.havencraft.pro (Java 2566, Bedrock 2025)." />
+  <meta name="keywords"
+    content="HavenCraft SMP, Bangladesh Minecraft server, Java 1.21.11, Bedrock crossplay, mc.havencraft.pro, Minecraft survival server" />
+  <meta name="theme-color" content="#0B131B" />
+
+  <!-- Open Graph / Social -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://havencraft.pro/" />
+  <meta property="og:title" content="HavenCraft SMP | Season 6 Survival Server" />
+  <meta property="og:description"
+    content="24/7 Bangladesh-hosted Minecraft SMP for Java 1.21.11 &amp; Bedrock crossplay. Land claims, player economy, live stats, and bKash/Nagad store." />
+  <meta property="og:image" content="https://havencraft.pro/images/sanctuary-hero.webp" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="HavenCraft SMP | Bangladesh Minecraft Java &amp; Bedrock Server" />
+  <meta name="twitter:description"
+    content="Play 24/7 on HavenCraft SMP. IP: mc.havencraft.pro · Java Port: 2566 · Bedrock Port: 2025." />
+  <meta name="twitter:image" content="https://havencraft.pro/images/sanctuary-hero.webp" />
+
+  <!-- Canonical & Icons -->
+  <link rel="canonical" href="https://havencraft.pro/" />
+  <link rel="icon" type="image/svg+xml" href="logo/icon.svg" />
+  <link rel="icon" type="image/png" sizes="512x512" href="logo/logo.png" />
+  <link rel="apple-touch-icon" href="logo/logo.png" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="preload" as="image" href="images/sanctuary-hero.webp" type="image/webp" fetchpriority="high" />
+
+  <!-- Typography (Chakra Petch · Source Sans 3 · Hind Siliguri · Fira Code) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Fira+Code:wght@500;600&family=Hind+Siliguri:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" />
+
+  <!-- Icons & Core Stylesheet -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="assets/css/style.css?v=269" />
+
+  <!-- Schema.org Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "name": "HavenCraft SMP",
+        "url": "https://havencraft.pro/",
+        "logo": "https://havencraft.pro/logo/logo.png",
+        "sameAs": [
+          "https://dc.havencraft.pro"
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How do I join HavenCraft SMP on Java and Bedrock?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "On Java Edition 1.21.11, add mc.havencraft.pro:2566 in Multiplayer. On Bedrock Edition (Mobile, Windows, or Console), enter Server Address mc.havencraft.pro and Port 2025."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Are cracked accounts supported alongside premium accounts?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Both official Microsoft accounts and cracked launchers work with our in-game login protection."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What ping can players in Bangladesh expect?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The server routes through a South Asian node open 24/7, so players in Dhaka and across Bangladesh typically get under 45ms ping."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do Store purchases work with bKash and Nagad?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "@id": "https://havencraft.pro/#faq-store",
+              "text": "Visit the Store, choose a Season 6 Rank or Spawner bundle, send BDT via bKash or Nagad Send Money, and submit your TrxID with your Minecraft IGN to get a verified digital invoice."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <!-- Core Scripts (Local shell first so navbar mounts with zero CDN wait) -->
+  <script defer src="assets/js/core.js?v=255"></script>
+  <script defer src="assets/js/navbar.js?v=256"></script>
+  <script defer src="assets/js/components.js?v=256"></script>
+  <script defer src="assets/js/home.js?v=254"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="assets/js/utils.js?v=254"></script>
+  <script defer src="assets/js/leaderboard-core.js?v=255"></script>
+  <script defer src="assets/js/leaderboard.js?v=254"></script>
+  <script defer src="assets/js/ticket-chat.js?v=255"></script>
+</head>
+
+<body>
+  <div id="navbar-placeholder"></div>
+
+  <main id="main-content">
+    <!-- Hero Gate — Sanctuary Bastion -->
+    <section class="hero-sanctuary" aria-label="HavenCraft SMP Server Overview">
+      <div class="hero-sanctuary-media" aria-hidden="true">
+        <img src="images/sanctuary-hero.webp" width="1376" height="768"
+          alt="HavenCraft SMP prismarine and terracotta bastion stronghold"
+          class="hero-sanctuary-img" decoding="sync" fetchpriority="high" />
+        <div class="hero-sanctuary-scrim"></div>
+      </div>
+
+      <div class="container">
+        <div class="hero-gate-grid">
+          <div class="hero-copy-col">
+            <div class="hero-brand-lockup">
+              <img src="logo/icon.svg" alt="" aria-hidden="true" class="hero-title-logo" width="94" height="94" />
+              <h1 class="hero-title">Haven<span class="hero-title-accent">Craft</span></h1>
+            </div>
+
+            <div class="hero-spec-line" aria-label="Realm specifications">
+              <span class="season-name" data-season-name>Season 6</span>
+              <span class="hero-spec-tag">Java 1.21.11 + Bedrock</span>
+              <span class="hero-spec-tag">24/7 Bangladesh Node</span>
+            </div>
+
+            <p class="hero-thesis">
+              A 24/7 Bangladesh-hosted survival server for Java and Bedrock players. Claim land for your base, trade in
+              the player market, and play with no pay-to-win walls.
+            </p>
+          </div>
+
+          <!-- Realm Connection Ledger (.terminal-card hooks ticket-chat.js focus-not-obscured observer) -->
+          <aside class="terminal-card sanctuary-ledger" aria-label="Server Connection Details">
+            <div class="ledger-head">
+              <div class="status-badge" id="statusBadge" onclick="openPlayerModal()" role="button" tabindex="0"
+                title="Click to inspect player list">
+                <span class="status-dot" id="statusIndicator" aria-hidden="true"></span>
+                <span id="statusText">Checking server...</span>
+              </div>
+              <button type="button" class="ledger-players-chip" id="ledgerPlayersBtn" onclick="openPlayerModal()"
+                aria-label="Inspect online players list" title="Click to view online players">
+                <i class="fa-solid fa-users ledger-players-icon" aria-hidden="true"></i>
+                <span class="ledger-players-text"><span id="playerCountLarge">0 / 200</span> online</span>
+                <i class="fa-solid fa-chevron-right ledger-players-arrow" aria-hidden="true"></i>
+                <span class="sr-only" id="playerCount">0</span>
+                <span class="sr-only" id="playerMax">200</span>
+              </button>
+            </div>
+
+            <div class="ledger-body">
+              <div class="ledger-edition-row">
+                <div class="ledger-edition-meta">
+                  <span class="ledger-edition-label">Java Edition · 1.21+</span>
+                  <div class="ledger-ip-code">
+                    <span class="server-ip">mc.havencraft.pro</span><span class="ledger-ip-sep" aria-hidden="true">:</span><span
+                      class="ledger-port-tag server-port">2566</span>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm ledger-copy-btn"
+                  onclick="copyServerIP('mc.havencraft.pro', this, 'java')" aria-label="Copy Java server address">
+                  <i class="fa-solid fa-copy" aria-hidden="true"></i> Copy
+                </button>
+              </div>
+
+              <div class="ledger-edition-row">
+                <div class="ledger-edition-meta">
+                  <span class="ledger-edition-label">Bedrock · Mobile &amp; Console</span>
+                  <div class="ledger-ip-code">
+                    <span class="server-ip">mc.havencraft.pro</span>
+                    <span class="ledger-ip-sep" aria-hidden="true">·</span>
+                    <span class="ledger-port-label">Port</span>
+                    <strong class="ledger-port-tag bedrock-port">2025</strong>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm ledger-copy-btn"
+                  onclick="copyServerIP('mc.havencraft.pro', this, 'bedrock')" aria-label="Copy Bedrock server address">
+                  <i class="fa-solid fa-copy" aria-hidden="true"></i> Copy
+                </button>
+              </div>
+
+              <div class="ledger-actions-stack">
+                <a class="btn btn-secondary ledger-discord-btn" href="https://dc.havencraft.pro" target="_blank" rel="noopener noreferrer">
+                  <i class="fa-brands fa-discord" aria-hidden="true"></i> Join Discord
+                </a>
+                <a class="btn btn-prismarine bedrock-connect-link"
+                  href="minecraft://?addExternalServer=HavenCraft%20SMP|mc.havencraft.pro:2025">
+                  <i class="fa-solid fa-gamepad" aria-hidden="true"></i> Launch Bedrock
+                </a>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- Realm Proof & Architecture Band (Distinct from Hero Ledger) -->
+    <section class="infra-spec-band" aria-label="Server Architecture Summary">
+      <div class="container">
+        <span class="sr-only" id="statPlayers">0 / 200</span>
+        <span class="sr-only" id="statStatus">Online</span>
+        <div class="infra-spec-grid">
+          <div class="infra-spec-item">
+            <span class="infra-spec-key">Tracked <span class="season-name" data-season-name>Season 6</span> Roster</span>
+            <span class="infra-spec-val" id="uniquePlayers">3,200+</span>
+          </div>
+          <div class="infra-spec-item">
+            <span class="infra-spec-key">Crossplay Core</span>
+            <span class="infra-spec-val">Java 1.21.11 + Bedrock</span>
+          </div>
+          <div class="infra-spec-item">
+            <span class="infra-spec-key">Low-Latency Gateway</span>
+            <span class="infra-spec-val">Bangladesh 24/7 Host</span>
+          </div>
+          <div class="infra-spec-item">
+            <span class="infra-spec-key">Seasonal Balance</span>
+            <span class="infra-spec-val infra-val-terracotta">Fair Economy &amp; PvP</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Core Gameplay Worlds -->
+    <section class="sanctuary-section" id="features" aria-labelledby="worlds-heading">
+      <div class="container">
+        <div class="section-intro-row">
+          <div>
+            <h2 id="worlds-heading" class="section-heading">Built Around Long-Term Survival</h2>
+            <p class="section-lead">
+              Play solo or with a team in a survival world built around protected land, player shops, and seasonal
+              progression.
+            </p>
+          </div>
+          <a href="features/" class="btn btn-secondary">
+            <i class="fa-solid fa-compass" aria-hidden="true"></i> Explore All Features
+          </a>
+        </div>
+
+        <div class="worlds-exhibition">
+          <article class="world-card">
+            <div class="world-card-media">
+              <img src="images/survival.webp" alt="HavenCraft SMP protected terrain and bastion town builds" />
+            </div>
+            <div class="world-card-body">
+              <h3 class="world-card-title">
+                <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                Claimed Frontier &amp; Towns
+              </h3>
+              <p class="world-card-copy">
+                Protect anything from a starter base to a full town with a golden shovel, and choose which friends can
+                build or open chests.
+              </p>
+              <ul class="world-card-points">
+                <li><i class="fa-solid fa-check" aria-hidden="true"></i> Anti-grief claim boundaries</li>
+                <li><i class="fa-solid fa-check" aria-hidden="true"></i> Toggleable claim PvP &amp; containers</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="world-card">
+            <div class="world-card-media">
+              <img src="images/community.webp" alt="HavenCraft SMP community plaza and bazaar events" />
+            </div>
+            <div class="world-card-body">
+              <h3 class="world-card-title">
+                <i class="fa-solid fa-coins" aria-hidden="true"></i>
+                Player Economy &amp; Market
+              </h3>
+              <p class="world-card-copy">
+                Earn coins and shards from mining, quests, and daily votes, then open chest shops or list items on the
+                auction house.
+              </p>
+              <ul class="world-card-points">
+                <li><i class="fa-solid fa-check" aria-hidden="true"></i> Live auction house &amp; <code>/trade</code>
+                </li>
+                <li><i class="fa-solid fa-check" aria-hidden="true"></i> Player warps &amp; bazaar districts</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="world-card">
+            <div class="world-card-media">
+              <img src="images/gameplay.webp" alt="HavenCraft SMP dungeon boss arena and custom combat gear" />
+            </div>
+            <div class="world-card-body">
+              <h3 class="world-card-title">
+                <i class="fa-solid fa-khanda" aria-hidden="true"></i>
+                Seasonal Combat &amp; Progression
+              </h3>
+              <p class="world-card-copy">
+                Level up survival skills, fight timed arena bosses, and track your stats across eight live
+                leaderboards.
+              </p>
+              <ul class="world-card-points">
+                <li><i class="fa-solid fa-check" aria-hidden="true"></i> Fair seasonal rank progression</li>
+                <li><i class="fa-solid fa-check" aria-hidden="true"></i> Real-time Web Profile &amp; 3D Skins</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+
+        <div class="mechanics-rail">
+          <div class="mechanic-tile">
+            <div class="mechanic-tile-head">
+              <i class="fa-solid fa-globe" aria-hidden="true"></i>
+              <h3>Java &amp; Bedrock Sync</h3>
+            </div>
+            <p>Play side-by-side from PC, Android, iOS, or consoles in one unified survival world.</p>
+          </div>
+          <div class="mechanic-tile">
+            <div class="mechanic-tile-head">
+              <i class="fa-solid fa-key" aria-hidden="true"></i>
+              <h3>Daily Vote Crates</h3>
+            </div>
+            <p>Vote across 8 server lists to unlock crate keys, shards, and seasonal streaks.</p>
+          </div>
+          <div class="mechanic-tile">
+            <div class="mechanic-tile-head">
+              <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+              <h3>bKash &amp; Nagad Store</h3>
+            </div>
+            <p>Pay in BDT with bKash or Nagad, submit your TrxID for a receipt, and keep progression fair.</p>
+          </div>
+          <div class="mechanic-tile">
+            <div class="mechanic-tile-head">
+              <i class="fa-solid fa-headset" aria-hidden="true"></i>
+              <h3>Live Staff Support</h3>
+            </div>
+            <p>24/7 bilingual ticket desk in Bengali and English for billing, bug reports, or appeals.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Live Leaderboard Split -->
+    <section class="sanctuary-section sanctuary-section--alt" id="leaderboard" aria-labelledby="lb-section-heading">
+      <div class="container">
+        <div class="lb-split-layout">
+          <div class="lb-summary-rail">
+            <h2 id="lb-section-heading" class="section-heading">Live Season Rankings</h2>
+            <p class="section-lead">
+              Updated directly from server stats. Switch tabs to check <span class="season-name" data-season-name>Season 6</span> leaders in playtime, wealth, building,
+              and PvP.
+            </p>
+
+            <div class="lb-highlights-list">
+              <div class="lb-highlight-row">
+                <span><i class="fa-solid fa-clock" aria-hidden="true"></i> Playtime &amp; Wealth</span>
+                <span>Synced every 60s</span>
+              </div>
+              <div class="lb-highlight-row">
+                <span><i class="fa-solid fa-crosshairs" aria-hidden="true"></i> Combat &amp; Mobs</span>
+                <span>All-time PvP tallies</span>
+              </div>
+              <div class="lb-highlight-row">
+                <span><i class="fa-solid fa-cubes" aria-hidden="true"></i> Builders &amp; Miners</span>
+                <span>Blocks placed &amp; broken</span>
+              </div>
+            </div>
+
+            <div class="hero-cta-row">
+              <a href="leaderboard/" class="btn btn-primary">
+                <i class="fa-solid fa-trophy" aria-hidden="true"></i> Open Full Leaderboard
+              </a>
+              <a href="profile/" class="btn btn-secondary">
+                <i class="fa-solid fa-id-card" aria-hidden="true"></i> Check Your Profile
+              </a>
+            </div>
+          </div>
+
+          <div class="lb-panel">
+            <div class="lb-tabs" id="lbTabs" role="tablist" aria-label="Leaderboard Categories">
+              <button type="button" class="lb-tab active" data-category="playtime" role="tab" aria-selected="true">
+                <i class="fa-solid fa-clock" aria-hidden="true"></i> Playtime
+              </button>
+              <button type="button" class="lb-tab" data-category="money" role="tab" aria-selected="false">
+                <i class="fa-solid fa-coins" aria-hidden="true"></i> Money
+              </button>
+              <button type="button" class="lb-tab" data-category="shards" role="tab" aria-selected="false">
+                <i class="fa-solid fa-gem" aria-hidden="true"></i> Shards
+              </button>
+              <button type="button" class="lb-tab" data-category="kills" role="tab" aria-selected="false">
+                <i class="fa-solid fa-khanda" aria-hidden="true"></i> Kills
+              </button>
+              <button type="button" class="lb-tab" data-category="deaths" role="tab" aria-selected="false">
+                <i class="fa-solid fa-heart-crack" aria-hidden="true"></i> Deaths
+              </button>
+            </div>
+
+            <div class="lb-body" id="lbBody">
+              <div class="lb-loading" id="lbLoading">
+                <div class="lb-skeleton-row loading-skeleton"></div>
+                <div class="lb-skeleton-row loading-skeleton"></div>
+                <div class="lb-skeleton-row loading-skeleton"></div>
+                <div class="lb-skeleton-row loading-skeleton"></div>
+                <div class="lb-skeleton-row loading-skeleton"></div>
+              </div>
+              <div class="lb-list" id="lbList"></div>
+              <div class="lb-error" id="lbError" style="display:none;">
+                <p>Unable to load leaderboard stats right now.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How to Join + FAQ -->
+    <section class="sanctuary-section" id="join" aria-labelledby="join-heading">
+      <div class="container">
+        <div class="guide-faq-split">
+          <div>
+            <h2 id="join-heading" class="section-heading">Enter the Realm in Three Steps</h2>
+            <p class="section-lead" style="margin-bottom: 24px;">
+              Ready in under a minute on Java PC, Android, iOS, or Bedrock consoles.
+            </p>
+
+            <div class="join-steps-list">
+              <div class="join-step-card">
+                <span class="join-step-num">01</span>
+                <div>
+                  <h3>Launch Java 1.21+ or Bedrock</h3>
+                  <p>Open Multiplayer (Java) or Play &rarr; Servers (Bedrock) on the latest supported release.</p>
+                </div>
+              </div>
+              <div class="join-step-card">
+                <span class="join-step-num">02</span>
+                <div>
+                  <h3>Add Server Coordinates</h3>
+                  <p>Use <strong class="server-ip">mc.havencraft.pro</strong> with port <strong class="server-port">2566</strong> (Java) or
+                    <strong class="bedrock-port">2025</strong> (Bedrock).
+                  </p>
+                </div>
+              </div>
+              <div class="join-step-card">
+                <span class="join-step-num">03</span>
+                <div>
+                  <h3>Claim Land &amp; Sync Web Profile</h3>
+                  <p>Claim your first base with a golden shovel and bookmark your web gametag to vote and check stats.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="faq">
+            <h2 class="section-heading">Quick Answers</h2>
+            <p class="section-lead" style="margin-bottom: 24px;">
+              Common questions about joining, accounts, ping, and store orders.
+            </p>
+
+            <div class="faq-accordion">
+              <details class="faq-acc-item" open>
+                <summary class="faq-acc-trigger">
+                  <span>How do I join on Java vs. Bedrock?</span>
+                  <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                </summary>
+                <div class="faq-acc-panel">
+                  <p>On Java Edition 1.21.11, connect to <code class="server-address-full">mc.havencraft.pro:2566</code>. On Bedrock Edition
+                    (Mobile/Windows/Console), enter Server Address <code class="server-ip">mc.havencraft.pro</code> and Port
+                    <code class="bedrock-port">2025</code>, or click Launch Bedrock above.
+                  </p>
+                </div>
+              </details>
+
+              <details class="faq-acc-item">
+                <summary class="faq-acc-trigger">
+                  <span>Can both premium and cracked accounts join?</span>
+                  <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                </summary>
+                <div class="faq-acc-panel">
+                  <p>Yes. Official Microsoft accounts and non-premium launchers both connect to the same <span class="season-name" data-season-name>Season 6</span> world
+                    using <code>/register</code> and <code>/login</code> protection.</p>
+                </div>
+              </details>
+
+              <details class="faq-acc-item">
+                <summary class="faq-acc-trigger">
+                  <span>What ping should I expect from Bangladesh?</span>
+                  <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                </summary>
+                <div class="faq-acc-panel">
+                  <p>The server runs 24/7 with South Asian routing so players in Dhaka, Chattogram, and across
+                    Bangladesh get low ping for survival and combat.</p>
+                </div>
+              </details>
+
+              <details class="faq-acc-item">
+                <summary class="faq-acc-trigger">
+                  <span>How are Store ranks &amp; spawners delivered?</span>
+                  <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                </summary>
+                <div class="faq-acc-panel">
+                  <p>Complete your bKash or Nagad payment in the Store and enter your TrxID. Save or download your
+                    digital invoice and open a verification ticket in our Discord <code>#store-orders</code> or Support
+                    Desk.</p>
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final Gate CTA Strip -->
+    <section class="sanctuary-cta-band" id="cta" aria-label="Ready to Play">
+      <div class="container">
+        <div class="cta-ledger-box">
+          <div class="cta-ledger-copy">
+            <h2>Ready to join <span class="season-name" data-season-name>Season 6</span>?</h2>
+            <p>Copy the server IP or join our Discord to get started.</p>
+          </div>
+          <div class="cta-ledger-actions">
+            <button type="button" class="btn btn-primary copy-ip-btn" onclick="copyIP(this)">
+              <i class="fa-solid fa-copy" aria-hidden="true"></i> <span>Copy <span class="server-ip">mc.havencraft.pro</span></span>
+            </button>
+            <a href="vote/" class="btn btn-secondary">
+              <i class="fa-solid fa-gift" aria-hidden="true"></i> Claim Vote Rewards
+            </a>
+            <a href="https://dc.havencraft.pro" target="_blank" rel="noopener noreferrer"
+              class="btn btn-secondary">
+              <i class="fa-brands fa-discord" aria-hidden="true"></i> Discord Community
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="footer-placeholder"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- Online Players Modal -->
+  <div class="modal-overlay" id="playerModal" role="dialog" aria-modal="true" aria-labelledby="playerModalTitle">
+    <div class="player-modal">
+      <div class="modal-header">
+        <h2 id="playerModalTitle">
+          <i class="fa-solid fa-users" aria-hidden="true"></i>
+          Online Players
+        </h2>
+        <button type="button" class="modal-close" id="closePlayerModal" aria-label="Close modal">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="player-list" id="playerList"></div>
+    </div>
+  </div>
+</body>
+
+</html>

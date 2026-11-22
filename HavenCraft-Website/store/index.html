@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-sanctuary="core">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Store | HavenCraft SMP (Season 6 Ranks &amp; Spawners)</title>
+  <meta name="description" content="Official HavenCraft SMP Store. Purchase Season 6 ranks and spawner bundles with bKash &amp; Nagad BDT or USD checkout." />
+  <meta name="theme-color" content="#0B131B" />
+
+  <link rel="canonical" href="https://havencraft.pro/store/" />
+  <link rel="icon" type="image/svg+xml" href="../logo/icon.svg" />
+  <link rel="icon" type="image/png" sizes="512x512" href="../logo/logo.png" />
+  <link rel="manifest" href="../manifest.json" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Fira+Code:wght@500;600&family=Hind+Siliguri:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="../assets/css/style.css?v=255" />
+  <link rel="stylesheet" href="../assets/css/store.css?v=254" />
+
+  <script defer src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="../assets/js/core.js?v=255"></script>
+  <script defer src="../assets/js/utils.js?v=254"></script>
+  <script defer src="../assets/js/navbar.js?v=255"></script>
+  <script defer src="../store/config.js?v=254"></script>
+  <script defer src="../assets/js/store.js?v=255"></script>
+  <script defer src="../assets/js/ticket-chat.js?v=255"></script>
+  <script defer src="../assets/js/components.js?v=254"></script>
+</head>
+<body>
+  <div id="navbar-placeholder"></div>
+
+  <main id="main-content">
+    <header class="operate-header">
+      <div class="container">
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+          <a href="../">Home</a>
+          <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+          <span>Store</span>
+        </nav>
+
+        <div class="operate-header-row">
+          <div>
+            <h1>HavenCraft Store</h1>
+            <p class="subtitle">
+              Support server hosting and order Season 6 ranks or farm spawners with bKash and Nagad verification.
+            </p>
+          </div>
+          <span class="store-season-pill" id="storeHeroBadge">
+            <i class="fa-solid fa-gem" aria-hidden="true"></i>
+            <span class="season-name" data-season-name>Season 6</span> Live Catalog
+          </span>
+        </div>
+
+        <div class="store-controls-bar">
+          <div class="store-tabs" id="storeTabs" role="tablist" aria-label="Store Categories">
+            <button type="button" class="store-tab active" data-tab="ranks" role="tab" aria-selected="true">
+              <i class="fa-solid fa-crown" aria-hidden="true"></i> Seasonal Ranks
+            </button>
+            <button type="button" class="store-tab" data-tab="spawners" role="tab" aria-selected="false">
+              <i class="fa-solid fa-cubes" aria-hidden="true"></i> Spawners
+            </button>
+          </div>
+
+          <div class="store-toolbar-right">
+            <div class="currency-switch" role="group" aria-label="Select Currency">
+              <button type="button" class="currency-btn active" id="btnBDT" onclick="setCurrency('BDT')">৳ BDT</button>
+              <button type="button" class="currency-btn" id="btnUSD" onclick="setCurrency('USD')">$ USD</button>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="openStoreTermsModal(event)">
+              <i class="fa-solid fa-file-contract" aria-hidden="true"></i> Store Rules
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="store-main-section">
+      <div class="container">
+        <!-- Ranks Tab -->
+        <div id="ranks-section">
+          <div class="store-section-top">
+            <div>
+              <h2>Season 6 Ranks</h2>
+              <p>Each seasonal rank includes priority perks, <code>/commands</code>, and bonus spawner quotas selected during checkout.</p>
+            </div>
+          </div>
+
+          <div class="ranks-grid" id="ranksGrid"></div>
+        </div>
+
+        <!-- Spawners Tab -->
+        <div id="spawners-section" style="display: none;">
+          <div class="store-section-top">
+            <div>
+              <h2>Standalone Mob Spawners</h2>
+              <p>Combine passive, hostile, or utility spawners into one verified checkout slip.</p>
+            </div>
+          </div>
+
+          <div class="spawner-grid" id="spawnerGrid"></div>
+        </div>
+
+        <div class="store-info-band">
+          <div class="store-info-points">
+            <span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Verified TrxID Slip &amp; PNG Invoice</span>
+            <span><i class="fa-solid fa-mobile-screen" aria-hidden="true"></i> Java &amp; Bedrock (<code>.Name</code>) Supported</span>
+            <span class="store-payment-logos">
+              <img src="../assets/images/bkash-logo.svg" alt="bKash" width="56" height="20" />
+              <img src="../assets/images/nagad-logo.svg" alt="Nagad" width="56" height="20" />
+            </span>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="openStoreTermsModal(event)">
+            Read Purchase Terms (বাংলা / EN)
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Sticky Standalone Spawner Cart Bar -->
+  <div class="spawner-cart-bar" id="spawnerCartBar">
+    <div class="spawner-cart-info">
+      <span class="spawner-cart-count"><strong id="cartTotalCount">0</strong> Spawners Selected</span>
+      <span class="spawner-cart-total" id="cartTotalPrice">৳0</span>
+    </div>
+    <button type="button" class="btn btn-primary" onclick="openSpawnerCartCheckout()">
+      <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i> Proceed to Checkout
+    </button>
+  </div>
+
+  <!-- Checkout Modal Overlay -->
+  <div class="checkout-overlay" id="checkoutModalOverlay" role="dialog" aria-modal="true" aria-labelledby="checkoutModalTitle" style="display: none;">
+    <div class="checkout-modal" id="checkoutModal">
+      <div class="checkout-modal-header">
+        <h2 id="checkoutModalTitle">Store Checkout</h2>
+        <button type="button" class="modal-close" onclick="closeCheckoutModal()" aria-label="Close checkout">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div class="checkout-summary-bar">
+        <span class="checkout-summary-item" id="modalSummaryItem">Selected Package</span>
+        <span class="checkout-summary-price" id="modalSummaryPrice">৳0</span>
+      </div>
+
+      <form class="checkout-form" id="checkoutForm" onsubmit="handleOrderSubmit(event)" novalidate>
+        <input type="checkbox" name="botcheck" tabindex="-1" style="display:none;" aria-hidden="true" />
+
+        <!-- Step 1: Player Identity -->
+        <div class="checkout-step-block">
+          <div class="checkout-step-head">
+            <h3><i class="fa-solid fa-user" aria-hidden="true"></i> 1. Minecraft &amp; Discord Identity</h3>
+          </div>
+          <div class="player-preview-row">
+            <img id="playerAvatarPreview" src="https://mc-heads.net/avatar/MHF_Steve/64" alt="Player Head" />
+            <div class="form-field" style="flex: 1;">
+              <label for="playerUsername">Minecraft Username (prefix dot <code>.</code> for Bedrock)</label>
+              <input type="text" id="playerUsername" placeholder="e.g. JU3L or .BedrockTag" required maxlength="24" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="discordUser">Discord Username (for order ticket &amp; rank sync)</label>
+            <input type="text" id="discordUser" placeholder="e.g. player_bd" required maxlength="40" />
+          </div>
+        </div>
+
+        <!-- Step 2A: Rank Included Spawners -->
+        <div class="checkout-step-block" id="rankSpawnersStep" style="display: none;">
+          <div class="checkout-step-head">
+            <h3><i class="fa-solid fa-cubes" aria-hidden="true"></i> 2. Choose Included Spawners</h3>
+            <span class="quota-badge" id="spawnerQuotaBadge">0/0 Selected</span>
+          </div>
+          <div id="rankSpawnerSelectors"></div>
+        </div>
+
+        <!-- Step 2B: Standalone Cart Review -->
+        <div class="checkout-step-block" id="spawnersCartStep" style="display: none;">
+          <div class="checkout-step-head">
+            <h3><i class="fa-solid fa-cart-shopping" aria-hidden="true"></i> 2. Spawner Cart Review</h3>
+          </div>
+          <div id="cartItemsReview" style="display: flex; flex-direction: column; gap: 8px;"></div>
+        </div>
+
+        <!-- Step 3: Payment Details -->
+        <div class="checkout-step-block">
+          <div class="checkout-step-head">
+            <h3><i class="fa-solid fa-money-bill-transfer" aria-hidden="true"></i> 3. Send Money &amp; Enter TrxID</h3>
+          </div>
+
+          <div class="payment-tabs" role="tablist" aria-label="Payment Methods">
+            <button type="button" class="payment-tab active" id="tabBkash" onclick="setPaymentMethod('bKash')">
+              <img src="../assets/images/bkash-logo.svg" alt="" width="48" height="18" aria-hidden="true" />
+              <span>bKash Personal</span>
+            </button>
+            <button type="button" class="payment-tab" id="tabNagad" onclick="setPaymentMethod('Nagad')">
+              <img src="../assets/images/nagad-logo.svg" alt="" width="48" height="18" aria-hidden="true" />
+              <span>Nagad Personal</span>
+            </button>
+          </div>
+
+          <div class="payment-box method-bkash" id="paymentBox">
+            <div style="font-size: 0.85rem; color: var(--text-secondary);">
+              Official Account (<strong id="paymentMethodLabel">bKash Personal</strong>):
+            </div>
+            <div class="payment-number-container" onclick="copyPaymentNumber()" role="button" tabindex="0">
+              <span class="payment-number-val" id="paymentNumberDisplay">01516523070</span>
+              <span class="payment-copy-pill" id="paymentCopyPill">
+                <i class="fa-regular fa-copy" aria-hidden="true"></i> <span>Tap to copy</span>
+              </span>
+            </div>
+            <p class="payment-guide-steps">
+              Use <strong>Send Money</strong> in your <strong id="guideMethodName">bKash</strong> app to
+              <code id="guidePaymentNumber">01516523070</code> for exact amount <strong id="guideAmountText">৳0</strong>.
+            </p>
+            <div class="pay-action-note">
+              <i class="fa-solid fa-circle-info" aria-hidden="true"></i> Use Send Money only; do not Cash Out.
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label for="senderNumber">Sender Phone Number</label>
+              <input type="tel" id="senderNumber" placeholder="01XXXXXXXXX" required maxlength="20" />
+            </div>
+            <div class="form-field">
+              <label for="trxId">Transaction ID (TrxID)</label>
+              <input type="text" id="trxId" placeholder="e.g. BLX92849182" required maxlength="32" />
+            </div>
+          </div>
+
+          <div class="terms-checkbox-wrapper">
+            <input type="checkbox" id="agreeStoreTerms" required />
+            <label for="agreeStoreTerms">
+              I accept the
+              <button type="button" class="terms-link-btn" onclick="openStoreTermsModal(event)">HavenCraft Store Terms &amp; Refund Policy</button>
+              (স্টোর নীতিমালায় সম্মত).
+            </label>
+          </div>
+
+          <div class="turnstile-slot" id="storeTurnstile"></div>
+
+          <button type="submit" class="btn btn-primary btn-lg" id="btnSubmitOrder">
+            <span id="btnSubmitText">Confirm &amp; Generate Invoice</span>
+            <i class="fa-solid fa-spinner fa-spin" id="btnSubmitSpinner" style="display: none;" aria-hidden="true"></i>
+          </button>
+        </div>
+      </form>
+
+      <!-- Order Success Receipt View -->
+      <div class="order-success-view" id="orderSuccessView" style="display: none;">
+        <div class="invoice-sheet" id="invoiceSheet">
+          <div class="invoice-head">
+            <div>
+              <span style="font-size: 0.78rem; color: var(--primary); font-family: var(--font-mono); text-transform: uppercase;">Verified Store Receipt</span>
+              <div class="invoice-id" id="receiptOrderId">#HVN-0000</div>
+            </div>
+            <div class="invoice-date" id="receiptDate">Today</div>
+          </div>
+
+          <div class="invoice-player-row">
+            <img id="receiptPlayerAvatar" src="https://mc-heads.net/avatar/MHF_Steve/64" alt="Player Avatar" />
+            <div>
+              <div style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 700;" id="receiptPlayer">Player</div>
+              <span style="font-size: 0.82rem; color: var(--primary);" id="receiptEditionBadge">Java Edition</span>
+            </div>
+          </div>
+
+          <div class="invoice-grid">
+            <div><span class="invoice-kv-label">Package</span><span class="invoice-kv-val" id="receiptItem">-</span></div>
+            <div><span class="invoice-kv-label">Type</span><span class="invoice-kv-val" id="receiptItemType">Rank</span></div>
+            <div><span class="invoice-kv-label">Discord</span><span class="invoice-kv-val" id="receiptDiscord">-</span></div>
+            <div><span class="invoice-kv-label">Payment Method</span><span class="invoice-kv-val" id="receiptMethod">-</span></div>
+            <div><span class="invoice-kv-label">Sender No.</span><span class="invoice-kv-val" id="receiptSender">-</span></div>
+            <div><span class="invoice-kv-label">TrxID</span><span class="invoice-kv-val" id="receiptTrx">-</span></div>
+            <div><span class="invoice-kv-label">Amount</span><span class="invoice-kv-val" id="receiptAmount">-</span></div>
+          </div>
+
+          <div id="receiptSpawnersRow" style="display: none; padding-top: 10px; border-top: 1px solid var(--border);">
+            <span class="invoice-kv-label" id="receiptSpawnersLabel">Selected Spawners</span>
+            <pre id="receiptSpawnersText" style="font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-secondary); white-space: pre-wrap; margin-top: 4px;"></pre>
+          </div>
+
+          <div class="invoice-total-row">
+            <span>Total Paid</span>
+            <span id="receiptTotalAmount">৳0</span>
+          </div>
+        </div>
+
+        <div class="invoice-actions-row">
+          <button type="button" class="btn btn-secondary" id="btnCopyInvoice" onclick="copyReceiptSlip()">
+            <i class="fa-regular fa-copy" aria-hidden="true"></i> <span>Copy Receipt Slip</span>
+          </button>
+          <button type="button" class="btn btn-prismarine" id="btnDownloadInvoice" onclick="downloadInvoiceImage()">
+            <i class="fa-solid fa-download" aria-hidden="true"></i> <span>Save PNG Invoice</span>
+          </button>
+          <a href="https://dc.havencraft.pro" target="_blank" rel="noopener noreferrer" class="btn btn-discord" id="btnOpenDiscordTicket">
+            <i class="fa-brands fa-discord" aria-hidden="true"></i> Open Discord Ticket
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bilingual Store Terms Modal -->
+  <div class="checkout-overlay" id="storeTermsModalOverlay" onclick="handleTermsOverlayClick(event)" role="dialog" aria-modal="true" aria-labelledby="storeTermsTitle" style="display: none;">
+    <div class="checkout-modal" id="storeTermsModal">
+      <div class="checkout-modal-header">
+        <div>
+          <h2 id="storeTermsTitle">Store Terms &amp; Guidelines</h2>
+          <span id="storeTermsModalSubtitle" style="font-size: 0.82rem; color: var(--text-muted);">স্টোর নীতিমালা ও নিয়মাবলী • Official Store Rules</span>
+        </div>
+        <div class="terms-lang-tabs" role="tablist">
+          <button type="button" class="terms-lang-btn active" id="btnTermsLangBn" role="tab" aria-selected="true" onclick="switchTermsLang('bn')">বাংলা</button>
+          <button type="button" class="terms-lang-btn" id="btnTermsLangEn" role="tab" aria-selected="false" onclick="switchTermsLang('en')">English</button>
+        </div>
+      </div>
+
+      <div class="store-terms-modal-body">
+        <div class="terms-pane active" id="termsPaneBn">
+          <div class="terms-rule-item">
+            <h3>১. ডিজিটাল আইটেম ও রিফান্ড নীতি</h3>
+            <p>সার্ভারের র‍্যাংক ও স্পনার ডিজিটাল ইন-গেম প্রোডাক্ট হওয়ায় পেমেন্ট সম্পন্ন ও ডেলিভারির পর কোনো ধরনের রিফান্ড প্রযোজ্য নয়।</p>
+          </div>
+          <div class="terms-rule-item">
+            <h3>২. সঠিক ইউজারনেম ও TrxID প্রদান</h3>
+            <p>অর্ডারের সময় আপনার সঠিক Minecraft IGN (Bedrock হলে নামের আগে <code>.</code>) ও bKash/Nagad Send Money-এর TrxID দিন।</p>
+          </div>
+          <div class="terms-rule-item">
+            <h3>৩. সার্ভার রুলস ও সিজনাল সময়সীমা</h3>
+            <p>সব র‍্যাংক বর্তমান সিজন মেয়াদী। হ্যাকিং বা রুলস ভঙ্গের কারণে ব্যান হলে ক্রয়কৃত সুবিধা পুনর্বহাল বা ফেরতযোগ্য নয়।</p>
+          </div>
+        </div>
+
+        <div class="terms-pane" id="termsPaneEn">
+          <div class="terms-rule-item">
+            <h3>1. Digital Goods &amp; Final Sale</h3>
+            <p>All ranks and spawner bundles are virtual Season 6 server entitlements. Purchases are final once verified.</p>
+          </div>
+          <div class="terms-rule-item">
+            <h3>2. Accurate IGN &amp; Verification</h3>
+            <p>Ensure exact case-sensitive IGN (prefix <code>.</code> for Bedrock) and valid bKash/Nagad Send Money TrxID. Save your PNG invoice to speed up ticket handling.</p>
+          </div>
+          <div class="terms-rule-item">
+            <h3>3. Rule Compliance &amp; Seasonal Duration</h3>
+            <p>Store ranks last for the active season. Account bans due to rule violations forfeit rank privileges without refund.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="terms-modal-footer">
+        <a href="../terms/" style="font-size: 0.84rem; color: var(--primary); font-weight: 600;" id="termsFullPageLinkText">সম্পূর্ণ ওয়েবসাইট নীতিমালা দেখুন ↗</a>
+        <div style="display: flex; gap: 10px;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeStoreTermsModal()" id="termsBtnCloseText">বন্ধ করুন</button>
+          <button type="button" class="btn btn-primary btn-sm" onclick="acceptStoreTermsFromModal()" id="termsBtnAcceptText">আমি বুঝেছি ও সম্মত (I Agree)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-placeholder"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-sanctuary="core">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Discord Community | HavenCraft SMP</title>
+  <meta name="description" content="Join the official HavenCraft Discord server to chat with players, use voice channels, get staff support, and read server announcements." />
+  <meta name="keywords" content="HavenCraft Discord, Minecraft Discord Bangladesh, SMP server community, Bangladeshi Minecraft Discord" />
+  <meta name="theme-color" content="#0B131B" />
+  <link rel="canonical" href="https://havencraft.pro/discord/" />
+  <meta name="robots" content="index, follow" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Discord Community | HavenCraft SMP" />
+  <meta property="og:description" content="Connect with the HavenCraft SMP community on Discord. Live member status, active voice channels, and invite links." />
+  <meta property="og:image" content="https://havencraft.pro/logo/logo.png" />
+  <meta property="og:site_name" content="HavenCraft SMP" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Discord Community | HavenCraft SMP" />
+  <meta name="twitter:description" content="Join our official Discord community to connect with players and staff!" />
+  <meta name="twitter:image" content="https://havencraft.pro/logo/logo.png" />
+
+  <link rel="icon" href="../logo/icon.svg" type="image/svg+xml" />
+  <link rel="icon" type="image/png" sizes="512x512" href="../logo/logo.png" />
+  <link rel="manifest" href="../manifest.json" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Fira+Code:wght@500;600&family=Hind+Siliguri:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="../assets/css/style.css?v=255" />
+  <link rel="stylesheet" href="../assets/css/discord.css?v=254" />
+</head>
+<body>
+  <div id="navbar-placeholder"></div>
+
+  <main id="main-content">
+    <header class="operate-header">
+      <div class="container">
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+          <a href="../">Home</a>
+          <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+          <span>Discord Server</span>
+        </nav>
+
+        <div class="operate-header-row">
+          <div>
+            <h1>Discord Server</h1>
+            <p class="subtitle">Join our official Discord community to connect with players, open support tickets, and participate in events.</p>
+          </div>
+          <a href="https://dc.havencraft.pro" target="_blank" rel="noopener noreferrer" class="btn btn-discord btn-sm">
+            <i class="fa-brands fa-discord" aria-hidden="true"></i> Open Invite
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <section class="discord-wrapper">
+      <div class="container">
+        <div class="discord-hero-card">
+          <div class="discord-hero-info">
+            <span class="discord-badge"><i class="fa-brands fa-discord" aria-hidden="true"></i> Official Server</span>
+            <h2>HavenCraft Community</h2>
+            <p>Chat with players between sessions, open support tickets, follow live leaderboard updates, and enter seasonal giveaways.</p>
+          </div>
+          <div class="discord-hero-mascot" aria-hidden="true">
+            <i class="fa-brands fa-discord discord-float-logo"></i>
+          </div>
+        </div>
+
+        <div class="discord-grid">
+          <div class="discord-dashboard">
+            <div class="discord-client-header">
+              <div class="discord-server-identity">
+                <div class="discord-server-avatar">HC</div>
+                <div>
+                  <div class="discord-server-title" id="guild-name">HavenCraft SMP</div>
+                  <div class="discord-status-row">
+                    <div class="discord-live-status">
+                      <span class="status-pulse-dot" aria-hidden="true"></span>
+                      <span id="online-count">0 Online</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="discord-search-box">
+                <label for="member-search" class="sr-only">Search online Discord members</label>
+                <i class="fa-solid fa-magnifying-glass discord-search-icon" aria-hidden="true"></i>
+                <input type="text" class="discord-search-input" id="member-search" placeholder="Search online members..." disabled />
+              </div>
+            </div>
+
+            <div class="discord-client-body">
+              <div class="discord-sidebar-channels" id="channels-list">
+                <div class="discord-channel-category">
+                  <div class="discord-category-header">
+                    <span>TEXT CHANNELS</span>
+                  </div>
+                  <button type="button" class="discord-channel-item active" onclick="setActiveChannel(this)">
+                    <i class="fa-solid fa-hashtag discord-channel-icon" aria-hidden="true"></i>
+                    <span>welcome-rules</span>
+                  </button>
+                  <button type="button" class="discord-channel-item" onclick="setActiveChannel(this)">
+                    <i class="fa-solid fa-hashtag discord-channel-icon" aria-hidden="true"></i>
+                    <span>general-chat</span>
+                  </button>
+                  <button type="button" class="discord-channel-item" onclick="setActiveChannel(this)">
+                    <i class="fa-solid fa-hashtag discord-channel-icon" aria-hidden="true"></i>
+                    <span>announcements</span>
+                  </button>
+                  <button type="button" class="discord-channel-item" onclick="setActiveChannel(this)">
+                    <i class="fa-solid fa-hashtag discord-channel-icon" aria-hidden="true"></i>
+                    <span>community-media</span>
+                  </button>
+                </div>
+
+                <div class="discord-channel-category">
+                  <div class="discord-category-header">
+                    <span>VOICE CHANNELS</span>
+                  </div>
+                  <button type="button" class="discord-channel-item" onclick="setActiveChannel(this)">
+                    <i class="fa-solid fa-volume-high discord-channel-icon" aria-hidden="true"></i>
+                    <span>Lounge 1</span>
+                  </button>
+                  <button type="button" class="discord-channel-item" onclick="setActiveChannel(this)">
+                    <i class="fa-solid fa-volume-high discord-channel-icon" aria-hidden="true"></i>
+                    <span>Gaming Room</span>
+                  </button>
+                  <button type="button" class="discord-channel-item" onclick="setActiveChannel(this)">
+                    <i class="fa-solid fa-volume-high discord-channel-icon" aria-hidden="true"></i>
+                    <span>Staff Lounge</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="discord-members-content">
+                <div class="discord-section-title" id="members-list-header">Online Members</div>
+                <div class="discord-members-list" id="members-grid">
+                  <div class="discord-loading-container">
+                    <i class="fa-solid fa-circle-notch discord-spinner" aria-hidden="true"></i>
+                    <p>Connecting to Discord Widget API...</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="discord-client-footer">
+              <div class="discord-footer-text">
+                Have questions? Ask directly in our <strong id="footer-guild-name">HavenCraft</strong> Discord!
+              </div>
+              <a href="https://dc.havencraft.pro" target="_blank" rel="noopener noreferrer" class="discord-join-btn" id="guild-invite-btn-footer">
+                <i class="fa-brands fa-discord" aria-hidden="true"></i> Connect Now
+              </a>
+            </div>
+          </div>
+
+          <aside class="discord-sidebar-widgets" aria-label="Discord invite and highlights">
+            <div class="discord-iframe-card">
+              <h3><i class="fa-brands fa-discord" aria-hidden="true"></i> Discord Live Widget</h3>
+              <div class="discord-iframe-wrapper">
+                <iframe title="HavenCraft Discord Server Live Widget" src="https://discord.com/widget?id=1447293915165233263&theme=dark" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+              </div>
+            </div>
+
+            <div class="discord-invite-copy-card">
+              <h3>Quick Invite Link</h3>
+              <div class="discord-copy-input-group">
+                <span class="discord-copy-url" id="invite-url-text">https://dc.havencraft.pro</span>
+                <button type="button" class="discord-copy-btn" id="copy-invite-btn" onclick="copyInviteLink()">
+                  <i class="fa-regular fa-copy" aria-hidden="true"></i> Copy
+                </button>
+              </div>
+              <span class="discord-copy-hint"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> Permanent invite link for sharing with friends.</span>
+            </div>
+
+            <div class="discord-features-card">
+              <h3>Community Highlights</h3>
+
+              <div class="discord-feature-item">
+                <div class="discord-feature-icon"><i class="fa-solid fa-comments" aria-hidden="true"></i></div>
+                <div class="discord-feature-text">
+                  <h4>In-Game Chat Sync</h4>
+                  <p>Chat directly with online Minecraft players in #ingame-chat even when you are offline.</p>
+                </div>
+              </div>
+
+              <div class="discord-feature-item">
+                <div class="discord-feature-icon"><i class="fa-solid fa-ticket" aria-hidden="true"></i></div>
+                <div class="discord-feature-text">
+                  <h4>Support Tickets</h4>
+                  <p>Get 24/7 staff help through synced Discord &amp; Web support tickets.</p>
+                </div>
+              </div>
+
+              <div class="discord-feature-item">
+                <div class="discord-feature-icon"><i class="fa-solid fa-gift" aria-hidden="true"></i></div>
+                <div class="discord-feature-text">
+                  <h4>Giveaways &amp; Drops</h4>
+                  <p>Win store vouchers, seasonal ranks, crate keys, and shards in community events.</p>
+                </div>
+              </div>
+
+              <div class="discord-feature-item">
+                <div class="discord-feature-icon"><i class="fa-solid fa-bullhorn" aria-hidden="true"></i></div>
+                <div class="discord-feature-text">
+                  <h4>Fastest Updates</h4>
+                  <p>Track patch notes, seasonal resets, maintenance notices, and staff applications first.</p>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <div class="discord-banner-cta">
+          <h2>Join the HavenCraft Discord</h2>
+          <p>Java and Bedrock players are active every day. Pick up community roles, hop into voice channels, and catch server announcements as they drop.</p>
+          <a href="https://dc.havencraft.pro" target="_blank" rel="noopener noreferrer" class="discord-banner-glow-btn" id="guild-invite-btn-main">
+            <i class="fa-brands fa-discord" aria-hidden="true"></i> Join HavenCraft Discord
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="footer-placeholder"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script defer src="../assets/js/core.js?v=255"></script>
+  <script defer src="../assets/js/utils.js?v=254"></script>
+  <script defer src="../assets/js/navbar.js?v=255"></script>
+  <script defer src="../assets/js/discord.js?v=254"></script>
+  <script defer src="../assets/js/ticket-chat.js?v=255"></script>
+  <script defer src="../assets/js/components.js?v=254"></script>
+</body>
+</html>

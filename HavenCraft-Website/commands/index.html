@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-sanctuary="core">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Server Commands &amp; Guide | HavenCraft SMP</title>
+  <meta name="description" content="Complete HavenCraft (Haven Craft) server guide &amp; commands in English and Bangla: /register, /claim, /trust, /ah, /shop, /sethome &amp; PvP rules for Java and Bedrock (mc.havencraft.pro:2566)." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0B131B" />
+  <link rel="canonical" href="https://havencraft.pro/commands/" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Server Commands &amp; Guide | HavenCraft SMP" />
+  <meta property="og:description" content="Step-by-step HavenCraft SMP guide in English &amp; Bangla: account login (/register), land claims (/claim), economy (/ah, /shop), and crossplay tips." />
+  <meta property="og:image" content="https://havencraft.pro/logo/logo.png" />
+  <meta property="og:url" content="https://havencraft.pro/commands/" />
+  <meta property="og:site_name" content="HavenCraft SMP" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Server Commands &amp; Guide | HavenCraft SMP" />
+  <meta name="twitter:description" content="Complete HavenCraft SMP commands &amp; survival guide in English and Bangla (/register, /claim, /trust, /ah, /shop)." />
+  <meta name="twitter:image" content="https://havencraft.pro/logo/logo.png" />
+
+  <link rel="manifest" href="../manifest.json" />
+  <link rel="icon" href="../logo/icon.svg" type="image/svg+xml" />
+  <link rel="icon" type="image/png" sizes="512x512" href="../logo/logo.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Fira+Code:wght@500;600&family=Hind+Siliguri:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="../assets/css/style.css?v=255" />
+  <link rel="stylesheet" href="../assets/css/commands.css?v=254" />
+</head>
+<body>
+  <div id="navbar-placeholder"></div>
+
+  <main id="main-content">
+    <header class="operate-header">
+      <div class="container">
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+          <a href="../">Home</a>
+          <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+          <span>Commands &amp; Wiki</span>
+        </nav>
+
+        <div class="commands-hero-row">
+          <div class="commands-title-wrap">
+            <div class="commands-title-inline">
+              <h1>Server Guide</h1>
+              <span class="commands-badge"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Wiki &amp; Commands</span>
+            </div>
+            <p class="subtitle" data-translate="header-subtitle">Beginner-friendly guide to all features and commands</p>
+            <p class="subtitle" data-translate="intro">Click on any section below to see all the commands and details for that specific feature.</p>
+          </div>
+
+          <div class="commands-tools-bar">
+            <div class="lang-toggle-wrapper">
+              <div class="lang-toggle" role="group" aria-label="Language Selector">
+                <div class="lang-slider" id="langSlider"></div>
+                <button type="button" class="lang-btn active" id="btnEN" onclick="setLang('en')">English</button>
+                <button type="button" class="lang-btn" id="btnBN" onclick="setLang('bn')">বাংলা</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="commands-section">
+      <div class="container">
+        <div class="wiki-toolbar">
+          <label for="commandsSearchInput" class="sr-only">Filter commands</label>
+          <div class="wiki-search-box">
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+            <input type="text" id="commandsSearchInput" placeholder="Filter commands (e.g. /claim, /shard, /tpa)..." autocomplete="off" />
+          </div>
+          <a href="../features/" class="btn btn-secondary btn-sm">
+            <i class="fa-solid fa-star" aria-hidden="true"></i> Explore Features
+          </a>
+        </div>
+
+        <div class="wiki-container">
+          <!-- 1. Account -->
+          <div class="wiki-section active">
+            <button type="button" class="wiki-header" id="wiki-header-1" aria-expanded="true" aria-controls="wiki-content-1" onclick="toggleWiki(this)">
+              <span class="wiki-icon" aria-hidden="true"><i class="fa-solid fa-user-shield"></i></span>
+              <span class="wiki-title">
+                <h2>Account &amp; Registration</h2>
+                <p data-translate="sec-1-desc">First time joining? Start here!</p>
+              </span>
+              <span class="wiki-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-down"></i></span>
+            </button>
+            <div class="wiki-content" id="wiki-content-1" role="region" aria-labelledby="wiki-header-1">
+              <div class="wiki-content-inner">
+                <div class="cmd-grid">
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/register [password] [password] <span class="cmd-alias">or /reg</span></span>
+                    <span class="cmd-desc" data-translate="cmd-reg"><strong>First time playing:</strong> You must register your account to protect it. Pick a secret password and type it twice. Example: <code>/register MySecret123 MySecret123</code></span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/login [password] <span class="cmd-alias">or /l</span></span>
+                    <span class="cmd-desc" data-translate="cmd-login"><strong>Returning players:</strong> Every time you join the server again, you need to log in with your password. Example: <code>/login MySecret123</code></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. General Commands & Features -->
+          <div class="wiki-section">
+            <button type="button" class="wiki-header" id="wiki-header-2" aria-expanded="false" aria-controls="wiki-content-2" onclick="toggleWiki(this)">
+              <span class="wiki-icon" aria-hidden="true"><i class="fa-solid fa-sliders"></i></span>
+              <span class="wiki-title">
+                <h2>General Commands &amp; Features</h2>
+                <p data-translate="sec-2-desc">Teleporting, settings, AFK zone, and fun emotes</p>
+              </span>
+              <span class="wiki-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-down"></i></span>
+            </button>
+            <div class="wiki-content" id="wiki-content-2" role="region" aria-labelledby="wiki-header-2">
+              <div class="wiki-content-inner">
+                <div class="cmd-grid">
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/rtp <span class="cmd-alias">or /wild</span></span>
+                    <span class="cmd-desc" data-translate="cmd-rtp">Randomly teleport far away into the survival world so you can start building safely.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/spawn</span>
+                    <span class="cmd-desc" data-translate="cmd-spawn">Return to the server's main spawn area safely.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/tpa [player]</span>
+                    <span class="cmd-desc" data-translate="cmd-tpa">Send a request to teleport to another player. They can type <code>/tpaccept</code> or <code>/tpdeny</code>.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/sethome [name]</span>
+                    <span class="cmd-desc" data-translate="cmd-sethome">Save your current location. You can type <code>/home [name]</code> later to teleport back here instantly!</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/warp afk <span class="cmd-alias">or /afkzone</span></span>
+                    <span class="cmd-desc" data-translate="cmd-afk">Teleport to the AFK Zone. You can stand here while away from your keyboard and earn passive rewards!</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">Spawners</span>
+                    <span class="cmd-desc" data-translate="cmd-spawners">Mine spawners using a Silk Touch pickaxe. If you place multiple spawners of the same type next to each other, they will automatically stack into one! Right click them to upgrade.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/settings</span>
+                    <span class="cmd-desc" data-translate="cmd-settings">Open the settings menu to toggle TPA requests, Global Chat, Private Messages, the Scoreboard, Night Vision, and more.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/lb</span>
+                    <span class="cmd-desc" data-translate="cmd-lb">View the server leaderboard for Playtime, Kills, Deaths, etc.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/stats <span class="cmd-alias">or /stats [player]</span></span>
+                    <span class="cmd-desc" data-translate="cmd-stats">View your gameplay statistics (playtime, kills, deaths, placed/broken blocks). Add a player's name (e.g. <code>/stats player</code>) to check someone else.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/sit, /crawl, /lay, /layback, /bellyflop, /spin</span>
+                    <span class="cmd-desc" data-translate="cmd-emotes">Character emotes you can use anywhere in the world.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Land Claiming -->
+          <div class="wiki-section">
+            <button type="button" class="wiki-header" id="wiki-header-3" aria-expanded="false" aria-controls="wiki-content-3" onclick="toggleWiki(this)">
+              <span class="wiki-icon" aria-hidden="true"><i class="fa-solid fa-house-lock"></i></span>
+              <span class="wiki-title">
+                <h2>Land Claiming (Protection)</h2>
+                <p data-translate="sec-3-desc">Protect your builds and items from griefers</p>
+              </span>
+              <span class="wiki-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-down"></i></span>
+            </button>
+            <div class="wiki-content" id="wiki-content-3" role="region" aria-labelledby="wiki-header-3">
+              <div class="wiki-content-inner">
+                <div class="cmd-grid">
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">Golden Shovel</span>
+                    <span class="cmd-desc" data-translate="cmd-claim">Use a <strong>Golden Shovel</strong> to claim land. Right-click one corner of your base, then right-click the opposite corner to block other players from editing inside.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/trust [player]</span>
+                    <span class="cmd-desc" data-translate="cmd-trust">Give your friend permission to build, open doors, and access chests inside your claimed land.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/untrust [player]</span>
+                    <span class="cmd-desc" data-translate="cmd-untrust">Remove a player's access from your land immediately.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/abandonclaim</span>
+                    <span class="cmd-desc" data-translate="cmd-abandon">Delete the claim you are standing in. <strong>Warning:</strong> Anyone will be able to break your blocks.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/claimslist</span>
+                    <span class="cmd-desc" data-translate="cmd-claimslist">See a list of all places you have claimed and their coordinates.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. Economy & Trading -->
+          <div class="wiki-section">
+            <button type="button" class="wiki-header" id="wiki-header-4" aria-expanded="false" aria-controls="wiki-content-4" onclick="toggleWiki(this)">
+              <span class="wiki-icon" aria-hidden="true"><i class="fa-solid fa-coins"></i></span>
+              <span class="wiki-title">
+                <h2>Economy &amp; Trading</h2>
+                <p data-translate="sec-4-desc">Earn money, buy supplies, and trade with other players</p>
+              </span>
+              <span class="wiki-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-down"></i></span>
+            </button>
+            <div class="wiki-content" id="wiki-content-4" role="region" aria-labelledby="wiki-header-4">
+              <div class="wiki-content-inner">
+                <div class="cmd-grid">
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/shop</span>
+                    <span class="cmd-desc" data-translate="cmd-shop">Open the main server shop to buy blocks, food, gear, or sell farm drops.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/sell</span>
+                    <span class="cmd-desc" data-translate="cmd-sell">Open a quick menu to drop survival items in and sell them immediately.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/price <span class="cmd-alias">or /worth</span></span>
+                    <span class="cmd-desc" data-translate="cmd-price">Open a category menu showing item prices so you know what each drop is worth.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/bal <span class="cmd-alias">or /money</span></span>
+                    <span class="cmd-desc" data-translate="cmd-bal">Check how much money you currently have.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/baltop</span>
+                    <span class="cmd-desc" data-translate="cmd-baltop">View the richest players on the server.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/pay [player] [amount]</span>
+                    <span class="cmd-desc" data-translate="cmd-pay">Transfer your money to another player.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/ah</span>
+                    <span class="cmd-desc" data-translate="cmd-ah">Open the Auction House to buy items listed by other players.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/ah sell [price]</span>
+                    <span class="cmd-desc" data-translate="cmd-ahsell">Hold an item in your hand and run this command to list it on the Auction House.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Shard System & Quests -->
+          <div class="wiki-section">
+            <button type="button" class="wiki-header" id="wiki-header-5" aria-expanded="false" aria-controls="wiki-content-5" onclick="toggleWiki(this)">
+              <span class="wiki-icon" aria-hidden="true"><i class="fa-solid fa-gem"></i></span>
+              <span class="wiki-title">
+                <h2>Shard System &amp; Quests</h2>
+                <p data-translate="sec-5-desc">Daily quests, rewards, physical items, and shard economy</p>
+              </span>
+              <span class="wiki-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-down"></i></span>
+            </button>
+            <div class="wiki-content" id="wiki-content-5" role="region" aria-labelledby="wiki-header-5">
+              <div class="wiki-content-inner">
+                <div class="cmd-grid">
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/shard</span>
+                    <span class="cmd-desc" data-translate="cmd-shard">Open the Shard Dashboard GUI to access your Profile, Daily Claims, Daily Quests, Rewards, Transaction History, and Top List.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/shard balance <span class="cmd-alias">or /shard bal</span></span>
+                    <span class="cmd-desc" data-translate="cmd-shard-bal">Check how many shards you currently have in your account balance.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/shard top</span>
+                    <span class="cmd-desc" data-translate="cmd-shard-top">View the top 10 shard holders on the server.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/shard history</span>
+                    <span class="cmd-desc" data-translate="cmd-shard-history">View your personal transaction log and recent shard activity.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/shard pay [player] [amount]</span>
+                    <span class="cmd-desc" data-translate="cmd-shard-pay">Transfer shards from your account to another player.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/shard withdraw [amount]</span>
+                    <span class="cmd-desc" data-translate="cmd-shard-withdraw">Withdraw shards from your account balance as physical items in your inventory.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/shard deposit</span>
+                    <span class="cmd-desc" data-translate="cmd-shard-deposit">Deposit physical shard items held in your hand back into your account balance.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 6. Teams -->
+          <div class="wiki-section">
+            <button type="button" class="wiki-header" id="wiki-header-6" aria-expanded="false" aria-controls="wiki-content-6" onclick="toggleWiki(this)">
+              <span class="wiki-icon" aria-hidden="true"><i class="fa-solid fa-users"></i></span>
+              <span class="wiki-title">
+                <h2>Teams &amp; Clans</h2>
+                <p data-translate="sec-6-desc">Team up with friends, chat privately, and set allies</p>
+              </span>
+              <span class="wiki-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-down"></i></span>
+            </button>
+            <div class="wiki-content" id="wiki-content-6" role="region" aria-labelledby="wiki-header-6">
+              <div class="wiki-content-inner">
+                <div class="cmd-grid">
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/team create [name]</span>
+                    <span class="cmd-desc" data-translate="cmd-teamcreate">Create your own team as its leader.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/team invite [player]</span>
+                    <span class="cmd-desc" data-translate="cmd-teaminvite">Invite a player to join your team.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/team join [name]</span>
+                    <span class="cmd-desc" data-translate="cmd-teamjoin">Accept an invitation and join a team.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/team chat</span>
+                    <span class="cmd-desc" data-translate="cmd-teamchat">Toggle team chat so only your teammates can read your messages.</span>
+                  </div>
+                  <div class="cmd-item">
+                    <span class="cmd-syntax">/team ally [team]</span>
+                    <span class="cmd-desc" data-translate="cmd-teamally">Send an alliance request to another team. Allies cannot damage each other.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p id="commandsEmptyState" class="commands-empty-state" hidden>No commands matched your filter. Try keywords like <code>/claim</code>, <code>/shard</code>, or <code>/tpa</code>.</p>
+      </div>
+    </section>
+  </main>
+
+  <div id="footer-placeholder"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script defer src="../assets/js/core.js?v=255"></script>
+  <script defer src="../assets/js/utils.js?v=254"></script>
+  <script defer src="../assets/js/navbar.js?v=255"></script>
+  <script defer src="../assets/js/commands.js?v=254"></script>
+  <script defer src="../assets/js/ticket-chat.js?v=255"></script>
+  <script defer src="../assets/js/components.js?v=254"></script>
+</body>
+</html>
