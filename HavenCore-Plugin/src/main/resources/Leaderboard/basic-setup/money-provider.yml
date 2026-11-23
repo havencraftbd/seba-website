@@ -1,4 +1,0 @@
-# Configuration for the Money provider
-provider: "Vault"
-# If set to true, it will format money using Vault's built-in formatting
-format-money: true
