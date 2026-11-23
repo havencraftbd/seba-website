@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:,">
+<title>Bangladesh Daily Help Website Plan — পূর্ণাঙ্গ রিপোর্ট</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F7F3; --surface:#FFFFFF; --surface2:#EEF3EE; --ink:#13201A; --muted:#5A6B62; --line:#DCE5DC;
+  --green:#0A7A5C; --green2:#E6F4EE; --amber:#D97706; --amber-bg:#FEF3C7; --red:#C2410C; --radius:18px;
+  --shadow:0 8px 30px rgba(10,60,44,.08);
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#0D1310; --surface:#161E19; --surface2:#1C2620; --ink:#EAF2EC; --muted:#9AB0A3; --line:#2A3A30; --green:#2DD4A8; --green2:#12382C; --amber-bg:#3A2A0A; --shadow:none; }
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Hind Siliguri",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.65}
+a{color:var(--green);text-decoration:none}
+button,select,summary{min-height:44px}
+.wrap{max-width:1120px;margin:0 auto;padding:20px 18px 60px}
+.hero{padding:28px 0 8px}
+.eyebrow{display:inline-flex;gap:8px;align-items:center;background:var(--green2);color:var(--green);font-weight:700;font-size:13px;padding:7px 12px;border-radius:999px;border:1px solid var(--line)}
+h1{font-size:clamp(30px,5vw,52px);line-height:1.08;margin:16px 0 12px;letter-spacing:-.02em}
+h1 span{color:var(--green)}
+.lead{font-size:18px;color:var(--muted);max-width:820px}
+.hero-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin-top:22px}
+@media(max-width:760px){.hero-grid{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.card h3{margin:0 0 8px;font-size:18px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
+@media(max-width:860px){.kpis{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:420px){.kpis{grid-template-columns:1fr 1fr}}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px}
+.kpi b{font-size:28px;line-height:1;display:block;font-family:Inter,sans-serif}
+.kpi span{font-size:13px;color:var(--muted);display:block;margin-top:6px;line-height:1.4}
+.kpi small{font-size:11px;color:var(--muted)}
+h2{font-size:26px;margin:36px 0 6px;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0 0 16px;max-width:820px}
+.bar-row{display:grid;grid-template-columns:130px 1fr 82px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.bar{height:10px;background:var(--surface2);border-radius:999px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--green);border-radius:999px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:10px 14px;border-radius:999px;font-weight:600;cursor:pointer;font-family:inherit}
+.chip.active{background:var(--green);color:#fff;border-color:var(--green)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.module{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px}
+.module-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.num{width:42px;height:42px;border-radius:12px;background:var(--green2);color:var(--green);display:grid;place-items:center;font-weight:800;font-family:Inter;flex:0 0 auto}
+.phase{font-size:12px;font-weight:700;padding:5px 9px;border-radius:999px;background:var(--amber-bg);color:var(--amber);white-space:nowrap}
+.phase.p1{background:var(--green2);color:var(--green)}
+.module h3{margin:2px 0 4px;font-size:19px}
+.module p{margin:6px 0;color:var(--muted);font-size:14.5px}
+.module ul{margin:8px 0 0 18px;padding:0;font-size:14.5px}
+.module li{margin:4px 0}
+.why{font-size:13px;background:var(--surface2);border-radius:10px;padding:10px 12px;margin-top:12px}
+.mock{border:1.5px solid var(--line);border-radius:20px;overflow:hidden;background:var(--surface)}
+.mock-head{background:var(--ink);color:var(--bg);padding:14px 16px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.mock-search{margin:16px;background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:12px 16px;color:var(--muted)}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:0 16px 16px}
+@media(max-width:700px){.tiles{grid-template-columns:repeat(2,1fr)}}
+.tile{background:var(--surface2);border-radius:14px;padding:14px;text-align:center;font-weight:700;font-size:14px}
+.tile span{display:block;font-weight:400;color:var(--muted);font-size:12px;margin-top:2px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.tab{padding:11px 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-weight:700;cursor:pointer;font-family:inherit}
+.tab.active{background:var(--ink);color:var(--bg)}
+.phase-panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:760px){.two{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.warn{background:#FFF7ED;border:1px solid #FDBA74;border-radius:16px;padding:18px;color:#431407}
+@media(prefers-color-scheme:dark){.warn{background:#2A1808;color:#FFEDD5;border-color:#7C2D12}}
+.sources{font-size:13px;color:var(--muted)}
+.sources li{margin:6px 0;word-break:break-all}
+footer{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+.badge{display:inline-block;font-size:12px;border:1px solid var(--line);border-radius:999px;padding:4px 8px;margin:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <span class="eyebrow">● পূর্ণাঙ্গ প্ল্যান রিপোর্ট • গবেষণা: নভেম্বর ২০২৬</span>
+  <h1>বাংলাদেশীদের প্রতিদিনের<br><span>সব কাজ এক ওয়েবসাইটে</span> —<br>সর্বোচ্চ কী কী রাখা যায়?</h1>
+  <p class="lead">এই রিপোর্ট আগের গবেষণার আসল ডেটার উপর দাঁড়িয়ে সাজানো: বাংলাদেশে মানুষ প্রতিদিন Google-এ কী খোঁজে, কোন সাইটে যায়, আর কোন কাজে ইন্টারনেট ব্যবহার করে। সেই চাহিদা অনুযায়ী একটি Daily Help ওয়েবসাইটে <strong>সর্বোচ্চ ১৪টি বিভাগ</strong> রাখা যায় — তবে একসাথে সব নয়, ধাপে ধাপে। নিচে প্রতিটি বিভাগে ঠিক কী থাকবে, কেন থাকবে, আর কোন ধাপে আসবে — সব দেওয়া হলো।</p>
+  <div class="hero-grid">
+    <div class="card">
+      <h3>এক লাইনে কৌশল</h3>
+      <p style="margin:0;color:var(--muted)">ওয়েবসাইটটা হবে <strong style="color:var(--ink)">মোবাইল-ফার্স্ট, বাংলা-ফার্স্ট, সার্চ-ফার্স্ট</strong>। মানুষ Google থেকে আসবে একটি নির্দিষ্ট উত্তরের জন্য (সার্কুলার, রেজাল্ট, দাম, স্কোর) — ৩০ সেকেন্ডে উত্তর পেয়ে যেন আবার ফিরে আসে। Facebook হবে বিতরণের প্রধান রাস্তা, ওয়েবসাইট হবে উত্তরের ঠিকানা।</p>
+      <div style="margin-top:12px"><span class="badge">Google: সার্চের ৯৮.৪৬%</span> <span class="badge">Facebook: সোশ্যাল রেফারালের ৭৬.৫৪%</span> <span class="badge">মোবাইল: সাবস্ক্রিপশনের ৮৮.৮%</span></div>
+      <p style="font-size:12px;color:var(--muted);margin:10px 0 0">সূত্র: StatCounter / SERP Mentor (অক্টো ২০২৬), BTRC (আগস্ট ২০২৬)</p>
+    </div>
+    <div class="card" style="background:var(--green);color:#fff;border-color:transparent">
+      <h3 style="color:#fff">সবচেয়ে বড় সুযোগ</h3>
+      <p style="font-size:32px;font-weight:800;line-height:1;margin:6px 0;font-family:Inter">64.4%</p>
+      <p style="margin:0;opacity:.92">ইন্টারনেট ব্যবহারকারী গত ৩ মাসে <strong>সরকারি চাকরি</strong> খুঁজেছে — BBS জরিপে মাপা সব উদ্দেশ্যের মধ্যে এটাই সর্বোচ্চ। তাই চাকরি হবে এই সাইটের প্রাণ, বাকি সব তার চারপাশে।</p>
+      <p style="font-size:12px;opacity:.8;margin:10px 0 0">সূত্র: BBS ICT Survey, এপ্রিল ২০২৬ (Financial Express)</p>
+    </div>
+  </div>
+</header>
+
+<div class="kpis">
+  <div class="kpi"><b>95.3M</b><span>ইন্টারনেট ব্যবহারকারী (ব্যক্তি হিসেবে) — জনসংখ্যার ৫৩.৪%</span><small>DataReportal Digital 2027, অক্টো ২০২৬*</small></div>
+  <div class="kpi"><b>137.66M</b><span>সক্রিয় ইন্টারনেট সাবস্ক্রিপশন / SIM — একজনের একাধিক থাকতে পারে</span><small>BTRC, আগস্ট ২০২৬</small></div>
+  <div class="kpi"><b>49.8%</b><span>ব্যবহারকারী গত ৩ মাসে খেলার কন্টেন্ট দেখেছে</span><small>BBS, এপ্রিল ২০২৬</small></div>
+  <div class="kpi"><b>11.6%</b><span>মাত্র এতজন গত ৩ মাসে অনলাইনে কেনাকাটা করেছে — শপিং নিয়ে কথা বেশি, কাজ কম</span><small>BBS, এপ্রিল ২০২৬</small></div>
+</div>
+<p style="font-size:12px;color:var(--muted);margin:-6px 0 0">* সতর্কতা: DataReportal-এর ২০২৫-এর 82.8M আর ২০২৬-এর 95.3M সরাসরি তুলনীয় নয় — উৎসের ডেটা “significantly revised” হয়েছে বলে প্রতিষ্ঠানটি নিজেই সতর্ক করেছে। BTRC গোনে SIM, BBS গোনে মানুষের জবাব — তিনটি সংখ্যা এক লাইনে মেলানো যাবে না।</p>
+
+<h2>মানুষ আসলে কোথায় যায় — অক্টোবর ২০২৬</h2>
+<p class="sub">Semrush-এর যাচাইকৃত শীর্ষ ওয়েবসাইট (মাসিক ভিজিট)। তোমার সাইটকে এই অভ্যাসের <em>বিপরীতে</em> নয়, <em>পাশে</em> দাঁড়াতে হবে — Google থেকে ট্রাফিক নিয়ে, Facebook/YouTube দিয়ে ছড়িয়ে।</p>
+<div class="card" id="chart"></div>
+<p style="font-size:12px;color:var(--muted)">সূত্র: Semrush Trending Websites BD, অক্টোবর ২০২৬ — ২৩ নভেম্বর ২০২৬ সরাসরি যাচাইকৃত। এগুলো ওয়েব ভিজিট, অ্যাপ ব্যবহার নয়; TikTok/WhatsApp অ্যাপে এর চেয়ে অনেক বড়। ChatGPT-র +১২৬% আর Claude-এর +১,৪৯৭% YoY বৃদ্ধি দেখায় AI এখন মূলধারার চাহিদা।</p>
+
+<h2>সর্বোচ্চ তালিকা — ১৪টি বিভাগে যা যা থাকতে পারে</h2>
+<p class="sub">ফিল্টার দিয়ে ধাপ অনুযায়ী দেখো। Phase 1 = শুরুতে অবশ্যই, Phase 2 = ট্রাফিক এলে, Phase 3 = বড় হলে। প্রতিটি কার্ডে “কেন” ঘরে গবেষণার প্রমাণ দেওয়া আছে।</p>
+<div class="filters" role="group" aria-label="ধাপ ফিল্টার">
+  <button class="chip active" data-f="all">সব ১৪টি</button>
+  <button class="chip" data-f="p1">Phase 1 — শুরু</button>
+  <button class="chip" data-f="p2">Phase 2 — সম্প্রসারণ</button>
+  <button class="chip" data-f="p3">Phase 3 — পূর্ণাঙ্গ</button>
+</div>
+<div class="grid" id="modules"></div>
+
+<h2>হোমপেজটা কেমন হবে?</h2>
+<p class="sub">উপরে সার্চ, তার নিচে এক-ট্যাপের কাজ — কোনো লম্বা স্ক্রল বা সাজানো ব্যানার নয়। গ্রামের কম দামি ফোনেও যেন দ্রুত খোলে: BBS বলছে খরচই অ-ব্যবহারকারীদের প্রধান বাধা (৪৩.৬%), আর শহরে ইন্টারনেট ব্যবহার ৭৫.৭% হলেও গ্রামে মাত্র ৪৩.৬%।</p>
+<div class="mock" aria-label="হোমপেজের কাঠামো">
+  <div class="mock-head"><strong>Daily Help BD</strong><span>আজ: চাকরি • রেজাল্ট • স্কোর • দাম</span></div>
+  <div class="mock-search">🔍 &nbsp;কী খুঁজছেন? যেমন: “প্রাইমারি শিক্ষক সার্কুলার”, “HSC রেজাল্ট”, “সোনার দাম”</div>
+  <div class="tiles">
+    <div class="tile">💼 আজকের চাকরি<span>নতুন সার্কুলার</span></div>
+    <div class="tile">🎓 রেজাল্ট<span>SSC / HSC</span></div>
+    <div class="tile">🏏 লাইভ স্কোর<span>ক্রিকেট</span></div>
+    <div class="tile">🏛️ সরকারি সেবা<span>NID • পাসপোর্ট</span></div>
+    <div class="tile">📱 মোবাইলের দাম<span>আজকের প্রাইস</span></div>
+    <div class="tile">💰 টাকার রেট<span>ডলার • সোনা • MFS</span></div>
+    <div class="tile">🤖 AI সাহায্য<span>পড়া • লেখা • CV</span></div>
+    <div class="tile">📰 আজকের খবর<span>সংক্ষেপে</span></div>
+  </div>
+  <div style="padding:0 16px 18px;display:grid;gap:10px">
+    <div style="background:var(--surface2);border-radius:12px;padding:12px 14px"><strong>🔥 আজ সবচেয়ে বেশি খোঁজা হচ্ছে</strong><br><span style="color:var(--muted);font-size:14px">দৈনিক ট্রেন্ডিং থেকে নেওয়া লাইভ তালিকা — যেমন ১৮ নভেম্বর ২০২৬-এ চাকরি (চাকরি), ডিম, আগুন ছিল শীর্ষে।</span></div>
+    <div style="background:var(--surface2);border-radius:12px;padding:12px 14px"><strong>⏰ ডেডলাইন রিমাইন্ডার</strong><br><span style="color:var(--muted);font-size:14px">আবেদনের শেষ তারিখ, পরীক্ষার তারিখ, রেজাল্টের দিন — এক নজরে।</span></div>
+  </div>
+</div>
+
+<h2>তিন ধাপের রোডম্যাপ</h2>
+<div class="tabs">
+  <button class="tab active" data-t="0">Phase 1 — লঞ্চ (মাস ১–২)</button>
+  <button class="tab" data-t="1">Phase 2 — বৃদ্ধি (মাস ৩–৬)</button>
+  <button class="tab" data-t="2">Phase 3 — পূর্ণাঙ্গ (মাস ৭–১২)</button>
+</div>
+<div class="phase-panel" id="phasePanel"></div>
+
+<h2>ডিজাইন ও কন্টেন্টের নিয়ম — ডেটা যা বলে</h2>
+<div class="two">
+  <div class="card"><h3>📱 মোবাইল-ফার্স্ট, হালকা পেজ</h3><p style="color:var(--muted);margin:0">মোবাইল ইন্টারনেট সাবস্ক্রিপশন ১২২.২৬M (মোটের ৮৮.৮%, BTRC)। মাত্র ১১.৩% মানুষ কম্পিউটার ব্যবহার করে (BBS)। তাই: ছোট ছবি, কম ডেটা, অফলাইনে পড়া যায় এমন গাইড, বড় ট্যাপ বাটন। 4G-ই প্রধান (১২২.৭১M), মধ্যম মোবাইল স্পিড ৩৮.৬৭ Mbps (Ookla/DataReportal)।</p></div>
+  <div class="card"><h3>🗣️ বাংলা আগে, ইংরেজি পাশে</h3><p style="color:var(--muted);margin:0">একই দিনে ইংরেজিতে ক্রিকেট (“ban u19 vs pak u19”) আর বাংলায় চাকরি/সরকারি শব্দ (চাকরি, জনপ্রশাসন মন্ত্রণালয়) ট্রেন্ড করে। চাকরি-শিক্ষা-সেবা = বাংলা; ফোন-টেক-ক্রিকেট = ইংরেজি + বাংলা দুটোই। BBS: ৮৪.৪% ব্যবহারকারী কপি-পেস্ট পারে, জটিল কাজ কম — তাই ভিডিও/ভয়েস-বান্ধব, সহজ ভাষা।</p></div>
+  <div class="card"><h3>👥 তরুণরাই প্রধান দর্শক</h3><p style="color:var(--muted);margin:0">জনসংখ্যার মধ্যম বয়স ২৬.৩ বছর। Facebook-এর সবচেয়ে বড় বয়স-দল ১৮–২৪ (২৮.১M, NapoleonCat সেপ্টেম্বর ২০২৬)। TikTok ১৮+ বিজ্ঞাপন পৌঁছ ৬৮.৩M — সব প্ল্যাটফর্মের মধ্যে সর্বোচ্চ (DataReportal)। ছোট ভিডিও দিয়ে সাইটে আনা হবে মূল কৌশল।</p></div>
+  <div class="card"><h3>⚖️ লিঙ্গ ও শহর-গ্রাম ফাঁক মাথায় রাখো</h3><p style="color:var(--muted);margin:0">অনলাইনে পুরুষ ৫৬.৬% বনাম নারী ৫০.২% (BBS); শহর ৭৫.৭% বনাম গ্রাম ৪৩.৬% — ব্যবধান ৩২.১ পয়েন্ট। ঢাকা বিভাগ সর্বোচ্চ (৬৫.৪%), ময়মনসিংহ সর্বনিম্ন (৩৭.৮%)। নারী ও গ্রামের ব্যবহারকারীর জন্য সহজ, কম-খরচের কন্টেন্ট আলাদা করে ভাবতে হবে।</p></div>
+</div>
+
+<h2>কোনটা আগে, কোনটা পরে — অগ্রাধিকার ছক</h2>
+<div class="card" style="overflow-x:auto">
+<table>
+<tr><th>বিভাগ</th><th>চাহিদার প্রমাণ</th><th>ফেরত আসবে?</th><th>কঠিনতা</th><th>সিদ্ধান্ত</th></tr>
+<tr><td><strong>চাকরি</strong></td><td>৬৪.৪% সরকারি চাকরি খুঁজেছে (BBS)</td><td>প্রতিদিন</td><td>মাঝারি</td><td>Phase 1</td></tr>
+<tr><td><strong>রেজাল্ট ও শিক্ষা</strong></td><td>HSC ২০২৬: ১,২৭০,৫৮৩ পরীক্ষার্থী, পাস ৫২.১২%</td><td>মৌসুমে প্রবল</td><td>সহজ</td><td>Phase 1</td></tr>
+<tr><td><strong>সরকারি সেবা গাইড</strong></td><td>NID, পাসপোর্ট, ভূমি, ট্যাক্স — useful-sites তালিকায় প্রধান</td><td>প্রয়োজনে বারবার</td><td>সহজ</td><td>Phase 1</td></tr>
+<tr><td><strong>ক্রিকেট স্কোর</strong></td><td>৪৯.৮% খেলার কন্টেন্ট; ম্যাচের দিনে scorecard ট্রেন্ডিং শীর্ষে</td><td>ম্যাচের দিনে</td><td>কঠিন (লাইভ ডেটা)</td><td>Phase 2</td></tr>
+<tr><td><strong>দাম (ফোন/সোনা/রেট)</strong></td><td>MobileDokan 5.4M ভিজিট/মাস — রিটেইলে #১ (Semrush)</td><td>সাপ্তাহিক</td><td>মাঝারি</td><td>Phase 1–2</td></tr>
+<tr><td><strong>AI হেল্প</strong></td><td>ChatGPT #৪ ওয়েবসাইট, 50.25M ভিজিট, +১২৬% YoY</td><td>প্রতিদিন</td><td>সহজ (গাইড)</td><td>Phase 2</td></tr>
+<tr><td><strong>শপিং</strong></td><td>মাত্র ১১.৬% অনলাইনে কিনেছে; COD ৮৫–৯০% (আনুমানিক)</td><td>কম</td><td>মাঝারি</td><td>Phase 3</td></tr>
+</table>
+</div>
+
+<h2>ট্রাফিক আসবে কোথা থেকে?</h2>
+<div class="grid">
+  <div class="card"><h3>1) Google Search (প্রধান)</h3><p style="color:var(--muted);margin:0">Google-এর ভাগ ৯৮.৪৬%। প্রতিটি সার্কুলার/রেজাল্ট/দামের জন্য আলাদা, দ্রুত, বাংলা+ইংরেজি শিরোনামের পেজ। দৈনিক ট্রেন্ডিং শব্দ (যেমন রূপপুর পারমাণবিক বিদ্যুৎ কেন্দ্র, ১৮ নভেম্বর ২০২৬) ধরতে “আজকের ট্রেন্ড” বক্স।</p></div>
+  <div class="card"><h3>2) Facebook (বিতরণ)</h3><p style="color:var(--muted);margin:0">Facebook বিজ্ঞাপন পৌঁছ ৬৪.১M (২০২৬ শেষে); খবর, চাকরি আর F-commerce-এর কেন্দ্র। পেজ + গ্রুপে প্রতিদিনের সার্কুলার ও ডেডলাইন পোস্ট, লিংক সাইটে।</p></div>
+  <div class="card"><h3>3) YouTube + TikTok (ভিডিও)</h3><p style="color:var(--muted);margin:0">YouTube #২ সাইট (219.59M ভিজিট); “Jamuna TV live”, “new eid natok 2025” ধরনের খোঁজ প্রমাণ করে ভিডিও-চাহিদা। #LearnOnTikTok খোঁজ ২০২৫-এ +৬৬% বেড়েছে (TikTok)। ৬০ সেকেন্ডে “কীভাবে আবেদন করবে” ভিডিও → সাইটে পূর্ণ গাইড।</p></div>
+  <div class="card"><h3>4) Messenger / WhatsApp (শেয়ার)</h3><p style="color:var(--muted);margin:0">Messenger পৌঁছ ৩৫.০M (২০২৫)। প্রতিটি পেজে এক-ট্যাপ শেয়ার বাটন। <em>সতর্কতা: WhatsApp-এর বাংলাদেশি ব্যবহারকারীর কোনো যাচাইকৃত সংখ্যা নেই</em> — অনুমান 40M+ থেকে 45–55M পর্যন্ত ছড়ানো, তাই পরিকল্পনায় সংখ্যা ধরা হয়নি।</p></div>
+</div>
+
+<div class="warn" style="margin-top:28px">
+  <h3 style="margin-top:0">⚠️ যা এখনো জানা যায়নি — সৎ সীমাবদ্ধতা</h3>
+  <ul style="margin:8px 0 0 18px;padding:0">
+    <li>Google/Semrush/Ahrefs-এর কোনো <strong>অফিসিয়াল “সর্বোচ্চ সার্চ ভলিউম” তালিকা</strong> বাংলাদেশের জন্য প্রকাশ্যে নেই — এই প্ল্যানের ক্রম জরিপের উদ্দেশ্য ও ট্রেন্ডিং স্পাইকের উপর ভিত্তি করে, ভলিউম র‍্যাংকিং নয়।</li>
+    <li><strong>গড়ে প্রতিদিন কতক্ষণ অনলাইনে</strong> থাকে — যাচাইকৃত জাতীয় সংখ্যা পাওয়া যায়নি (শুধু মডেল-ভিত্তিক ~২ঘ ৪০মি সোশ্যাল দাবি আছে, তথ্য হিসেবে ব্যবহার করা হয়নি)।</li>
+    <li>“৯৬% ব্যবহারকারী প্রতিদিন AI টুল ব্যবহার করে” দাবিটি (Year in Search 2025-এর সেকেন্ডারি সারসংক্ষেপ) Google-এর উৎসে যাচাই করা যায়নি — <strong>সন্দেহজনক, ব্যবহার করা হয়নি</strong>।</li>
+    <li>E-commerce ভাগ (Facebook Commerce ৪৫–৫০%, Daraz ৩৫–৪০% GMV) তৃতীয় পক্ষের <strong>অনুমান</strong> (Countly, অক্টোবর ২০২৬), কোম্পানি/নিয়ন্ত্রকের সংখ্যা নয়।</li>
+    <li>সরকারি সেবার পোর্টালগুলোর <strong>ব্যবহারের পরিমাণ</strong> প্রকাশিত হয়নি — চাহিদার প্রমাণ পরোক্ষ (চাকরি খোঁজার ৬৪.৪% ও রেজাল্টের দিনের ভিড়)।</li>
+    <li>Google Year in Search 2025-এর কোনো অফিসিয়াল বাংলাদেশ পেজ পাওয়া যায়নি — তথ্য সেকেন্ডারি সারসংক্ষেপ (Khaborwala, ৩১ ডিসেম্বর ২০২৫) থেকে নেওয়া।</li>
+  </ul>
+</div>
+
+<h2>উৎস</h2>
+<ul class="sources">
+  <li>DataReportal, Digital 2027: Bangladesh — https://datareportal.com/reports/digital-2027-bangladesh</li>
+  <li>Semrush, Most Visited Websites in Bangladesh, Oct 2026 — https://www.semrush.com/trending-websites/bd/all</li>
+  <li>Semrush, Retail Websites BD, Oct 2026 — https://www.semrush.com/trending-websites/bd/retail</li>
+  <li>SERP Mentor / StatCounter, State of SEO in Bangladesh 2027 — https://serpmentor.com/research/state-of-seo-bangladesh-2027</li>
+  <li>BBS ICT Survey via Financial Express, 16 Apr 2026 — https://today.thefinancialexpress.com.bd/last-page/deep-digital-divide-persists-across-bangladesh-1776363453</li>
+  <li>BTRC via BSS, 24 Sep 2026 — https://www.bssnews.net/others/427842/print</li>
+  <li>Khaborwala, Year in Search 2025 summary, 31 Dec 2025 — https://khaborwala.com/bangladeshs-most-searched-topics-according-to-google/</li>
+  <li>SEOAnything, Trending 12 Nov 2026 — https://www.seoanything.dev/b/bangladesh-trending-searches-12-november-2026 ; 18 Nov 2026 — https://www.seoanything.dev/b/bangladesh-bengali-word-searches-rooppur</li>
+  <li>Daily Star, MFS Tk 6,000cr daily, 11 Jul 2026 — https://www.thedailystar.net/business/news/tk-6000cr-moves-daily-not-every-wallet-winning-4220811</li>
+  <li>Deshiz, Most Useful Websites in Bangladesh — https://deshiz.com/top-most-useful-websites-bangladesh/</li>
+  <li>HSC Result 2026 — https://hscresult.bd/ ; Dhaka Tribune — https://www.dhakatribune.com/bangladesh/education/425515/hsc-re-scrutiny-changes-results-of-33-349</li>
+  <li>Financial Express, TikTok top searches 2025 — https://today.thefinancialexpress.com.bd/print/tiktok-reveals-countrys-top-searches-of-2025-1768145641</li>
+</ul>
+
+<footer>এই প্ল্যানটি ২৩ নভেম্বর ২০২৬-এর গবেষণা রিপোর্টের ভিত্তিতে তৈরি। সংখ্যাগুলো প্রকাশের তারিখ অনুযায়ী বদলাতে পারে — লঞ্চের আগে চাকরি, রেজাল্ট ও দামের ডেটা আবার যাচাই করে নিতে হবে। কোনো বিভাগই একসাথে লঞ্চ করার পরামর্শ নয়: Phase 1-এর ৫টি বিভাগ ভালোভাবে দাঁড় করালেই বাকিগুলো টিকে থাকার সুযোগ পাবে।</footer>
+</div>
+
+<script>
+var sites=[
+ ["google.com",427.27,"সার্চ — সবকিছুর গেটওয়ে"],
+ ["youtube.com",219.59,"ভিডিও: নাটক, গান, লাইভ TV"],
+ ["facebook.com",126.93,"সোশ্যাল, খবর, F-commerce"],
+ ["chatgpt.com",50.25,"AI — পড়া, লেখা, কোডিং"],
+ ["whatsapp.com",42.05,"মেসেজিং (ওয়েব)"],
+ ["instagram.com",32.94,"ছবি, Reels"],
+ ["tiktok.com",12.79,"শর্ট ভিডিও (অ্যাপে অনেক বড়)"],
+ ["claude.ai",11.77,"AI চ্যাট (+1,497% YoY)"],
+ ["prothomalo.com",6.83,"খবর — শীর্ষ বাংলাদেশি নিউজ সাইট"]
+];
+document.getElementById('chart').innerHTML = sites.map(function(s){
+ var w=Math.max(3, Math.round(s[1]/427.27*100));
+ return '<div class="bar-row"><strong>'+s[0]+'</strong><div class="bar"><i style="width:'+w+'%"></i></div><span>'+s[1].toFixed(2)+'M<br><small style="color:var(--muted)">'+s[2]+'</small></span></div>';
+}).join('');
+
+var modules=[
+ {n:1,p:'p1',t:'চাকরি হাব',d:'সাইটের প্রাণ। প্রতিদিনের সরকারি সার্কুলার, আবেদনের শেষ তারিখ, পরীক্ষার তারিখ ও রেজাল্ট — এক জায়গায়।',items:['সরকারি চাকরির সার্কুলার (দৈনিক আপডেট, ক্যাটাগরি: মন্ত্রণালয়, ব্যাংক, শিক্ষা, স্বাস্থ্য)','প্রাইমারি শিক্ষক নিয়োগ, NGO সার্কুলার, আর্মি/এয়ার ফোর্স/ডিফেন্স নিয়োগ','“সাপ্তাহিক চাকরির খবর” — প্রতি সপ্তাহের সব সার্কুলার এক পেজে','Teletalk Alljobs ও Bdjobs-এর অফিসিয়াল লিংক + আবেদনের ধাপে ধাপে গাইড','পরীক্ষার প্রস্তুতি: মডেল টেস্ট, বিগত প্রশ্ন, সিলেবাস'],why:'প্রমাণ: ৬৪.৪% ব্যবহারকারী সরকারি চাকরি খুঁজেছে (BBS)। পোর্টাল কীওয়ার্ড ইঙ্গিত: “govt job circular” ~17K, “primary teacher recruitment” 34K (Ahrefs স্ক্রিনশট, আগস্ট ২০২৬ — দুর্বল/বাণিজ্যিক উৎস, শুধু ইঙ্গিত)। LinkedIn সদস্য ১৪.০M (২০২৬)।'},
+ {n:2,p:'p1',t:'শিক্ষা ও রেজাল্ট',d:'রেজাল্টের দিন বাংলাদেশের সবচেয়ে বড় ট্রাফিকের দিনগুলোর একটি। দ্রুত, হালকা রেজাল্ট পেজই বিশ্বাস তৈরি করবে।',items:['SSC / HSC / সমমান রেজাল্ট — বোর্ড পোর্টালের সরাসরি লিংক + SMS পদ্ধতি (16140)','রেজাল্টের তারিখ, পুনঃনিরীক্ষণ (re-scrutiny) তারিখ ও পদ্ধতি','ভর্তি তথ্য: বিশ্ববিদ্যালয়, মেডিকেল, পলিটেকনিক','স্কলারশিপ ও বিদেশে পড়া: যেমন “How to apply for a German study visa” (২০২৫-এর শীর্ষ ব্যবহারিক খোঁজ)','পড়ার সাহায্য: 10 Minute School-ধাঁচের ফ্রি লেসন লিংক, Wikipedia গাইড'],why:'প্রমাণ: HSC ২০২৬-এ ১,২৭০,৫৮৩ পরীক্ষার্থী, পাস ৫২.১২% (২০২৫-এ ছিল ৫৮.৮৩%); SSC পাস ৬২.২৫% (১০ আগস্ট ২০২৬)। অফিসিয়াল পোর্টাল: educationboardresults.gov.bd। রেজাল্টের দিনের ট্রাফিকের প্রকাশিত সংখ্যা নেই — উদ্ভাবন করা হয়নি।'},
+ {n:3,p:'p1',t:'সরকারি সেবা গাইড',d:'মানুষ সেবা খোঁজে, কিন্তু ধাপ বুঝতে পারে না। প্রতিটি সেবায়: কী লাগবে, খরচ কত, কোথায় যেতে হবে, অফিসিয়াল লিংক।',items:['NID সংশোধন, নতুন NID, ভোটার তথ্য','ই-পাসপোর্ট: আবেদন, ফি, স্ট্যাটাস চেক','জন্ম নিবন্ধন ও সংশোধন','ভূমি: খতিয়ান, নামজারি (land mutation)','আয়কর (income tax), ড্রাইভিং লাইসেন্স, ট্রেনের টিকিট','জাতীয় পোর্টাল bangladesh.gov.bd-এর সঠিক পেজে সরাসরি লিংক'],why:'প্রমাণ: Deshiz useful-sites গাইডে (লিংক যাচাই অক্টোবর ২০২৬) এগুলোই “মানুষ আসলে ব্যবহার করে” এমন সরকারি সেবা। ব্যবহারের পরিমাণ প্রকাশিত নয় — খোলা প্রশ্ন হিসেবে চিহ্নিত।'},
+ {n:4,p:'p1',t:'দৈনন্দিন দাম ও রেট',d:'প্রতিদিন বদলায় এমন সংখ্যা — মানুষ বারবার ফিরে আসার সবচেয়ে সহজ কারণ।',items:['মোবাইলের দাম: ব্র্যান্ড/মডেল অনুযায়ী বাংলাদেশি দাম','সোনার দাম (ভরি অনুযায়ী)','ডলার / রেমিট্যান্স রেট ও প্রবাসী পাঠানোর গাইড','নিত্যপণ্যের বাজারদর (ট্রেন্ডিং শব্দ “ডিম”, “তেল” প্রমাণ করে চাহিদা)','অফার: Daraz, Star Tech, MobileDokan-এর যাচাইকৃত অফার লিংক'],why:'প্রমাণ: “iphone 13 pro max price in bangladesh” ~41K ভলিউম (এক পোর্টালের Ahrefs স্ক্রিনশট — ইঙ্গিতমাত্র); MobileDokan 5.4M ভিজিট/মাস রিটেইলে #১, Daraz 5.13M, Star Tech 3.73M (Semrush, অক্টোবর ২০২৬)।'},
+ {n:5,p:'p1',t:'টাকা ও মোবাইল ব্যাংকিং',d:'bKash/Nagad ছাড়া দৈনন্দিন জীবন চলে না — কিন্তু গাইড বাংলায় কম। চার্জ, লিমিট আর নিরাপত্তা হবে মূল কন্টেন্ট।',items:['bKash / Nagad: ক্যাশ-আউট চার্জ, লিমিট, সেন্ড মানি খরচ — ক্যালকুলেটরসহ','অ্যাকাউন্ট খোলা, PIN রিসেট, ভুল নম্বরে টাকা গেলে করণীয়','প্রতারণা থেকে বাঁচার গাইড (OTP/PIN কেলেঙ্কারি)','ব্যাংক ও রেমিট্যান্স: কোন মাধ্যমে রেট ভালো'],why:'প্রমাণ: bKash Similarweb-এ #৯ ওয়েবসাইট — সর্বোচ্চ স্থানীয় সাইট (ডিসেম্বর ২০২৫)। MFS-এ গড়ে প্রতিদিন ~Tk ৫,৮৮৩ কোটি লেনদেন (Bangladesh Bank / Daily Star); নিবন্ধিত অ্যাকাউন্ট 259.7M, মাসিক সক্রিয় 87.15M (আগস্ট ২০২৬); bKash সক্রিয় ৪.২০ কোটি, Nagad ২.৮২ কোটি। লেনদেনের ধরন: ক্যাশ-আউট ৩২%, ক্যাশ-ইন ৩০%, P2P ২৬%, মার্চেন্ট পেমেন্ট মাত্র ৫%।'},
+ {n:6,p:'p2',t:'ক্রিকেট ও খেলা',d:'ম্যাচের দিনে ট্রাফিকের বন্যা — তবে লাইভ ডেটা চালানো কঠিন, তাই Phase 2।',items:['লাইভ স্কোর ও scorecard (ESPNcricinfo / Cricbuzz-ধাঁচের হালকা পেজ)','বাংলাদেশের ম্যাচের সময়সূচি, BPL / Asia Cup / ICC ইভেন্ট ক্যালেন্ডার','ম্যাচ প্রিভিউ, একাদশ, ফলাফল — বাংলায়','ফুটবল: Fortis FC, Bashundhara Kings-সহ স্থানীয় খবর'],why:'প্রমাণ: ৪৯.৮% ব্যবহারকারী খেলার কন্টেন্ট দেখেছে (BBS)। ১২ নভেম্বর ২০২৬-এর #১ ট্রেন্ড “ban u19 vs pak u19” (1,000+); ১৮ নভেম্বরে England–Australia scorecard 10,000+। ২০২৫-এর শীর্ষ: ICC Champions Trophy, Asia Cup, BPL।'},
+ {n:7,p:'p2',t:'খবর — আজকের সারসংক্ষেপ',d:'নিজে সংবাদপত্র হওয়ার দরকার নেই; দিনের গুরুত্বপূর্ণ খবর ৫ মিনিটে পড়া যায় এমন সারসংক্ষেপ + মূল উৎসের লিংক।',items:['সকাল/সন্ধ্যার “আজকের ৫ খবর”','রাজনীতি, অর্থনীতি (মূল্যস্ফীতি, রেমিট্যান্স), শিক্ষা বুলেটিন','Prothom Alo, Ittefaq, Kaler Kantho, Jugantor, Daily Star-এর হেডলাইন লিংক'],why:'প্রমাণ: Prothom Alo #১ নিউজ সাইট (Similarweb অক্টোবর ২০২৬-এ দেশে #১০); তবে বেশিরভাগ খবর পড়া হয় Facebook/YouTube দিয়ে, হোমপেজে গিয়ে নয়। দৈনিক ট্রেন্ডিংয়ে খবরই প্রধান (১ ডিসেম্বর ২০২৫-এর স্ন্যাপশট)।'},
+ {n:8,p:'p2',t:'AI সাহায্য কেন্দ্র',d:'ChatGPT এখন দেশের #৪ ওয়েবসাইট। ব্যবহার শেখানোই কন্টেন্ট — নিজে AI বানানোর দরকার নেই।',items:['ChatGPT / Gemini / Claude / DeepSeek — কোন কাজে কোনটা, বাংলায় গাইড','পড়াশোনা, CV লেখা, ইমেইল, অনুবাদ — কপি-পেস্ট প্রম্পট লাইব্রেরি','ফ্রি বনাম পেইড: শিক্ষার্থী ও ফ্রিল্যান্সারের জন্য পরামর্শ'],why:'প্রমাণ: ChatGPT 50.25M ভিজিট (+১২৬% YoY), Claude 11.77M (+১,৪৯৭%) — Semrush অক্টোবর ২০২৬। AI-chatbot রেফারালে ChatGPT ৭৪.৯৭%, Gemini ২১.৪৭% (StatCounter, সেপ্টেম্বর ২০২৬)।'},
+ {n:9,p:'p2',t:'বিনোদন গাইড',d:'সবচেয়ে বেশি সার্চ হওয়া ক্ষেত্র — তবে কপিরাইট মেনে শুধু তথ্য ও অফিসিয়াল লিংক।',items:['নতুন সিনেমা/নাটক: মুক্তির তারিখ, কোথায় দেখা যাবে (অফিসিয়াল OTT/YouTube)','ঈদের নাটক ও জনপ্রিয় সিরিজের তালিকা','গান ও লাইভ TV-এর অফিসিয়াল চ্যানেল লিংক'],why:'প্রমাণ: ২০২৫-এর শীর্ষ ব্যক্তি-খোঁজ Shakib Khan; সিনেমা Borbad, Tandob, Jongli; সিরিজ Bachelor Point, Bohemian Ghora (Year in Search 2025, সেকেন্ডারি)। YouTube খোঁজে “Jamuna tv Watch Live” 2,550,000 ও “new eid natok 2025” 588,000 (OS Digital World — তারিখ অনির্ভরযোগ্য, সতর্কভাবে ব্যবহার)।'},
+ {n:10,p:'p2',t:'দৈনন্দিন টুলস',d:'ছোট ছোট কাজ, প্রতিদিনের ব্যবহার — বুকমার্ক পাওয়ার সেরা উপায়।',items:['বয়স, BMI, শতকরা, EMI ও bKash চার্জ ক্যালকুলেটর','PDF/ছবি টুলস গাইড (Adobe #১৯ ওয়েবসাইট — টুলের চাহিদার প্রমাণ)','“What is my IP address?”-ধাঁচের তাৎক্ষণিক উত্তর পেজ','বাংলা ↔ ইংরেজি অনুবাদ ও টাইপিং সাহায্য'],why:'প্রমাণ: ব্যবহারিক খোঁজের তালিকায় “What is my IP address?” ছিল ২০২৫-এর শীর্ষে; Adobe 6.54M ভিজিট/মাসে #১৯ (Semrush)।'},
+ {n:11,p:'p3',t:'শপিং ও F-commerce সাহায্য',d:'কেনাকাটা এখনো ছোট বাজার — তাই শেষ ধাপে। দাম যাচাই ও প্রতারণা-সতর্কতাই মূল্য।',items:['দাম তুলনা: Daraz, Pickaboo, Chaldal, Star Tech','Facebook পেজ থেকে কেনার আগে যাচাই চেকলিস্ট','COD, ডেলিভারি চার্জ ও রিটার্ন গাইড'],why:'প্রমাণ: মাত্র ১১.৬% অনলাইনে কিনেছে (BBS); COD ৮৫–৯০% (অনুমান)। Facebook Commerce লেনদেনের ~৪৫–৫০%, Daraz GMV-র ~৩৫–৪০% — দুটোই Countly-র অনুমান, অফিসিয়াল নয়।'},
+ {n:12,p:'p3',t:'টেক ও ফ্রিল্যান্সিং',d:'GitHub শীর্ষ ১৪-তে — ডেভেলপার/ফ্রিল্যান্সার অর্থনীতি বাস্তব ও বাড়ন্ত।',items:['ফ্রিল্যান্সিং শুরু করার গাইড, পেমেন্ট পাওয়ার উপায়','নতুন ফোন/ল্যাপটপ কেনার গাইড ও দাম','সফটওয়্যার/অ্যাপের বাংলা টিউটোরিয়াল'],why:'প্রমাণ: GitHub 8.39M ভিজিট/মাসে #১৪ (+২৬.৪% YoY), Pinterest #১৫, LinkedIn 6.94M — Semrush অক্টোবর ২০২৬।'},
+ {n:13,p:'p3',t:'লাইফস্টাইল, খাবার ও ভ্রমণ',d:'TikTok-এ বাড়ন্ত খোঁজের ক্ষেত্র — হালকা কন্টেন্ট, শেয়ার বেশি।',items:['ভ্রমণ: জনপ্রিয় গন্তব্যের খরচ ও গাইড','রেসিপি ও খাবারের ট্রেন্ড','স্থানীয় ঘোরার জায়গা ও ইভেন্ট'],why:'প্রমাণ: TikTok ২০২৫ — ভ্রমণে Dubai ও Jamuna Future Park শীর্ষে; #TravelTok +৬৩%, #FoodTok +৪০%, #BookTok +৪১% YoY। Google ২০২৫-এর গন্তব্য: London, Tokyo, Kuala Lumpur; লাইফস্টাইল ট্রেন্ড: hot honey, matcha, mushroom coffee (সেকেন্ডারি)।'},
+ {n:14,p:'p3',t:'কমিউনিটি ও সাহায্য ডেস্ক',d:'সবশেষে — যখন পাঠক তৈরি, তখন প্রশ্ন-উত্তর ও Facebook গ্রুপ সংযোগ।',items:['পাঠকের প্রশ্নের উত্তর (চাকরি/সেবা বিষয়ে)','জরুরি নম্বর ও হেল্পলাইনের যাচাইকৃত তালিকা','ভুল তথ্য জানানোর ফর্ম'],why:'প্রমাণ: Facebook কমিউনিটি ও Messenger-ভিত্তিক অর্ডার/যোগাযোগই দেশের প্রধান ধারা; Messenger পৌঁছ ৩৫.০M (২০২৫)।'}
+];
+function renderModules(f){
+ document.getElementById('modules').innerHTML = modules.filter(function(m){return f==='all'||m.p===f;}).map(function(m){
+  return '<article class="module"><div class="module-top"><div style="display:flex;gap:12px"><div class="num">'+m.n+'</div><div><h3>'+m.t+'</h3></div></div><span class="phase '+m.p+'">'+(m.p==='p1'?'PHASE 1':m.p==='p2'?'PHASE 2':'PHASE 3')+'</span></div><p>'+m.d+'</p><ul>'+m.items.map(function(i){return '<li>'+i+'</li>';}).join('')+'</ul><div class="why">'+m.why+'</div></article>';
+ }).join('');
+}
+renderModules('all');
+document.querySelectorAll('.chip').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.chip').forEach(function(x){x.classList.remove('active')});b.classList.add('active');renderModules(b.dataset.f);});});
+
+var phases=[
+ {t:'Phase 1 — লঞ্চ: বিশ্বাস অর্জন',items:['চাকরি হাব (সার্কুলার + ডেডলাইন ক্যালেন্ডার)','রেজাল্ট পেজ (পরের পরীক্ষার আগেই তৈরি রাখা)','সরকারি সেবার ১০টি গাইড (NID, পাসপোর্ট, জন্ম নিবন্ধন, খতিয়ান, ট্যাক্স, লাইসেন্স, ট্রেন টিকিটসহ)','দৈনন্দিন দাম: মোবাইল + সোনা + ডলার রেট','bKash/Nagad গাইড ও চার্জ ক্যালকুলেটর','Facebook পেজ চালু — প্রতিদিন ২টি পোস্ট (সার্কুলার + ডেডলাইন)'],kpi:'লক্ষ্য: Google থেকে প্রথম অর্গানিক ভিজিটর ও Facebook-এ পুনরাবৃত্ত পাঠক। সাফল্যের মাপ: রেজাল্ট/সার্কুলারের দিনে ফিরে আসা ব্যবহারকারী।'},
+ {t:'Phase 2 — বৃদ্ধি: প্রতিদিনের অভ্যাস',items:['ক্রিকেট স্কোর ও ম্যাচ ক্যালেন্ডার','“আজকের ৫ খবর” সারসংক্ষেপ','AI সাহায্য কেন্দ্র ও প্রম্পট লাইব্রেরি','বিনোদন গাইড (সিনেমা/নাটকের মুক্তির তথ্য)','দৈনন্দিন টুলস (ক্যালকুলেটর, PDF গাইড)','YouTube/TikTok-এ ৬০ সেকেন্ডের গাইড ভিডিও — সপ্তাহে ৩টি'],kpi:'লক্ষ্য: ম্যাচের দিন ও ট্রেন্ডিং ইস্যুতে স্পাইক ট্রাফিককে নিয়মিত পাঠকে রূপ দেওয়া।'},
+ {t:'Phase 3 — পূর্ণাঙ্গ: সম্প্রসারণ',items:['শপিং দাম-তুলনা ও F-commerce যাচাই গাইড','টেক ও ফ্রিল্যান্সিং বিভাগ','লাইফস্টাইল, খাবার ও ভ্রমণ','কমিউনিটি প্রশ্ন-উত্তর ও হেল্প ডেস্ক','ইমেইল/মেসেঞ্জার অ্যালার্ট: পছন্দের চাকরির ক্যাটাগরিতে নতুন সার্কুলার এলে জানানো'],kpi:'লক্ষ্য: এক-বিষয়ের সাইট থেকে পূর্ণ Daily Help প্ল্যাটফর্ম। কোনো বিভাগই আগের ধাপের ট্রাফিক ছাড়া চালু নয়।'}
+];
+function renderPhase(i){var p=phases[i];document.getElementById('phasePanel').innerHTML='<h3 style="margin-top:0">'+p.t+'</h3><ul style="margin:0 0 12px 18px;padding:0">'+p.items.map(function(x){return '<li style="margin:5px 0">'+x+'</li>';}).join('')+'</ul><p style="margin:0;color:var(--muted)">'+p.kpi+'</p>';}
+renderPhase(0);
+document.querySelectorAll('.tab').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active')});b.classList.add('active');renderPhase(+b.dataset.t);});});
+</script>
+</body>
+</html>
