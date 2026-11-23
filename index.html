@@ -1,272 +1,735 @@
 <!doctype html>
 <html lang="bn">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="light dark">
-<link rel="icon" href="data:,">
-<title>Bangladesh Daily Help Website Plan — পূর্ণাঙ্গ রিপোর্ট</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:#F6F7F3; --surface:#FFFFFF; --surface2:#EEF3EE; --ink:#13201A; --muted:#5A6B62; --line:#DCE5DC;
-  --green:#0A7A5C; --green2:#E6F4EE; --amber:#D97706; --amber-bg:#FEF3C7; --red:#C2410C; --radius:18px;
-  --shadow:0 8px 30px rgba(10,60,44,.08);
-}
-@media (prefers-color-scheme: dark){
-  :root{ --bg:#0D1310; --surface:#161E19; --surface2:#1C2620; --ink:#EAF2EC; --muted:#9AB0A3; --line:#2A3A30; --green:#2DD4A8; --green2:#12382C; --amber-bg:#3A2A0A; --shadow:none; }
-}
-*{box-sizing:border-box}
-body{margin:0;font-family:"Hind Siliguri",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.65}
-a{color:var(--green);text-decoration:none}
-button,select,summary{min-height:44px}
-.wrap{max-width:1120px;margin:0 auto;padding:20px 18px 60px}
-.hero{padding:28px 0 8px}
-.eyebrow{display:inline-flex;gap:8px;align-items:center;background:var(--green2);color:var(--green);font-weight:700;font-size:13px;padding:7px 12px;border-radius:999px;border:1px solid var(--line)}
-h1{font-size:clamp(30px,5vw,52px);line-height:1.08;margin:16px 0 12px;letter-spacing:-.02em}
-h1 span{color:var(--green)}
-.lead{font-size:18px;color:var(--muted);max-width:820px}
-.hero-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin-top:22px}
-@media(max-width:760px){.hero-grid{grid-template-columns:1fr}}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
-.card h3{margin:0 0 8px;font-size:18px}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
-@media(max-width:860px){.kpis{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:420px){.kpis{grid-template-columns:1fr 1fr}}
-.kpi{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px}
-.kpi b{font-size:28px;line-height:1;display:block;font-family:Inter,sans-serif}
-.kpi span{font-size:13px;color:var(--muted);display:block;margin-top:6px;line-height:1.4}
-.kpi small{font-size:11px;color:var(--muted)}
-h2{font-size:26px;margin:36px 0 6px;letter-spacing:-.01em}
-.sub{color:var(--muted);margin:0 0 16px;max-width:820px}
-.bar-row{display:grid;grid-template-columns:130px 1fr 82px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14px}
-.bar{height:10px;background:var(--surface2);border-radius:999px;overflow:hidden}
-.bar i{display:block;height:100%;background:var(--green);border-radius:999px}
-.filters{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
-.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:10px 14px;border-radius:999px;font-weight:600;cursor:pointer;font-family:inherit}
-.chip.active{background:var(--green);color:#fff;border-color:var(--green)}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-@media(max-width:760px){.grid{grid-template-columns:1fr}}
-.module{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px}
-.module-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
-.num{width:42px;height:42px;border-radius:12px;background:var(--green2);color:var(--green);display:grid;place-items:center;font-weight:800;font-family:Inter;flex:0 0 auto}
-.phase{font-size:12px;font-weight:700;padding:5px 9px;border-radius:999px;background:var(--amber-bg);color:var(--amber);white-space:nowrap}
-.phase.p1{background:var(--green2);color:var(--green)}
-.module h3{margin:2px 0 4px;font-size:19px}
-.module p{margin:6px 0;color:var(--muted);font-size:14.5px}
-.module ul{margin:8px 0 0 18px;padding:0;font-size:14.5px}
-.module li{margin:4px 0}
-.why{font-size:13px;background:var(--surface2);border-radius:10px;padding:10px 12px;margin-top:12px}
-.mock{border:1.5px solid var(--line);border-radius:20px;overflow:hidden;background:var(--surface)}
-.mock-head{background:var(--ink);color:var(--bg);padding:14px 16px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.mock-search{margin:16px;background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:12px 16px;color:var(--muted)}
-.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:0 16px 16px}
-@media(max-width:700px){.tiles{grid-template-columns:repeat(2,1fr)}}
-.tile{background:var(--surface2);border-radius:14px;padding:14px;text-align:center;font-weight:700;font-size:14px}
-.tile span{display:block;font-weight:400;color:var(--muted);font-size:12px;margin-top:2px}
-.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
-.tab{padding:11px 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-weight:700;cursor:pointer;font-family:inherit}
-.tab.active{background:var(--ink);color:var(--bg)}
-.phase-panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media(max-width:760px){.two{grid-template-columns:1fr}}
-table{width:100%;border-collapse:collapse;font-size:14px}
-th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
-th{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
-.warn{background:#FFF7ED;border:1px solid #FDBA74;border-radius:16px;padding:18px;color:#431407}
-@media(prefers-color-scheme:dark){.warn{background:#2A1808;color:#FFEDD5;border-color:#7C2D12}}
-.sources{font-size:13px;color:var(--muted)}
-.sources li{margin:6px 0;word-break:break-all}
-footer{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
-.badge{display:inline-block;font-size:12px;border:1px solid var(--line);border-radius:999px;padding:4px 8px;margin:2px}
-</style>
-</head>
-<body>
-<div class="wrap">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Seba — ওয়েবসাইট প্ল্যান ও ফাইল গঠন</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+    <style>
+      button, [role="button"], select, summary, input:not([type="checkbox"], [type="radio"]) { min-height: 2rem; }
+      * { box-sizing: border-box; }
+    </style>
+    <style>
+      :root{
+        --bg:#f4f7f5;
+        --surface:#ffffff;
+        --surface-2:#eaf1ec;
+        --ink:#15211b;
+        --ink-soft:#43534a;
+        --ink-faint:#6b7a70;
+        --line:#d7e0d9;
+        --green:#0b7a4b;
+        --green-deep:#075c38;
+        --green-soft:#e2f2e8;
+        --red:#d63a2f;
+        --amber:#b97a0c;
+        --amber-soft:#faf0da;
+        --code-bg:#0f1a14;
+        --code-ink:#d9e8dd;
+        --code-dim:#7fa18c;
+        --shadow:0 1px 2px rgba(16,40,26,.06),0 8px 24px rgba(16,40,26,.06);
+        --radius:14px;
+      }
+      @media (prefers-color-scheme: dark){
+        :root{
+          --bg:#0c120e;
+          --surface:#141d17;
+          --surface-2:#1a261e;
+          --ink:#e8f0ea;
+          --ink-soft:#b3c4b9;
+          --ink-faint:#85968a;
+          --line:#26362c;
+          --green:#3ec583;
+          --green-deep:#7ed6a8;
+          --green-soft:#173325;
+          --red:#f0705f;
+          --amber:#e0aa4e;
+          --amber-soft:#2c2412;
+          --code-bg:#0a120d;
+          --code-ink:#d9e8dd;
+          --code-dim:#7fa18c;
+          --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+        }
+      }
+      html{scroll-behavior:smooth}
+      @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
+      body{
+        margin:0;background:var(--bg);color:var(--ink);
+        font-family:"Hind Siliguri",system-ui,-apple-system,"Segoe UI",sans-serif;
+        font-size:17px;line-height:1.65;
+        -webkit-font-smoothing:antialiased;
+      }
+      .wrap{max-width:1080px;margin:0 auto;padding:0 20px 72px}
+      code,.mono{font-family:"JetBrains Mono",ui-monospace,monospace}
 
-<header class="hero">
-  <span class="eyebrow">● পূর্ণাঙ্গ প্ল্যান রিপোর্ট • গবেষণা: নভেম্বর ২০২৬</span>
-  <h1>বাংলাদেশীদের প্রতিদিনের<br><span>সব কাজ এক ওয়েবসাইটে</span> —<br>সর্বোচ্চ কী কী রাখা যায়?</h1>
-  <p class="lead">এই রিপোর্ট আগের গবেষণার আসল ডেটার উপর দাঁড়িয়ে সাজানো: বাংলাদেশে মানুষ প্রতিদিন Google-এ কী খোঁজে, কোন সাইটে যায়, আর কোন কাজে ইন্টারনেট ব্যবহার করে। সেই চাহিদা অনুযায়ী একটি Daily Help ওয়েবসাইটে <strong>সর্বোচ্চ ১৪টি বিভাগ</strong> রাখা যায় — তবে একসাথে সব নয়, ধাপে ধাপে। নিচে প্রতিটি বিভাগে ঠিক কী থাকবে, কেন থাকবে, আর কোন ধাপে আসবে — সব দেওয়া হলো।</p>
-  <div class="hero-grid">
-    <div class="card">
-      <h3>এক লাইনে কৌশল</h3>
-      <p style="margin:0;color:var(--muted)">ওয়েবসাইটটা হবে <strong style="color:var(--ink)">মোবাইল-ফার্স্ট, বাংলা-ফার্স্ট, সার্চ-ফার্স্ট</strong>। মানুষ Google থেকে আসবে একটি নির্দিষ্ট উত্তরের জন্য (সার্কুলার, রেজাল্ট, দাম, স্কোর) — ৩০ সেকেন্ডে উত্তর পেয়ে যেন আবার ফিরে আসে। Facebook হবে বিতরণের প্রধান রাস্তা, ওয়েবসাইট হবে উত্তরের ঠিকানা।</p>
-      <div style="margin-top:12px"><span class="badge">Google: সার্চের ৯৮.৪৬%</span> <span class="badge">Facebook: সোশ্যাল রেফারালের ৭৬.৫৪%</span> <span class="badge">মোবাইল: সাবস্ক্রিপশনের ৮৮.৮%</span></div>
-      <p style="font-size:12px;color:var(--muted);margin:10px 0 0">সূত্র: StatCounter / SERP Mentor (অক্টো ২০২৬), BTRC (আগস্ট ২০২৬)</p>
+      /* ---------- Hero ---------- */
+      .hero{padding:44px 0 8px}
+      .hero-top{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:18px}
+      .tag{
+        display:inline-flex;align-items:center;gap:7px;
+        font-size:13.5px;font-weight:600;color:var(--ink-soft);
+        background:var(--surface);border:1px solid var(--line);
+        padding:5px 12px;border-radius:999px;min-height:32px;
+      }
+      .tag .dot{width:8px;height:8px;border-radius:50%;background:var(--amber);flex:none}
+      .tag .dot.green{background:var(--green)}
+      .tag a{color:var(--green);text-decoration:none;font-family:"JetBrains Mono",monospace;font-size:12.5px}
+      .tag a:hover{text-decoration:underline}
+      h1{font-size:clamp(30px,5.4vw,46px);line-height:1.2;margin:0 0 12px;font-weight:700;letter-spacing:-.01em}
+      h1 .accent{color:var(--green)}
+      .hero-sub{font-size:clamp(16.5px,2.4vw,19px);color:var(--ink-soft);max-width:46em;margin:0}
+      .hero-sub strong{color:var(--ink)}
+
+      /* ---------- Section scaffolding ---------- */
+      section{margin-top:52px}
+      .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:6px}
+      .sec-num{
+        font-family:"JetBrains Mono",monospace;font-size:14px;font-weight:700;
+        color:var(--green);background:var(--green-soft);
+        border-radius:8px;padding:3px 9px;flex:none;transform:translateY(-2px);
+      }
+      h2{font-size:clamp(23px,3.6vw,30px);margin:0;line-height:1.3;font-weight:700}
+      .sec-lede{color:var(--ink-soft);max-width:52em;margin:8px 0 22px}
+      h3{font-size:19px;margin:0 0 8px;font-weight:600}
+
+      /* ---------- Cards ---------- */
+      .grid{display:grid;gap:16px}
+      .grid.c3{grid-template-columns:repeat(3,1fr)}
+      .grid.c2{grid-template-columns:repeat(2,1fr)}
+      @media (max-width:820px){ .grid.c3,.grid.c2{grid-template-columns:1fr} }
+      .card{
+        background:var(--surface);border:1px solid var(--line);
+        border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);
+      }
+      .card p{margin:0;color:var(--ink-soft)}
+      .card ul{margin:10px 0 0;padding:0;list-style:none}
+      .card ul li{padding:5px 0 5px 22px;position:relative;color:var(--ink-soft);font-size:15.5px}
+      .card ul li::before{content:"";position:absolute;left:2px;top:13px;width:7px;height:7px;border-radius:2px;background:var(--green)}
+      .card ul li strong{color:var(--ink)}
+      .card .card-kicker{
+        display:flex;align-items:center;gap:10px;margin-bottom:10px;
+      }
+      .card .card-kicker h3{margin:0}
+      .badge{
+        font-size:12.5px;font-weight:700;padding:2px 9px;border-radius:999px;
+        background:var(--green-soft);color:var(--green-deep);white-space:nowrap;
+      }
+      .badge.later{background:var(--surface-2);color:var(--ink-faint)}
+
+      /* principle strip */
+      .principles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:22px}
+      @media (max-width:820px){ .principles{grid-template-columns:repeat(2,1fr)} }
+      @media (max-width:480px){ .principles{grid-template-columns:1fr} }
+      .principle{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
+      .principle .p-num{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--green);font-weight:700}
+      .principle h4{margin:4px 0 4px;font-size:16.5px}
+      .principle p{margin:0;font-size:14.5px;color:var(--ink-soft);line-height:1.55}
+
+      /* ---------- Phase tabs ---------- */
+      .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+      .tab-btn{
+        font-family:inherit;font-size:16px;font-weight:600;cursor:pointer;
+        padding:9px 18px;border-radius:999px;min-height:44px;
+        border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);
+      }
+      .tab-btn[aria-selected="true"]{background:var(--green);border-color:var(--green);color:#fff}
+      @media (prefers-color-scheme: dark){ .tab-btn[aria-selected="true"]{color:#08130c} }
+      .tab-panel{display:none}
+      .tab-panel.active{display:block}
+      .phase-note{
+        display:flex;gap:10px;align-items:flex-start;margin-top:16px;
+        background:var(--amber-soft);border-radius:12px;padding:14px 16px;
+        font-size:15.5px;color:var(--ink);
+      }
+      .phase-note svg{flex:none;margin-top:3px}
+
+      /* ---------- File explorer ---------- */
+      .explorer{
+        display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);
+        border:1px solid var(--line);border-radius:var(--radius);
+        overflow:hidden;background:var(--surface);box-shadow:var(--shadow);
+      }
+      @media (max-width:820px){ .explorer{grid-template-columns:1fr} }
+      .tree-pane{background:var(--code-bg);color:var(--code-ink);padding:18px 10px 18px 14px;overflow-x:auto}
+      .tree-pane .tp-head{
+        display:flex;justify-content:space-between;align-items:center;gap:10px;
+        padding:0 6px 12px;border-bottom:1px solid rgba(255,255,255,.09);margin-bottom:10px;
+      }
+      .tree-pane .tp-head span{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--code-dim)}
+      .copy-btn{
+        font-family:"Hind Siliguri",sans-serif;font-size:14px;font-weight:600;cursor:pointer;
+        background:transparent;color:var(--code-ink);border:1px solid rgba(255,255,255,.25);
+        border-radius:8px;padding:6px 14px;min-height:36px;white-space:nowrap;
+      }
+      .copy-btn:hover{border-color:rgba(255,255,255,.55)}
+      .tree{list-style:none;margin:0;padding:0;font-family:"JetBrains Mono",monospace;font-size:13.5px;line-height:1.5}
+      .tree ul{list-style:none;margin:0;padding-left:19px;border-left:1px solid rgba(255,255,255,.08);margin-left:8px}
+      .tree button{
+        all:unset;box-sizing:border-box;display:flex;align-items:center;gap:7px;width:100%;
+        padding:4.5px 8px;border-radius:7px;cursor:pointer;color:var(--code-ink);
+        font:inherit;min-height:32px;text-align:left;white-space:nowrap;
+      }
+      .tree button:hover{background:rgba(255,255,255,.06)}
+      .tree button.selected{background:rgba(62,197,131,.18);color:#fff;box-shadow:inset 2px 0 0 var(--green)}
+      .tree .ic{flex:none;width:16px;text-align:center;font-size:12px;color:var(--code-dim)}
+      .tree .folder-name{color:#8fd3ab;font-weight:500}
+      .tree .file-name{color:var(--code-ink)}
+      .tree .tag-new{font-size:10.5px;background:rgba(224,170,78,.2);color:#e8bc6d;border-radius:4px;padding:1px 5px;margin-left:4px}
+      .detail-pane{padding:24px}
+      .detail-pane .d-path{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--green);word-break:break-all}
+      .detail-pane h3{margin:8px 0 8px;font-size:21px}
+      .detail-pane p{margin:0 0 12px;color:var(--ink-soft)}
+      .detail-pane .d-rule{
+        background:var(--surface-2);border-radius:10px;padding:12px 14px;font-size:15px;color:var(--ink);
+      }
+      .detail-pane .d-rule strong{color:var(--green-deep)}
+      .detail-hint{font-size:14px;color:var(--ink-faint);margin-top:14px}
+
+      /* ---------- Rules / conventions ---------- */
+      .rules{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+      @media (max-width:820px){ .rules{grid-template-columns:1fr} }
+      .rule-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}
+      .rule-card h3{margin-bottom:12px}
+      .rule-list{list-style:none;margin:0;padding:0}
+      .rule-list li{padding:8px 0;border-top:1px dashed var(--line);color:var(--ink-soft);font-size:15.5px}
+      .rule-list li:first-child{border-top:none;padding-top:0}
+      .rule-list code{
+        background:var(--surface-2);border-radius:6px;padding:1px 7px;font-size:13.5px;color:var(--ink);
+      }
+      .do-dont{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+      @media (max-width:480px){ .do-dont{grid-template-columns:1fr} }
+      .dd{border-radius:10px;padding:12px 14px;font-size:14.5px;font-family:"JetBrains Mono",monospace;line-height:1.9}
+      .dd.good{background:var(--green-soft);color:var(--ink)}
+      .dd.bad{background:var(--surface-2);color:var(--ink-faint);text-decoration:line-through;text-decoration-color:var(--red);text-decoration-thickness:1.5px}
+
+      /* ---------- Workflow steps ---------- */
+      .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;counter-reset:step}
+      @media (max-width:820px){ .steps{grid-template-columns:repeat(2,1fr)} }
+      @media (max-width:480px){ .steps{grid-template-columns:1fr} }
+      .step{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;position:relative}
+      .step .s-num{
+        font-family:"JetBrains Mono",monospace;font-weight:700;font-size:13px;
+        color:#fff;background:var(--green);border-radius:50%;
+        width:26px;height:26px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;
+      }
+      @media (prefers-color-scheme: dark){ .step .s-num{color:#08130c} }
+      .step h4{margin:0 0 5px;font-size:16.5px}
+      .step p{margin:0;font-size:14.5px;color:var(--ink-soft);line-height:1.55}
+      .step code{background:var(--surface-2);border-radius:5px;padding:0 5px;font-size:12.5px}
+
+      /* ---------- Checklist ---------- */
+      .checklist{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+      .checklist li{display:flex;gap:14px;padding:16px 20px;border-top:1px solid var(--line);align-items:flex-start}
+      .checklist li:first-child{border-top:none}
+      .check-box{
+        flex:none;width:22px;height:22px;border-radius:6px;margin-top:3px;
+        border:2px solid var(--line);display:flex;align-items:center;justify-content:center;
+        color:#fff;font-size:13px;font-weight:700;
+      }
+      .check-box.done{background:var(--green);border-color:var(--green)}
+      @media (prefers-color-scheme: dark){ .check-box.done{color:#08130c} }
+      .checklist .done-text{color:var(--ink-faint);text-decoration:line-through}
+      .checklist p{margin:0}
+      .checklist .sub{font-size:14.5px;color:var(--ink-faint)}
+
+      .warn-card{
+        border:1px solid var(--line);border-left:4px solid var(--red);
+        background:var(--surface);border-radius:10px;padding:18px 20px;
+      }
+      .warn-card h3{color:var(--red)}
+      .warn-card p{margin:0;color:var(--ink-soft)}
+      .warn-card p + p{margin-top:8px}
+
+      footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);color:var(--ink-faint);font-size:14.5px}
+      footer a{color:var(--green)}
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+
+      <!-- ================= HERO ================= -->
+      <header class="hero">
+        <div class="hero-top">
+          <span class="tag"><span class="dot"></span> অবস্থা: পরিকল্পনা পর্যায় — এখনো কোড শুরু হয়নি</span>
+          <span class="tag">Repo: <a href="https://github.com/havencraftbd/seba-website" target="_blank" rel="noopener">github.com/havencraftbd/seba-website</a></span>
+          <span class="tag"><span class="dot green"></span> টেস্ট ঠিকানা (পরে): seba.hvnbd.net</span>
+        </div>
+        <h1><span class="accent">Seba</span> ওয়েবসাইট — পূর্ণাঙ্গ প্ল্যান ও ফাইল গঠন</h1>
+        <p class="hero-sub">
+          বাংলাদেশের মানুষ প্রতিদিন যেসব কাজে ইন্টারনেটে যায় — <strong>চাকরি, রেজাল্ট, সরকারি সেবা</strong> —
+          সেগুলো এক জায়গায় আনার প্ল্যান। এই পেজে আছে: শুরুতে কী থাকবে, পরে কী আসবে,
+          আর বড় কোম্পানির মতো <strong>পরিষ্কার ফোল্ডার গঠন</strong> যাতে যে কেউ কোড খুললেই বুঝতে পারে কোথায় কী আছে।
+        </p>
+      </header>
+
+      <!-- ================= 1. এক নজরে ================= -->
+      <section aria-labelledby="s1">
+        <div class="sec-head"><span class="sec-num">০১</span><h2 id="s1">এক নজরে প্রজেক্টটা</h2></div>
+        <p class="sec-lede">আগের গবেষণা রিপোর্ট থেকে জানা গেছে — এখন এই কাজগুলোর জন্য আলাদা আলাদা ওয়েবসাইটে যেতে হয়। Seba-র কাজ হবে সব এক ছাদের নিচে আনা, নিজে কপি না করে অফিসিয়াল সোর্সের সঠিক লিংক আর ধাপে ধাপে গাইড দিয়ে।</p>
+        <div class="grid c3">
+          <div class="card">
+            <h3>লক্ষ্য</h3>
+            <p>প্রতিদিনের দরকারি কাজের জন্য একটাই ঠিকানা — মানুষ যেন Google-এ খুঁজে Seba-তে এসে সরাসরি কাজের উত্তর পায়, ঘুরতে না হয়।</p>
+          </div>
+          <div class="card">
+            <h3>কার জন্য</h3>
+            <p>বাংলাদেশের সাধারণ মোবাইল ব্যবহারকারী — চাকরিপ্রার্থী, শিক্ষার্থী, আর যারা NID–পাসপোর্ট–ভূমির কাজে সরকারি সেবা খোঁজেন। মোবাইল-ফার্স্ট ডিজাইন, হালকা পেজ, বাংলা ভাষা।</p>
+          </div>
+          <div class="card">
+            <h3>এখনকার অবস্থা</h3>
+            <p>এটা একটা <strong>টেস্ট প্রজেক্ট</strong>। নাম “Seba” আপাতত পরীক্ষামূলক, ডোমেইন কেনা হয়নি। ভালো চললে নিজের ডোমেইনের <strong>seba.hvnbd.net</strong> সাবডোমেইনে চালানো হবে, সফল হলে আলাদা ডোমেইন।</p>
+          </div>
+        </div>
+        <div class="principles">
+          <div class="principle"><span class="p-num">নীতি ১</span><h4>ছোট করে শুরু</h4><p>একসাথে ১৪টা বিভাগ নয় — মাত্র ৩টা দিয়ে শুরু, ভালো চললে একটা একটা করে বাড়বে।</p></div>
+          <div class="principle"><span class="p-num">নীতি ২</span><h4>ডেটা আলাদা ফাইলে</h4><p>চাকরি–রেজাল্টের তথ্য JSON ফাইলে থাকবে। আপডেট মানে শুধু ডেটা ফাইল বদলানো — ডিজাইন ছোঁয়ার দরকার নেই।</p></div>
+          <div class="principle"><span class="p-num">নীতি ৩</span><h4>এক ফাইলে এক কাজ</h4><p>প্রতিটা ফাইলের দায়িত্ব একটাই। নাম দেখলেই বোঝা যাবে ভেতরে কী আছে।</p></div>
+          <div class="principle"><span class="p-num">নীতি ৪</span><h4>কপি নয়, অফিসিয়াল লিংক</h4><p>সার্কুলার বা রেজাল্ট নিজে হোস্ট না করে সরকারি/অফিসিয়াল সাইটে লিংক — ভুল তথ্যের ঝুঁকি কম, আইনি ঝামেলাও নেই।</p></div>
+        </div>
+      </section>
+
+      <!-- ================= 2. Phases ================= -->
+      <section aria-labelledby="s2">
+        <div class="sec-head"><span class="sec-num">০২</span><h2 id="s2">কী থাকবে — ধাপে ধাপে</h2></div>
+        <p class="sec-lede">সবকিছু একবারে বানানো হবে না। তিন ধাপে ভাগ করা হয়েছে — প্রতিটা ধাপ আগেরটার ওপর দাঁড়িয়ে বাড়বে। ট্যাব বদলে প্রতিটা ধাপের তালিকা দেখো।</p>
+
+        <div class="tabs" role="tablist" aria-label="রোডম্যাপ ধাপ">
+          <button class="tab-btn" role="tab" id="tab-1" aria-selected="true" aria-controls="panel-1" data-tab="1">Phase 1 — শুরুতে</button>
+          <button class="tab-btn" role="tab" id="tab-2" aria-selected="false" aria-controls="panel-2" data-tab="2">Phase 2 — এরপর</button>
+          <button class="tab-btn" role="tab" id="tab-3" aria-selected="false" aria-controls="panel-3" data-tab="3">Phase 3 — বড় হলে</button>
+        </div>
+
+        <div class="tab-panel active" id="panel-1" role="tabpanel" aria-labelledby="tab-1">
+          <div class="grid c3">
+            <div class="card">
+              <div class="card-kicker"><h3>চাকরি</h3><span class="badge">সবচেয়ে বেশি খোঁজা হয়</span></div>
+              <p>সরকারি চাকরির নতুন সার্কুলার — যেটা প্রতিদিন আপডেট হবে, এটাই সাইটের প্রাণ।</p>
+              <ul>
+                <li><strong>নতুন সার্কুলার</strong> — পদের নাম, প্রতিষ্ঠান, পদসংখ্যা</li>
+                <li><strong>আবেদনের শেষ তারিখ</strong> — ডেডলাইন সামনে রেখে সাজানো</li>
+                <li>ক্যাটাগরি <strong>ফিল্টার</strong> — মন্ত্রণালয়, ব্যাংক, শিক্ষা, স্বাস্থ্য</li>
+                <li>প্রতিটার সাথে <strong>অফিসিয়াল লিংক</strong> — আবেদন ও মূল বিজ্ঞপ্তি</li>
+              </ul>
+            </div>
+            <div class="card">
+              <div class="card-kicker"><h3>রেজাল্ট</h3><span class="badge">মৌসুমে সবচেয়ে বড় ট্রাফিক</span></div>
+              <p>পরীক্ষার রেজাল্ট বেরোনোর দিন লাখো মানুষ একসাথে খোঁজে — সেই দিনের জন্য তৈরি থাকা।</p>
+              <ul>
+                <li><strong>SSC / HSC</strong> রেজাল্ট চেকের ধাপে ধাপে নিয়ম</li>
+                <li>সব <strong>শিক্ষা বোর্ডের অফিসিয়াল লিংক</strong> এক জায়গায়</li>
+                <li><strong>চাকরির পরীক্ষার রেজাল্ট</strong> — কোন পরীক্ষার ফল বেরোলো</li>
+                <li>SMS দিয়ে রেজাল্ট দেখার নিয়ম</li>
+              </ul>
+            </div>
+            <div class="card">
+              <div class="card-kicker"><h3>সরকারি সেবা</h3><span class="badge">ধাপে ধাপে গাইড</span></div>
+              <p>সরকারি পোর্টালগুলো জটিল — সহজ বাংলায় ধাপে ধাপে গাইডই এখানকার মূল্য।</p>
+              <ul>
+                <li><strong>NID</strong> — নতুন নিবন্ধন, সংশোধন, ডাউনলোড</li>
+                <li><strong>পাসপোর্ট</strong> — e-Passport আবেদন ও ফি</li>
+                <li><strong>জন্ম নিবন্ধন</strong> ও <strong>ভূমি/নামজারি</strong> (খতিয়ান)</li>
+                <li><strong>আয়কর রিটার্ন</strong> ও <strong>ট্রেনের টিকিট</strong> কাটার নিয়ম</li>
+              </ul>
+            </div>
+          </div>
+          <div class="phase-note">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="var(--amber)" stroke-width="2"/><path d="M12 8v5" stroke="var(--amber)" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16.5" r="1.3" fill="var(--amber)"/></svg>
+            <span><strong>হোমপেজে আরও থাকবে:</strong> বড় সার্চ বক্স (সব বিভাগে একসাথে খোঁজা), আজকের নতুন সার্কুলার, আর দুইটা ছোট টুল — বয়স ক্যালকুলেটর ও BMI ক্যালকুলেটর। সাইট টিকবে প্রতিদিনের আপডেটে — সার্কুলার আর রেজাল্ট নিয়মিত না বসালে মানুষ ফিরে আসবে না, এটাই এই ধাপের আসল শর্ত।</span>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="panel-2" role="tabpanel" aria-labelledby="tab-2">
+          <div class="grid c3">
+            <div class="card">
+              <div class="card-kicker"><h3>দৈনন্দিন দাম</h3><span class="badge later">Phase 2</span></div>
+              <ul>
+                <li>মোবাইলের দাম (বাংলাদেশের বাজার)</li>
+                <li>সোনার দাম, ডলার ও রেমিট্যান্স রেট</li>
+                <li>নিত্যপণ্যের বাজারদর</li>
+              </ul>
+            </div>
+            <div class="card">
+              <div class="card-kicker"><h3>টাকা ও মোবাইল ব্যাংকিং</h3><span class="badge later">Phase 2</span></div>
+              <ul>
+                <li>bKash / Nagad ব্যবহারের গাইড</li>
+                <li>চার্জ ও ক্যাশ-আউট খরচের হিসাব</li>
+                <li>সাধারণ সমস্যার সমাধান</li>
+              </ul>
+            </div>
+            <div class="card">
+              <div class="card-kicker"><h3>আরও টুলস</h3><span class="badge later">Phase 2</span></div>
+              <ul>
+                <li>আবহাওয়া ও নামাজের সময়</li>
+                <li>PDF / ছবির ছোট টুলস</li>
+                <li>তারিখ ও একক কনভার্টার</li>
+              </ul>
+            </div>
+          </div>
+          <div class="phase-note">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="var(--amber)" stroke-width="2"/><path d="M12 8v5" stroke="var(--amber)" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16.5" r="1.3" fill="var(--amber)"/></svg>
+            <span><strong>শর্ত:</strong> Phase 1 অন্তত কয়েক সপ্তাহ ঠিকমতো চললে আর প্রতিদিনের আপডেটের অভ্যাস তৈরি হলেই কেবল Phase 2 শুরু হবে। আগে বাড়ালে পুরো সাইটই এলোমেলো হয়ে যাবে।</span>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="panel-3" role="tabpanel" aria-labelledby="tab-3">
+          <div class="grid c3">
+            <div class="card">
+              <div class="card-kicker"><h3>ক্রিকেট লাইভ স্কোর</h3><span class="badge later">Phase 3</span></div>
+              <p>ম্যাচের দিনে সবচেয়ে বেশি ট্রাফিক আসে এখান থেকে — তবে লাইভ ডেটার জন্য আলাদা ব্যবস্থা (API) লাগবে, তাই সবার শেষে।</p>
+            </div>
+            <div class="card">
+              <div class="card-kicker"><h3>খবর ও বিনোদন</h3><span class="badge later">Phase 3</span></div>
+              <p>দিনের গুরুত্বপূর্ণ খবরের সারসংক্ষেপ আর অফিসিয়াল সোর্সের লিংক। নিজে খবর লেখা নয় — কিউরেশন।</p>
+            </div>
+            <div class="card">
+              <div class="card-kicker"><h3>শিক্ষা ও AI সাহায্য</h3><span class="badge later">Phase 3</span></div>
+              <p>ভর্তি তথ্য, স্কলারশিপ, পড়াশোনার গাইড — আর পড়াশোনায় সাহায্যের জন্য AI টুলের সংযোগ।</p>
+            </div>
+          </div>
+          <div class="phase-note">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="var(--amber)" stroke-width="2"/><path d="M12 8v5" stroke="var(--amber)" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16.5" r="1.3" fill="var(--amber)"/></svg>
+            <span><strong>মনে রাখতে হবে:</strong> পূর্ণাঙ্গ প্ল্যানে মোট ১৪টা বিভাগের কথা ভাবা হয়েছিল। সেগুলো হারিয়ে যাচ্ছে না — এই ধাপে অপেক্ষা করছে। কোনটা আসলেই লাগবে, সেটা Phase 1–2-এর ব্যবহার দেখেই ঠিক হবে।</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 3. File structure ================= -->
+      <section aria-labelledby="s3">
+        <div class="sec-head"><span class="sec-num">০৩</span><h2 id="s3">ফাইল গঠন — বড় কোম্পানির ধাঁচে</h2></div>
+        <p class="sec-lede">
+          মূল আইডিয়া সহজ: <strong>যা যা একই ধরনের, তা একই ফোল্ডারে; প্রতিটা ফাইলের নাম দেখলেই তার কাজ বোঝা যাবে।</strong>
+          ডিজাইন (CSS), আচরণ (JS), তথ্য (data) আর পেজ (pages) — চারটাই সম্পূর্ণ আলাদা।
+          নিচের ট্রি-তে যেকোনো ফাইল বা ফোল্ডারে ক্লিক করলেই ডানদিকে তার কাজ দেখা যাবে।
+        </p>
+
+        <div class="explorer">
+          <div class="tree-pane">
+            <div class="tp-head">
+              <span>seba-website/</span>
+              <button class="copy-btn" id="copyTreeBtn" type="button">গঠনটা কপি করো</button>
+            </div>
+            <ul class="tree" id="fileTree"></ul>
+          </div>
+          <div class="detail-pane" aria-live="polite">
+            <div class="d-path" id="dPath">seba-website/</div>
+            <h3 id="dTitle">পুরো প্রজেক্ট</h3>
+            <p id="dDesc">এটাই GitHub repo-র মূল গঠন। বামদিকের যেকোনো ফোল্ডার বা ফাইলে ক্লিক করলে এখানে দেখা যাবে সেটা কেন আছে, ভেতরে কী থাকবে, আর সেটা বদলালে কী হবে।</p>
+            <div class="d-rule" id="dRule"><strong>সোনালি নিয়ম:</strong> নতুন কিছু যোগ করার আগে ভাবতে হবে — এটা কোন ফোল্ডারে যায়? উত্তর পরিষ্কার না হলে গঠনটাই আবার ভাবতে হবে, জোর করে কোথাও ঢোকানো যাবে না।</div>
+            <p class="detail-hint">ট্যাগ <span class="mono" style="font-size:12px;background:var(--amber-soft);border-radius:4px;padding:1px 6px">Phase 2</span> মানে ওই ফাইলটা এখনই লাগবে না — জায়গাটা শুধু আগে থেকে ঠিক করে রাখা, যাতে পরে এলোমেলো না হয়।</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 4. Rules ================= -->
+      <section aria-labelledby="s4">
+        <div class="sec-head"><span class="sec-num">০৪</span><h2 id="s4">নামকরণ ও কোডের নিয়ম</h2></div>
+        <p class="sec-lede">গঠন ভালো হলেও নিয়ম না মানলে ছয় মাসে আবার এলোমেলো হয়ে যাবে। এই নিয়মগুলো ছোট, কিন্তু সবার জন্য বাধ্যতামূলক — বড় কোম্পানিগুলো ঠিক এভাবেই কোড পড়ার যোগ্য রাখে।</p>
+        <div class="rules">
+          <div class="rule-card">
+            <h3>ফাইল ও ফোল্ডারের নাম</h3>
+            <ul class="rule-list">
+              <li>সব নাম <strong>ছোট হাতের ইংরেজি</strong> — বাংলা নাম ফাইলে নয়, ফাইলের ভেতরের লেখায়।</li>
+              <li>শব্দ আলাদা করতে হাইফেন: <code>kebab-case</code> — স্পেস বা আন্ডারস্কোর নয়।</li>
+              <li>নাম হবে <strong>কাজ অনুযায়ী</strong>, চেহারা অনুযায়ী নয় — “নীল বাক্স” নয়, “চাকরির কার্ড”।</li>
+              <li>এক বিভাগ = এক ফোল্ডার। নতুন বিভাগ এলে নতুন ফোল্ডার, পুরনো ফাইলে ঠেসে ঢোকানো নয়।</li>
+            </ul>
+            <div class="do-dont">
+              <div class="dd good">job-list.js<br/>govt-services/<br/>age-calculator.html</div>
+              <div class="dd bad">JobList Final2.js<br/>নতুন ফোল্ডার/<br/>page-new-copy.html</div>
+            </div>
+          </div>
+          <div class="rule-card">
+            <h3>কোড লেখার নিয়ম</h3>
+            <ul class="rule-list">
+              <li>প্রতিটা ফাইলের একদম উপরে <strong>এক লাইনের মন্তব্য</strong> — এই ফাইলটা কী করে।</li>
+              <li>HTML-এ শুধু কাঠামো, CSS-এ শুধু ডিজাইন, JS-এ শুধু আচরণ — <strong>এক ফাইলে তিনটা মেশানো নয়</strong>।</li>
+              <li>হেডার–ফুটারের মতো <strong>সব পেজে লাগে এমন অংশ</strong> এক জায়গায় (<code>components/</code>) — বদলালে সব পেজে একসাথে বদলাবে।</li>
+              <li>তথ্য কখনো HTML-এর ভেতরে হার্ডকোড নয় — সব <code>data/</code>-এর JSON-এ।</li>
+              <li>ছবি রাখার আগে <strong>কমপ্রেস</strong> করতে হবে — পেজ ভারী হলে মোবাইল ব্যবহারকারীই আগে ভুগবে।</li>
+            </ul>
+          </div>
+          <div class="rule-card">
+            <h3>Git ও Repo-র নিয়ম</h3>
+            <ul class="rule-list">
+              <li>সব আপডেট যাবে একটাই জায়গায়: <code>havencraftbd/seba-website</code> repo-তে।</li>
+              <li>ছোট ছোট <strong>commit</strong> — এক commit-এ একটাই কাজ, মেসেজে পরিষ্কার লেখা কী বদলালো।</li>
+              <li>বড় বা ঝুঁকিপূর্ণ বদলের আগে <strong>branch</strong> খুলে কাজ, ঠিক হলে main-এ মেলানো।</li>
+              <li>ভাঙা কোড কখনো main-এ push নয় — main মানেই লাইভে যাওয়ার যোগ্য।</li>
+            </ul>
+            <div class="do-dont">
+              <div class="dd good">add: নতুন ৫টি সার্কুলার<br/>fix: রেজাল্ট পেজের ভাঙা লিংক</div>
+              <div class="dd bad">update<br/>asdf / final fix</div>
+            </div>
+          </div>
+          <div class="rule-card">
+            <h3>টেক সিদ্ধান্ত (শুরুতে)</h3>
+            <ul class="rule-list">
+              <li><strong>সাধারণ HTML + CSS + JavaScript</strong> — কোনো ফ্রেমওয়ার্ক নয়। শেখা সহজ, লোড দ্রুত, যেকেউ পড়তে পারে।</li>
+              <li>হোস্টিং: <strong>GitHub → Vercel</strong> (চেনা স্ট্যাক, ফ্রি) — push দিলেই অটো ডিপ্লয়।</li>
+              <li>ডেটাবেস <strong>এখনই নয়</strong> — JSON ফাইলেই চলবে। সত্যিকারের দরকার হলে পরে Supabase।</li>
+              <li>বাংলা ফন্ট: <strong>Hind Siliguri</strong> — মোবাইলে পরিষ্কার পড়া যায়।</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 5. Daily update flow ================= -->
+      <section aria-labelledby="s5">
+        <div class="sec-head"><span class="sec-num">০৫</span><h2 id="s5">প্রতিদিনের আপডেট কিভাবে হবে</h2></div>
+        <p class="sec-lede">গঠনটা এমনভাবে বানানো যাতে প্রতিদিনের কাজ — নতুন সার্কুলার বসানো — মাত্র কয়েক মিনিটের হয়, আর ভুল করে ডিজাইন ভাঙার সুযোগই না থাকে।</p>
+        <div class="steps">
+          <div class="step"><span class="s-num">1</span><h4>তথ্য সংগ্রহ</h4><p>অফিসিয়াল সোর্স (সরকারি ওয়েবসাইট / মূল বিজ্ঞপ্তি) থেকে সার্কুলার বা রেজাল্টের তথ্য নেওয়া।</p></div>
+          <div class="step"><span class="s-num">2</span><h4>শুধু ডেটা ফাইল বদলাও</h4><p><code>data/jobs.json</code>-এ নতুন এন্ট্রি যোগ — HTML বা CSS ছোঁয়ার দরকারই নেই।</p></div>
+          <div class="step"><span class="s-num">3</span><h4>Commit + Push</h4><p>পরিষ্কার মেসেজে commit করে GitHub repo-তে push — যেমন <code>add: আজকের সার্কুলার</code>।</p></div>
+          <div class="step"><span class="s-num">4</span><h4>অটো লাইভ</h4><p>Vercel push দেখলেই নিজে থেকে নতুন সংস্করণ লাইভ করে দেবে (সাবডোমেইন যুক্ত হওয়ার পর থেকে)।</p></div>
+        </div>
+      </section>
+
+      <!-- ================= 6. Decisions & next steps ================= -->
+      <section aria-labelledby="s6">
+        <div class="sec-head"><span class="sec-num">০৬</span><h2 id="s6">সিদ্ধান্ত ও পরের ধাপ</h2></div>
+        <div class="grid c2" style="margin-bottom:16px">
+          <div class="warn-card">
+            <h3>নাম নিয়ে সতর্কতা</h3>
+            <p>“Seba” নামটা আপাতত শুধু <strong>টেস্ট প্রজেক্টের কাজের নাম</strong>। বাংলাদেশে <strong>sheba.xyz</strong> নামে বড় পরিচিত ব্র্যান্ড আগে থেকেই আছে — তাই পাবলিক লঞ্চের আগে নামটা নিয়ে আবার সিদ্ধান্ত নিতে হবে, যেন ট্রেডমার্ক বা বিভ্রান্তির ঝামেলা না হয়।</p>
+            <p>ডোমেইন এখন কেনা হচ্ছে না — সাইট ভালো চললে আগে নিজের ডোমেইনের সাবডোমেইন (seba.hvnbd.net), তারপর দরকার হলে আলাদা ডোমেইন।</p>
+          </div>
+          <div class="card">
+            <h3>এই প্ল্যানের বাইরে যা থাকছে না</h3>
+            <ul>
+              <li>এখনই <strong>লাইভ করা হচ্ছে না</strong> — আগে প্ল্যান চূড়ান্ত, তারপর কোড।</li>
+              <li>কোনো <strong>ডেটাবেস বা লগইন সিস্টেম</strong> Phase 1-এ নেই।</li>
+              <li>অন্য সাইটের লেখা <strong>কপি করে বসানো</strong> হবে না — শুধু নিজের ভাষায় গাইড + অফিসিয়াল লিংক।</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3 style="margin-bottom:12px">পরের ধাপের তালিকা</h3>
+        <ul class="checklist">
+          <li>
+            <span class="check-box done" aria-hidden="true">✓</span>
+            <div><p class="done-text"><strong>Repo তৈরি</strong> — havencraftbd/seba-website</p><p class="sub">তৈরি হয়ে গেছে; আগের প্রোটোটাইপের HTML দিয়ে শুরু হয়েছে।</p></div>
+          </li>
+          <li>
+            <span class="check-box done" aria-hidden="true">✓</span>
+            <div><p class="done-text"><strong>Phase 1-এর ৩ বিভাগ ঠিক করা</strong> — চাকরি, রেজাল্ট, সরকারি সেবা</p><p class="sub">গবেষণা রিপোর্টের ভিত্তিতে সিদ্ধান্ত নেওয়া হয়েছে।</p></div>
+          </li>
+          <li>
+            <span class="check-box" aria-hidden="true"></span>
+            <div><p><strong>এই প্ল্যানে মতামত দেওয়া</strong> — গঠন বা ধাপে কিছু বদলাতে চাইলে এখনই</p><p class="sub">প্ল্যান চূড়ান্ত না হলে কোড শুরু হবে না — বদল এখন সস্তা, কোড লেখার পর দামি।</p></div>
+          </li>
+          <li>
+            <span class="check-box" aria-hidden="true"></span>
+            <div><p><strong>Repo-তে ফোল্ডার গঠন বসানো</strong> — এই পেজের ট্রি অনুযায়ী খালি কাঠামো + README</p><p class="sub">প্রতিটা ফোল্ডারে ছোট্ট README থাকবে, যাতে নতুন কেউ এসেই বুঝতে পারে।</p></div>
+          </li>
+          <li>
+            <span class="check-box" aria-hidden="true"></span>
+            <div><p><strong>Phase 1-এর পেজগুলো নতুন গঠনে সাজানো</strong> — আগের প্রোটোটাইপ ভেঙে ফোল্ডার অনুযায়ী ভাগ করা</p><p class="sub">ডেটা আলাদা করে data/ ফোল্ডারের JSON-এ নিয়ে যাওয়া হবে।</p></div>
+          </li>
+          <li>
+            <span class="check-box" aria-hidden="true"></span>
+            <div><p><strong>সাবডোমেইনে টেস্ট লাইভ</strong> — seba.hvnbd.net (Vercel + DNS)</p><p class="sub">শুধু পেজগুলো ঠিকমতো চললেই — তাড়াহুড়ো নয়।</p></div>
+          </li>
+        </ul>
+      </section>
+
+      <footer>
+        Seba — টেস্ট প্রজেক্টের পরিকল্পনা পেজ। Repo:
+        <a href="https://github.com/havencraftbd/seba-website" target="_blank" rel="noopener">github.com/havencraftbd/seba-website</a>
+        · এই প্ল্যান বদলালে আগে এই পেজ আর repo-র <span class="mono">docs/PLAN.md</span> — দুই জায়গাতেই বদলাতে হবে, যেন দুটো কখনো আলাদা কথা না বলে।
+      </footer>
     </div>
-    <div class="card" style="background:var(--green);color:#fff;border-color:transparent">
-      <h3 style="color:#fff">সবচেয়ে বড় সুযোগ</h3>
-      <p style="font-size:32px;font-weight:800;line-height:1;margin:6px 0;font-family:Inter">64.4%</p>
-      <p style="margin:0;opacity:.92">ইন্টারনেট ব্যবহারকারী গত ৩ মাসে <strong>সরকারি চাকরি</strong> খুঁজেছে — BBS জরিপে মাপা সব উদ্দেশ্যের মধ্যে এটাই সর্বোচ্চ। তাই চাকরি হবে এই সাইটের প্রাণ, বাকি সব তার চারপাশে।</p>
-      <p style="font-size:12px;opacity:.8;margin:10px 0 0">সূত্র: BBS ICT Survey, এপ্রিল ২০২৬ (Financial Express)</p>
-    </div>
-  </div>
-</header>
 
-<div class="kpis">
-  <div class="kpi"><b>95.3M</b><span>ইন্টারনেট ব্যবহারকারী (ব্যক্তি হিসেবে) — জনসংখ্যার ৫৩.৪%</span><small>DataReportal Digital 2027, অক্টো ২০২৬*</small></div>
-  <div class="kpi"><b>137.66M</b><span>সক্রিয় ইন্টারনেট সাবস্ক্রিপশন / SIM — একজনের একাধিক থাকতে পারে</span><small>BTRC, আগস্ট ২০২৬</small></div>
-  <div class="kpi"><b>49.8%</b><span>ব্যবহারকারী গত ৩ মাসে খেলার কন্টেন্ট দেখেছে</span><small>BBS, এপ্রিল ২০২৬</small></div>
-  <div class="kpi"><b>11.6%</b><span>মাত্র এতজন গত ৩ মাসে অনলাইনে কেনাকাটা করেছে — শপিং নিয়ে কথা বেশি, কাজ কম</span><small>BBS, এপ্রিল ২০২৬</small></div>
-</div>
-<p style="font-size:12px;color:var(--muted);margin:-6px 0 0">* সতর্কতা: DataReportal-এর ২০২৫-এর 82.8M আর ২০২৬-এর 95.3M সরাসরি তুলনীয় নয় — উৎসের ডেটা “significantly revised” হয়েছে বলে প্রতিষ্ঠানটি নিজেই সতর্ক করেছে। BTRC গোনে SIM, BBS গোনে মানুষের জবাব — তিনটি সংখ্যা এক লাইনে মেলানো যাবে না।</p>
+    <script>
+      /* ---------- Phase tabs ---------- */
+      var tabBtns = document.querySelectorAll(".tab-btn");
+      tabBtns.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          tabBtns.forEach(function (b) { b.setAttribute("aria-selected", "false"); });
+          btn.setAttribute("aria-selected", "true");
+          document.querySelectorAll(".tab-panel").forEach(function (p) { p.classList.remove("active"); });
+          document.getElementById("panel-" + btn.getAttribute("data-tab")).classList.add("active");
+        });
+      });
 
-<h2>মানুষ আসলে কোথায় যায় — অক্টোবর ২০২৬</h2>
-<p class="sub">Semrush-এর যাচাইকৃত শীর্ষ ওয়েবসাইট (মাসিক ভিজিট)। তোমার সাইটকে এই অভ্যাসের <em>বিপরীতে</em> নয়, <em>পাশে</em> দাঁড়াতে হবে — Google থেকে ট্রাফিক নিয়ে, Facebook/YouTube দিয়ে ছড়িয়ে।</p>
-<div class="card" id="chart"></div>
-<p style="font-size:12px;color:var(--muted)">সূত্র: Semrush Trending Websites BD, অক্টোবর ২০২৬ — ২৩ নভেম্বর ২০২৬ সরাসরি যাচাইকৃত। এগুলো ওয়েব ভিজিট, অ্যাপ ব্যবহার নয়; TikTok/WhatsApp অ্যাপে এর চেয়ে অনেক বড়। ChatGPT-র +১২৬% আর Claude-এর +১,৪৯৭% YoY বৃদ্ধি দেখায় AI এখন মূলধারার চাহিদা।</p>
+      /* ---------- File tree data ---------- */
+      var NODES = {
+        root: { path: "seba-website/", title: "পুরো প্রজেক্ট", desc: "এটাই GitHub repo-র মূল গঠন। বামদিকের যেকোনো ফোল্ডার বা ফাইলে ক্লিক করলে এখানে দেখা যাবে সেটা কেন আছে, ভেতরে কী থাকবে, আর সেটা বদলালে কী হবে।", rule: "<strong>সোনালি নিয়ম:</strong> নতুন কিছু যোগ করার আগে ভাবতে হবে — এটা কোন ফোল্ডারে যায়? উত্তর পরিষ্কার না হলে গঠনটাই আবার ভাবতে হবে, জোর করে কোথাও ঢোকানো যাবে না।" },
+        readme: { path: "seba-website/README.md", title: "README.md — প্রজেক্টের দরজা", desc: "Repo খুললেই সবার আগে যেটা দেখা যায়। এতে থাকবে: সাইটটা কী, কিভাবে লোকাল কম্পিউটারে চালাতে হয়, ফোল্ডার গঠনের ছোট মানচিত্র, আর আপডেট করার নিয়মের লিংক।", rule: "<strong>নিয়ম:</strong> গঠনে বড় বদল এলে README-ও একই commit-এ বদলাতে হবে — নাহলে নতুন মানুষ পুরনো মানচিত্র দেখে পথ হারাবে।" },
+        index: { path: "seba-website/index.html", title: "index.html — হোমপেজ", desc: "সাইটের প্রধান পেজ: বড় সার্চ বক্স, আজকের নতুন সার্কুলার, ৩ বিভাগের প্রবেশপথ, আর ছোট টুলগুলোর লিংক। এতে শুধু কাঠামো থাকবে — তথ্য আসবে data/ থেকে JavaScript দিয়ে।", rule: "<strong>নিয়ম:</strong> হোমপেজে সরাসরি কোনো সার্কুলারের তথ্য লেখা যাবে না — সব তথ্য JSON থেকে আসবে, যাতে আপডেট মানেই শুধু ডেটা ফাইল বদলানো।" },
+        docs: { path: "seba-website/docs/", title: "docs/ — সব লেখালেখি ও সিদ্ধান্ত", desc: "কোড নয়, প্রজেক্টের মস্তিষ্ক। প্ল্যান, আপডেটের গাইড, ডিজাইনের নিয়ম — যা যা ভবিষ্যতে দরকার পড়বে, সব এখানে লেখা থাকবে। ছয় মাস পর নিজের নেওয়া সিদ্ধান্তও এখানেই খুঁজে পাওয়া যাবে।", rule: "<strong>নিয়ম:</strong> বড় কোনো সিদ্ধান্ত নিলে এখানে এক লাইন লিখে রাখতে হবে — কেন নেওয়া হলো।" },
+        plan: { path: "seba-website/docs/PLAN.md", title: "PLAN.md — এই প্ল্যানটাই", desc: "এই পেজের লেখা সংস্করণ, repo-র ভেতরে রাখা। কোন ধাপে কী থাকবে, কোনটা কেন পেছানো হলো — সব সিদ্ধান্তের মূল কপি এটাই।", rule: "<strong>নিয়ম:</strong> প্ল্যান বদলালে আগে এখানে বদলাতে হবে, তারপর কোডে।" },
+        updateguide: { path: "seba-website/docs/UPDATE-GUIDE.md", title: "UPDATE-GUIDE.md — প্রতিদিনের আপডেটের নিয়ম", desc: "নতুন সার্কুলার বা রেজাল্ট কিভাবে বসাতে হয়, ধাপে ধাপে স্ক্রিনশট ছাড়াই বোঝা যায় এমন করে লেখা। যে কেউ — এমনকি প্রথম দিনের মানুষও — এই গাইড পড়ে আপডেট দিতে পারবে।", rule: "<strong>নিয়ম:</strong> আপডেটের পদ্ধতি বদলালে গাইডটাও একই দিনে বদলাতে হবে।" },
+        assets: { path: "seba-website/assets/", title: "assets/ — ডিজাইনের সব জিনিসপত্র", desc: "যা যা দেখতে সুন্দর করে আর চালায় — স্টাইল, স্ক্রিপ্ট, ছবি, আইকন। কোডের লজিক বা তথ্য এখানে থাকে না; থাকে শুধু সাইটের ‘চেহারা ও আচরণের’ সরঞ্জাম।", rule: "<strong>নিয়ম:</strong> পেজ-নির্দিষ্ট জিনিস assets-এর ভেতরেও আলাদা ফাইলে — একটা dev পেজের স্টাইল অন্য পেজে গিয়ে লাগবে না।" },
+        css: { path: "seba-website/assets/css/", title: "css/ — সব স্টাইল", desc: "সাইটের পুরো ডিজাইন এখানে, তিন ভাগে ভাগ করা: মূল রং ও ফন্ট, পুনঃব্যবহারযোগ্য অংশ (বাটন, কার্ড), আর পেজভিত্তিক স্টাইল।", rule: "<strong>নিয়ম:</strong> রং বা ফন্ট বদলাতে হলে শুধু main.css — এক জায়গা বদলালেই পুরো সাইট বদলে যাবে।" },
+        maincss: { path: "seba-website/assets/css/main.css", title: "main.css — রং, ফন্ট, ভিত্তি", desc: "পুরো সাইটের রং (সবুজ প্রধান রং, গাঢ় লেখা), Hind Siliguri ফন্ট, আর সব পেজে লাগে এমন মৌলিক নিয়ম। প্রতিটা পেজ সবার আগে এই ফাইলটা লোড করে।", rule: "<strong>নিয়ম:</strong> রং কখনো সরাসরি সংখ্যা দিয়ে অন্য ফাইলে লেখা নয় — সব রং এখানকার variable থেকে নিতে হবে।" },
+        compcss: { path: "seba-website/assets/css/components.css", title: "components.css — বাটন, কার্ড, ফর্ম", desc: "বারবার ব্যবহৃত অংশগুলোর ডিজাইন: বাটন, চাকরির কার্ড, সার্চ বক্স, ট্যাব। একবার এখানে ঠিক করলে সাইটের সব জায়গায় একসাথে ঠিক হয়ে যায়।", rule: "<strong>নিয়ম:</strong> একই ডিজাইন দুই জায়গায় কপি করা যাবে না — দরকার হলে এখানে component বানাতে হবে।" },
+        pagescss: { path: "seba-website/assets/css/pages.css", title: "pages.css — পেজভিত্তিক স্টাইল", desc: "যে স্টাইল শুধু একটা পেজেই লাগে — যেমন রেজাল্ট পেজের বোর্ডের তালিকা বা গাইড পেজের ধাপের নকশা। সাইট বড় হলে এটা পেজ অনুযায়ী আলাদা ফাইলে ভাগ হবে।", rule: "<strong>নিয়ম:</strong> কোনো স্টাইল দ্বিতীয় পেজে লাগলেই সেটা components.css-এ উঠে যাবে।" },
+        js: { path: "seba-website/assets/js/", title: "js/ — সব JavaScript", desc: "সাইটের আচরণ: ডেটা লোড করা, সার্চ, ফিল্টার, টুলের হিসাব। প্রতিটা ফাইল একটা কাজের জন্য — নাম দেখলেই বোঝা যাবে কোনটা কী চালায়।", rule: "<strong>নিয়ম:</strong> এক ফাইলের কোড অন্য ফাইলের ভেতরের জিনিসের ওপর নির্ভর করবে না — দরকার হলে data-loader দিয়ে ডেটা নেবে।" },
+        mainjs: { path: "seba-website/assets/js/main.js", title: "main.js — সব পেজে চলে", desc: "প্রতিটা পেজ লোড হলেই যেগুলো লাগে: হেডার–ফুটার বসানো, মেনু, সাধারণ সেটআপ। খুব হালকা রাখা হবে, যাতে পেজ ধীর না হয়।", rule: "<strong>নিয়ম:</strong> শুধু একটা পেজে লাগে এমন কোড এখানে ঢোকানো যাবে না।" },
+        loader: { path: "seba-website/assets/js/data-loader.js", title: "data-loader.js — ডেটা আনার কাজ", desc: "data/ ফোল্ডারের JSON ফাইল পড়ে পেজে তথ্য বসানোর একমাত্র জায়গা। চাকরি, রেজাল্ট, সেবা — সব পেজ এই একই পথে ডেটা পায়।", rule: "<strong>নিয়ম:</strong> JSON পড়ার কোড অন্য কোথাও দ্বিতীয়বার লেখা যাবে না।" },
+        searchjs: { path: "seba-website/assets/js/search.js", title: "search.js — সার্চ ও ফিল্টার", desc: "হোমপেজের বড় সার্চ বক্স আর চাকরির পেজের ক্যাটাগরি ফিল্টারের লজিক। বাংলা ও ইংরেজি — দুই ভাষাতেই খুঁজতে পারবে।", rule: "<strong>নিয়ম:</strong> সার্চ শুধু data/ এর তথ্যের মধ্যে খুঁজবে — আলাদা করে তথ্য এখানে রাখা নয়।" },
+        images: { path: "seba-website/assets/images/", title: "images/ — সব ছবি", desc: "বিভাগ অনুযায়ী সাব-ফোল্ডারে ছবি। আপলোডের আগে কমপ্রেস করা বাধ্যতামূলক — বাংলাদেশের ধীর ইন্টারনেটে ভারী ছবি মানেই ব্যবহারকারী হারানো।", rule: "<strong>নিয়ম:</strong> একটা ছবি সর্বোচ্চ ~200KB। নাম হবে বিষয় অনুযায়ী, যেমন nid-guide-step-1.jpg।" },
+        icons: { path: "seba-website/assets/icons/", title: "icons/ — সব আইকন", desc: "ছোট SVG আইকনগুলো — চাকরি, রেজাল্ট, সেবা, সার্চ। SVG হওয়ায় যেকোনো সাইজে পরিষ্কার দেখায় আর ওজন প্রায় শূন্য।", rule: "<strong>নিয়ম:</strong> আইকন সবসময় SVG — PNG আইকন ব্যবহার করা যাবে না।" },
+        data: { path: "seba-website/data/", title: "data/ — সাইটের সব তথ্য (JSON)", desc: "এই ফোল্ডারটাই সাইটের প্রাণ। প্রতিদিনের আপডেট মানে এই ফোল্ডারের ফাইল বদলানো। ডিজাইন বা কোড না ছুঁয়েই নতুন সার্কুলার, নতুন রেজাল্ট, নতুন গাইড যোগ করা যায়।", rule: "<strong>সোনালি নিয়ম:</strong> তথ্য শুধু এখানেই থাকবে। HTML-এর ভেতরে তথ্য লিখে রাখলে আপডেট করা কঠিন হয়ে যায় — সেটাই পুরনো প্রোটোটাইপের সবচেয়ে বড় দুর্বলতা ছিল।" },
+        jobsjson: { path: "seba-website/data/jobs.json", title: "jobs.json — সব সার্কুলার", desc: "প্রতিটা চাকরির একটা করে এন্ট্রি: পদের নাম, প্রতিষ্ঠান, পদসংখ্যা, শেষ তারিখ, ক্যাটাগরি, অফিসিয়াল লিংক। নতুন সার্কুলার এলে শুধু এখানে একটা এন্ট্রি যোগ — চাকরির পেজ নিজে থেকেই দেখিয়ে দেবে।", rule: "<strong>নিয়ম:</strong> শেষ তারিখ পেরিয়ে যাওয়া সার্কুলার প্রতি সপ্তাহে পরিষ্কার করতে হবে।" },
+        resultsjson: { path: "seba-website/data/results.json", title: "results.json — রেজাল্টের তথ্য", desc: "কোন পরীক্ষার রেজাল্ট বের হয়েছে, কোন বোর্ডের লিংক কোনটা, SMS-এর নিয়ম — সব এখানে। রেজাল্টের দিন শুধু এই ফাইলটা আপডেট করলেই পুরো পেজ তৈরি।", rule: "<strong>নিয়ম:</strong> রেজাল্টের লিংক সবসময় অফিসিয়াল বোর্ডের সাইটের হবে — তৃতীয় পক্ষের সাইটের নয়।" },
+        servicesjson: { path: "seba-website/data/services.json", title: "services.json — সরকারি সেবার গাইড", desc: "NID, পাসপোর্ট, জন্ম নিবন্ধন, নামজারি, আয়কর, ট্রেন টিকিট — প্রতিটা সেবার ধাপগুলো ক্রম অনুযায়ী সাজানো, সাথে অফিসিয়াল পোর্টালের লিংক আর ফি।", rule: "<strong>নিয়ম:</strong> সরকারি ফি বা নিয়ম বদলালে এখানে আপডেট করে তারিখসহ নোট রাখতে হবে — পুরনো ফি দেখানো যাবে না।" },
+        pricesjson: { path: "seba-website/data/prices.json", title: "prices.json — দৈনন্দিন দাম", desc: "মোবাইলের দাম, সোনার দাম, ডলার রেট — Phase 2-তে চালু হবে। ফাইলটার জায়গা এখনই ঠিক করে রাখা হলো, যাতে পরে এলে গঠন বদলাতে না হয়।", rule: "<strong>নিয়ম:</strong> প্রতিটা দামের সাথে ‘শেষ আপডেটের তারিখ’ বাধ্যতামূলকভাবে থাকবে।", tag: "Phase 2" },
+        components: { path: "seba-website/components/", title: "components/ — সব পেজে লাগে এমন অংশ", desc: "হেডার (লোগো + মেনু) আর ফুটার — প্রতিটা পেজে একই রকম থাকে। এগুলো এখানে একবার লিখলেই সব পেজে চলে যাবে; মেনুতে নতুন বিভাগ যোগ করা মানে এক জায়গায় বদল।", rule: "<strong>নিয়ম:</strong> কোনো পেজে আলাদা করে হেডার কপি করা যাবে না — সবসময় এখান থেকেই আসবে।" },
+        headerjs: { path: "seba-website/components/header.js", title: "header.js — উপরের অংশ", desc: "লোগো, প্রধান মেনু (চাকরি, রেজাল্ট, সরকারি সেবা) আর মোবাইলের মেনু বাটন। প্রতিটা পেজ লোডের সময় এটা বসে যায়।", rule: "<strong>নিয়ম:</strong> নতুন বিভাগ এলে মেনু বদলানোর জায়গা শুধু এই ফাইল।" },
+        footerjs: { path: "seba-website/components/footer.js", title: "footer.js — নিচের অংশ", desc: "যোগাযোগ, দরকারি লিংক, আর ‘তথ্যের সোর্স অফিসিয়াল সাইট’ — এই ঘোষণা। সব পেজে একই ফুটার।", rule: "<strong>নিয়ম:</strong> ফুটারের লিংক ভাঙলে সব পেজে ভাঙে — বদলের পর সব পেজ একবার দেখে নিতে হবে।" },
+        pages: { path: "seba-website/pages/", title: "pages/ — ভেতরের সব পেজ", desc: "হোমপেজ ছাড়া বাকি সব পেজ, বিভাগ অনুযায়ী ফোল্ডারে ভাগ করা। প্রতিটা বিভাগের নিজের ফোল্ডার — ভবিষ্যতে নতুন বিভাগ এলে এখানে শুধু আরেকটা ফোল্ডার বাড়বে, পুরনো কিছু বদলাতে হবে না।", rule: "<strong>নিয়ম:</strong> পেজের ফাইলে শুধু কাঠামো — তথ্য আসবে data/ থেকে, ডিজাইন আসবে assets/css থেকে।" },
+        jobspage: { path: "seba-website/pages/jobs/", title: "jobs/ — চাকরির পেজগুলো", desc: "সার্কুলারের তালিকা (index.html) আর একটা সার্কুলারের বিস্তারিত পেজ (details.html)। তালিকার পেজটা jobs.json থেকে নিজে নিজে তৈরি হয় — নতুন সার্কুলারের জন্য নতুন পেজ বানাতে হয় না।", rule: "<strong>নিয়ম:</strong> বিস্তারিত পেজ একটাই টেমপ্লেট — কোন সার্কুলার দেখাবে, সেটা লিংকের প্যারামিটার দেখে ঠিক হয়।" },
+        resultspage: { path: "seba-website/pages/results/", title: "results/ — রেজাল্টের পেজ", desc: "SSC/HSC ও চাকরির রেজাল্টের একটাই পেজ — সব বোর্ডের লিংক, ধাপে ধাপে নিয়ম আর SMS পদ্ধতি। রেজাল্টের দিন এই পেজটাই সাইটের সবচেয়ে ব্যস্ত পেজ হবে।", rule: "<strong>নিয়ম:</strong> পেজটা হালকা রাখতে হবে — রেজাল্টের দিন হাজার হাজার মানুষ একসাথে আসবে।" },
+        servicespage: { path: "seba-website/pages/services/", title: "services/ — সরকারি সেবার পেজগুলো", desc: "সব সেবার তালিকা (index.html) আর প্রতিটা সেবার আলাদা গাইড পেজ (guide.html) — ধাপ, ফি, প্রয়োজনীয় কাগজ, অফিসিয়াল লিংক।", rule: "<strong>নিয়ম:</strong> গাইডের ধাপগুলো services.json থেকে আসবে — নতুন সেবা যোগ করা মানে শুধু ডেটা যোগ।" },
+        toolspage: { path: "seba-website/pages/tools/", title: "tools/ — ছোট ক্যালকুলেটর ও টুল", desc: "বয়স ক্যালকুলেটর, BMI ক্যালকুলেটর — প্রতিটা টুলের নিজের ছোট্ট পেজ। এগুলো একবার বানালে আর আপডেট লাগে না, কিন্তু মানুষ বারবার ফিরে আসে।", rule: "<strong>নিয়ম:</strong> এক টুল = এক ফাইল। টুলের হিসাবের কোড ওই ফাইলের সাথেই থাকবে।" }
+      };
 
-<h2>সর্বোচ্চ তালিকা — ১৪টি বিভাগে যা যা থাকতে পারে</h2>
-<p class="sub">ফিল্টার দিয়ে ধাপ অনুযায়ী দেখো। Phase 1 = শুরুতে অবশ্যই, Phase 2 = ট্রাফিক এলে, Phase 3 = বড় হলে। প্রতিটি কার্ডে “কেন” ঘরে গবেষণার প্রমাণ দেওয়া আছে।</p>
-<div class="filters" role="group" aria-label="ধাপ ফিল্টার">
-  <button class="chip active" data-f="all">সব ১৪টি</button>
-  <button class="chip" data-f="p1">Phase 1 — শুরু</button>
-  <button class="chip" data-f="p2">Phase 2 — সম্প্রসারণ</button>
-  <button class="chip" data-f="p3">Phase 3 — পূর্ণাঙ্গ</button>
-</div>
-<div class="grid" id="modules"></div>
+      var TREE = [
+        { id: "root", name: "seba-website", folder: true, children: [
+          { id: "index", name: "index.html" },
+          { id: "readme", name: "README.md" },
+          { id: "docs", name: "docs", folder: true, children: [
+            { id: "plan", name: "PLAN.md" },
+            { id: "updateguide", name: "UPDATE-GUIDE.md" }
+          ]},
+          { id: "assets", name: "assets", folder: true, children: [
+            { id: "css", name: "css", folder: true, children: [
+              { id: "maincss", name: "main.css" },
+              { id: "compcss", name: "components.css" },
+              { id: "pagescss", name: "pages.css" }
+            ]},
+            { id: "js", name: "js", folder: true, children: [
+              { id: "mainjs", name: "main.js" },
+              { id: "loader", name: "data-loader.js" },
+              { id: "searchjs", name: "search.js" }
+            ]},
+            { id: "images", name: "images", folder: true, children: [] },
+            { id: "icons", name: "icons", folder: true, children: [] }
+          ]},
+          { id: "data", name: "data", folder: true, children: [
+            { id: "jobsjson", name: "jobs.json" },
+            { id: "resultsjson", name: "results.json" },
+            { id: "servicesjson", name: "services.json" },
+            { id: "pricesjson", name: "prices.json", tag: "Phase 2" }
+          ]},
+          { id: "components", name: "components", folder: true, children: [
+            { id: "headerjs", name: "header.js" },
+            { id: "footerjs", name: "footer.js" }
+          ]},
+          { id: "pages", name: "pages", folder: true, children: [
+            { id: "jobspage", name: "jobs", folder: true, children: [] },
+            { id: "resultspage", name: "results", folder: true, children: [] },
+            { id: "servicespage", name: "services", folder: true, children: [] },
+            { id: "toolspage", name: "tools", folder: true, children: [] }
+          ]}
+        ]}
+      ];
 
-<h2>হোমপেজটা কেমন হবে?</h2>
-<p class="sub">উপরে সার্চ, তার নিচে এক-ট্যাপের কাজ — কোনো লম্বা স্ক্রল বা সাজানো ব্যানার নয়। গ্রামের কম দামি ফোনেও যেন দ্রুত খোলে: BBS বলছে খরচই অ-ব্যবহারকারীদের প্রধান বাধা (৪৩.৬%), আর শহরে ইন্টারনেট ব্যবহার ৭৫.৭% হলেও গ্রামে মাত্র ৪৩.৬%।</p>
-<div class="mock" aria-label="হোমপেজের কাঠামো">
-  <div class="mock-head"><strong>Daily Help BD</strong><span>আজ: চাকরি • রেজাল্ট • স্কোর • দাম</span></div>
-  <div class="mock-search">🔍 &nbsp;কী খুঁজছেন? যেমন: “প্রাইমারি শিক্ষক সার্কুলার”, “HSC রেজাল্ট”, “সোনার দাম”</div>
-  <div class="tiles">
-    <div class="tile">💼 আজকের চাকরি<span>নতুন সার্কুলার</span></div>
-    <div class="tile">🎓 রেজাল্ট<span>SSC / HSC</span></div>
-    <div class="tile">🏏 লাইভ স্কোর<span>ক্রিকেট</span></div>
-    <div class="tile">🏛️ সরকারি সেবা<span>NID • পাসপোর্ট</span></div>
-    <div class="tile">📱 মোবাইলের দাম<span>আজকের প্রাইস</span></div>
-    <div class="tile">💰 টাকার রেট<span>ডলার • সোনা • MFS</span></div>
-    <div class="tile">🤖 AI সাহায্য<span>পড়া • লেখা • CV</span></div>
-    <div class="tile">📰 আজকের খবর<span>সংক্ষেপে</span></div>
-  </div>
-  <div style="padding:0 16px 18px;display:grid;gap:10px">
-    <div style="background:var(--surface2);border-radius:12px;padding:12px 14px"><strong>🔥 আজ সবচেয়ে বেশি খোঁজা হচ্ছে</strong><br><span style="color:var(--muted);font-size:14px">দৈনিক ট্রেন্ডিং থেকে নেওয়া লাইভ তালিকা — যেমন ১৮ নভেম্বর ২০২৬-এ চাকরি (চাকরি), ডিম, আগুন ছিল শীর্ষে।</span></div>
-    <div style="background:var(--surface2);border-radius:12px;padding:12px 14px"><strong>⏰ ডেডলাইন রিমাইন্ডার</strong><br><span style="color:var(--muted);font-size:14px">আবেদনের শেষ তারিখ, পরীক্ষার তারিখ, রেজাল্টের দিন — এক নজরে।</span></div>
-  </div>
-</div>
+      var treeEl = document.getElementById("fileTree");
+      function buildTree(nodes, parent) {
+        nodes.forEach(function (n) {
+          var li = document.createElement("li");
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.setAttribute("data-node", n.id);
+          var icon = document.createElement("span");
+          icon.className = "ic";
+          icon.textContent = n.folder ? "▸" : "·";
+          icon.setAttribute("aria-hidden", "true");
+          var label = document.createElement("span");
+          label.className = n.folder ? "folder-name" : "file-name";
+          label.textContent = n.name + (n.folder ? "/" : "");
+          btn.appendChild(icon);
+          btn.appendChild(label);
+          if (n.tag) {
+            var t = document.createElement("span");
+            t.className = "tag-new";
+            t.textContent = n.tag;
+            btn.appendChild(t);
+          }
+          btn.addEventListener("click", function () { selectNode(n.id, btn); });
+          li.appendChild(btn);
+          if (n.children && n.children.length) {
+            var ul = document.createElement("ul");
+            li.appendChild(ul);
+            buildTree(n.children, ul);
+          }
+          parent.appendChild(li);
+        });
+      }
+      buildTree(TREE, treeEl);
 
-<h2>তিন ধাপের রোডম্যাপ</h2>
-<div class="tabs">
-  <button class="tab active" data-t="0">Phase 1 — লঞ্চ (মাস ১–২)</button>
-  <button class="tab" data-t="1">Phase 2 — বৃদ্ধি (মাস ৩–৬)</button>
-  <button class="tab" data-t="2">Phase 3 — পূর্ণাঙ্গ (মাস ৭–১২)</button>
-</div>
-<div class="phase-panel" id="phasePanel"></div>
+      var dPath = document.getElementById("dPath"),
+          dTitle = document.getElementById("dTitle"),
+          dDesc = document.getElementById("dDesc"),
+          dRule = document.getElementById("dRule");
 
-<h2>ডিজাইন ও কন্টেন্টের নিয়ম — ডেটা যা বলে</h2>
-<div class="two">
-  <div class="card"><h3>📱 মোবাইল-ফার্স্ট, হালকা পেজ</h3><p style="color:var(--muted);margin:0">মোবাইল ইন্টারনেট সাবস্ক্রিপশন ১২২.২৬M (মোটের ৮৮.৮%, BTRC)। মাত্র ১১.৩% মানুষ কম্পিউটার ব্যবহার করে (BBS)। তাই: ছোট ছবি, কম ডেটা, অফলাইনে পড়া যায় এমন গাইড, বড় ট্যাপ বাটন। 4G-ই প্রধান (১২২.৭১M), মধ্যম মোবাইল স্পিড ৩৮.৬৭ Mbps (Ookla/DataReportal)।</p></div>
-  <div class="card"><h3>🗣️ বাংলা আগে, ইংরেজি পাশে</h3><p style="color:var(--muted);margin:0">একই দিনে ইংরেজিতে ক্রিকেট (“ban u19 vs pak u19”) আর বাংলায় চাকরি/সরকারি শব্দ (চাকরি, জনপ্রশাসন মন্ত্রণালয়) ট্রেন্ড করে। চাকরি-শিক্ষা-সেবা = বাংলা; ফোন-টেক-ক্রিকেট = ইংরেজি + বাংলা দুটোই। BBS: ৮৪.৪% ব্যবহারকারী কপি-পেস্ট পারে, জটিল কাজ কম — তাই ভিডিও/ভয়েস-বান্ধব, সহজ ভাষা।</p></div>
-  <div class="card"><h3>👥 তরুণরাই প্রধান দর্শক</h3><p style="color:var(--muted);margin:0">জনসংখ্যার মধ্যম বয়স ২৬.৩ বছর। Facebook-এর সবচেয়ে বড় বয়স-দল ১৮–২৪ (২৮.১M, NapoleonCat সেপ্টেম্বর ২০২৬)। TikTok ১৮+ বিজ্ঞাপন পৌঁছ ৬৮.৩M — সব প্ল্যাটফর্মের মধ্যে সর্বোচ্চ (DataReportal)। ছোট ভিডিও দিয়ে সাইটে আনা হবে মূল কৌশল।</p></div>
-  <div class="card"><h3>⚖️ লিঙ্গ ও শহর-গ্রাম ফাঁক মাথায় রাখো</h3><p style="color:var(--muted);margin:0">অনলাইনে পুরুষ ৫৬.৬% বনাম নারী ৫০.২% (BBS); শহর ৭৫.৭% বনাম গ্রাম ৪৩.৬% — ব্যবধান ৩২.১ পয়েন্ট। ঢাকা বিভাগ সর্বোচ্চ (৬৫.৪%), ময়মনসিংহ সর্বনিম্ন (৩৭.৮%)। নারী ও গ্রামের ব্যবহারকারীর জন্য সহজ, কম-খরচের কন্টেন্ট আলাদা করে ভাবতে হবে।</p></div>
-</div>
+      function selectNode(id, btn) {
+        var info = NODES[id];
+        if (!info) return;
+        document.querySelectorAll(".tree button").forEach(function (b) { b.classList.remove("selected"); });
+        if (btn) btn.classList.add("selected");
+        dPath.textContent = info.path;
+        dTitle.textContent = info.title;
+        dDesc.textContent = info.desc;
+        dRule.innerHTML = info.rule;
+      }
+      /* Default selection: data folder — the heart of the plan */
+      var defaultBtn = document.querySelector('[data-node="data"]');
+      selectNode("data", defaultBtn);
 
-<h2>কোনটা আগে, কোনটা পরে — অগ্রাধিকার ছক</h2>
-<div class="card" style="overflow-x:auto">
-<table>
-<tr><th>বিভাগ</th><th>চাহিদার প্রমাণ</th><th>ফেরত আসবে?</th><th>কঠিনতা</th><th>সিদ্ধান্ত</th></tr>
-<tr><td><strong>চাকরি</strong></td><td>৬৪.৪% সরকারি চাকরি খুঁজেছে (BBS)</td><td>প্রতিদিন</td><td>মাঝারি</td><td>Phase 1</td></tr>
-<tr><td><strong>রেজাল্ট ও শিক্ষা</strong></td><td>HSC ২০২৬: ১,২৭০,৫৮৩ পরীক্ষার্থী, পাস ৫২.১২%</td><td>মৌসুমে প্রবল</td><td>সহজ</td><td>Phase 1</td></tr>
-<tr><td><strong>সরকারি সেবা গাইড</strong></td><td>NID, পাসপোর্ট, ভূমি, ট্যাক্স — useful-sites তালিকায় প্রধান</td><td>প্রয়োজনে বারবার</td><td>সহজ</td><td>Phase 1</td></tr>
-<tr><td><strong>ক্রিকেট স্কোর</strong></td><td>৪৯.৮% খেলার কন্টেন্ট; ম্যাচের দিনে scorecard ট্রেন্ডিং শীর্ষে</td><td>ম্যাচের দিনে</td><td>কঠিন (লাইভ ডেটা)</td><td>Phase 2</td></tr>
-<tr><td><strong>দাম (ফোন/সোনা/রেট)</strong></td><td>MobileDokan 5.4M ভিজিট/মাস — রিটেইলে #১ (Semrush)</td><td>সাপ্তাহিক</td><td>মাঝারি</td><td>Phase 1–2</td></tr>
-<tr><td><strong>AI হেল্প</strong></td><td>ChatGPT #৪ ওয়েবসাইট, 50.25M ভিজিট, +১২৬% YoY</td><td>প্রতিদিন</td><td>সহজ (গাইড)</td><td>Phase 2</td></tr>
-<tr><td><strong>শপিং</strong></td><td>মাত্র ১১.৬% অনলাইনে কিনেছে; COD ৮৫–৯০% (আনুমানিক)</td><td>কম</td><td>মাঝারি</td><td>Phase 3</td></tr>
-</table>
-</div>
+      /* ---------- Copy tree as plain text ---------- */
+      var TREE_TEXT = [
+        "seba-website/",
+        "├── index.html              # হোমপেজ",
+        "├── README.md               # প্রজেক্টের পরিচিতি ও চালানোর নিয়ম",
+        "├── docs/",
+        "│   ├── PLAN.md             # পূর্ণাঙ্গ প্ল্যান",
+        "│   └── UPDATE-GUIDE.md     # প্রতিদিনের আপডেটের গাইড",
+        "├── assets/",
+        "│   ├── css/                # main.css, components.css, pages.css",
+        "│   ├── js/                 # main.js, data-loader.js, search.js",
+        "│   ├── images/             # সব ছবি (কমপ্রেস করা)",
+        "│   └── icons/              # সব SVG আইকন",
+        "├── data/                   # সব তথ্য (JSON)",
+        "│   ├── jobs.json           # সার্কুলার",
+        "│   ├── results.json        # রেজাল্ট",
+        "│   ├── services.json       # সরকারি সেবার গাইড",
+        "│   └── prices.json         # দাম (Phase 2)",
+        "├── components/             # header.js, footer.js",
+        "└── pages/",
+        "    ├── jobs/               # চাকরির পেজ",
+        "    ├── results/            # রেজাল্টের পেজ",
+        "    ├── services/           # সরকারি সেবার পেজ",
+        "    └── tools/              # ক্যালকুলেটর ও টুল"
+      ].join("\n");
 
-<h2>ট্রাফিক আসবে কোথা থেকে?</h2>
-<div class="grid">
-  <div class="card"><h3>1) Google Search (প্রধান)</h3><p style="color:var(--muted);margin:0">Google-এর ভাগ ৯৮.৪৬%। প্রতিটি সার্কুলার/রেজাল্ট/দামের জন্য আলাদা, দ্রুত, বাংলা+ইংরেজি শিরোনামের পেজ। দৈনিক ট্রেন্ডিং শব্দ (যেমন রূপপুর পারমাণবিক বিদ্যুৎ কেন্দ্র, ১৮ নভেম্বর ২০২৬) ধরতে “আজকের ট্রেন্ড” বক্স।</p></div>
-  <div class="card"><h3>2) Facebook (বিতরণ)</h3><p style="color:var(--muted);margin:0">Facebook বিজ্ঞাপন পৌঁছ ৬৪.১M (২০২৬ শেষে); খবর, চাকরি আর F-commerce-এর কেন্দ্র। পেজ + গ্রুপে প্রতিদিনের সার্কুলার ও ডেডলাইন পোস্ট, লিংক সাইটে।</p></div>
-  <div class="card"><h3>3) YouTube + TikTok (ভিডিও)</h3><p style="color:var(--muted);margin:0">YouTube #২ সাইট (219.59M ভিজিট); “Jamuna TV live”, “new eid natok 2025” ধরনের খোঁজ প্রমাণ করে ভিডিও-চাহিদা। #LearnOnTikTok খোঁজ ২০২৫-এ +৬৬% বেড়েছে (TikTok)। ৬০ সেকেন্ডে “কীভাবে আবেদন করবে” ভিডিও → সাইটে পূর্ণ গাইড।</p></div>
-  <div class="card"><h3>4) Messenger / WhatsApp (শেয়ার)</h3><p style="color:var(--muted);margin:0">Messenger পৌঁছ ৩৫.০M (২০২৫)। প্রতিটি পেজে এক-ট্যাপ শেয়ার বাটন। <em>সতর্কতা: WhatsApp-এর বাংলাদেশি ব্যবহারকারীর কোনো যাচাইকৃত সংখ্যা নেই</em> — অনুমান 40M+ থেকে 45–55M পর্যন্ত ছড়ানো, তাই পরিকল্পনায় সংখ্যা ধরা হয়নি।</p></div>
-</div>
-
-<div class="warn" style="margin-top:28px">
-  <h3 style="margin-top:0">⚠️ যা এখনো জানা যায়নি — সৎ সীমাবদ্ধতা</h3>
-  <ul style="margin:8px 0 0 18px;padding:0">
-    <li>Google/Semrush/Ahrefs-এর কোনো <strong>অফিসিয়াল “সর্বোচ্চ সার্চ ভলিউম” তালিকা</strong> বাংলাদেশের জন্য প্রকাশ্যে নেই — এই প্ল্যানের ক্রম জরিপের উদ্দেশ্য ও ট্রেন্ডিং স্পাইকের উপর ভিত্তি করে, ভলিউম র‍্যাংকিং নয়।</li>
-    <li><strong>গড়ে প্রতিদিন কতক্ষণ অনলাইনে</strong> থাকে — যাচাইকৃত জাতীয় সংখ্যা পাওয়া যায়নি (শুধু মডেল-ভিত্তিক ~২ঘ ৪০মি সোশ্যাল দাবি আছে, তথ্য হিসেবে ব্যবহার করা হয়নি)।</li>
-    <li>“৯৬% ব্যবহারকারী প্রতিদিন AI টুল ব্যবহার করে” দাবিটি (Year in Search 2025-এর সেকেন্ডারি সারসংক্ষেপ) Google-এর উৎসে যাচাই করা যায়নি — <strong>সন্দেহজনক, ব্যবহার করা হয়নি</strong>।</li>
-    <li>E-commerce ভাগ (Facebook Commerce ৪৫–৫০%, Daraz ৩৫–৪০% GMV) তৃতীয় পক্ষের <strong>অনুমান</strong> (Countly, অক্টোবর ২০২৬), কোম্পানি/নিয়ন্ত্রকের সংখ্যা নয়।</li>
-    <li>সরকারি সেবার পোর্টালগুলোর <strong>ব্যবহারের পরিমাণ</strong> প্রকাশিত হয়নি — চাহিদার প্রমাণ পরোক্ষ (চাকরি খোঁজার ৬৪.৪% ও রেজাল্টের দিনের ভিড়)।</li>
-    <li>Google Year in Search 2025-এর কোনো অফিসিয়াল বাংলাদেশ পেজ পাওয়া যায়নি — তথ্য সেকেন্ডারি সারসংক্ষেপ (Khaborwala, ৩১ ডিসেম্বর ২০২৫) থেকে নেওয়া।</li>
-  </ul>
-</div>
-
-<h2>উৎস</h2>
-<ul class="sources">
-  <li>DataReportal, Digital 2027: Bangladesh — https://datareportal.com/reports/digital-2027-bangladesh</li>
-  <li>Semrush, Most Visited Websites in Bangladesh, Oct 2026 — https://www.semrush.com/trending-websites/bd/all</li>
-  <li>Semrush, Retail Websites BD, Oct 2026 — https://www.semrush.com/trending-websites/bd/retail</li>
-  <li>SERP Mentor / StatCounter, State of SEO in Bangladesh 2027 — https://serpmentor.com/research/state-of-seo-bangladesh-2027</li>
-  <li>BBS ICT Survey via Financial Express, 16 Apr 2026 — https://today.thefinancialexpress.com.bd/last-page/deep-digital-divide-persists-across-bangladesh-1776363453</li>
-  <li>BTRC via BSS, 24 Sep 2026 — https://www.bssnews.net/others/427842/print</li>
-  <li>Khaborwala, Year in Search 2025 summary, 31 Dec 2025 — https://khaborwala.com/bangladeshs-most-searched-topics-according-to-google/</li>
-  <li>SEOAnything, Trending 12 Nov 2026 — https://www.seoanything.dev/b/bangladesh-trending-searches-12-november-2026 ; 18 Nov 2026 — https://www.seoanything.dev/b/bangladesh-bengali-word-searches-rooppur</li>
-  <li>Daily Star, MFS Tk 6,000cr daily, 11 Jul 2026 — https://www.thedailystar.net/business/news/tk-6000cr-moves-daily-not-every-wallet-winning-4220811</li>
-  <li>Deshiz, Most Useful Websites in Bangladesh — https://deshiz.com/top-most-useful-websites-bangladesh/</li>
-  <li>HSC Result 2026 — https://hscresult.bd/ ; Dhaka Tribune — https://www.dhakatribune.com/bangladesh/education/425515/hsc-re-scrutiny-changes-results-of-33-349</li>
-  <li>Financial Express, TikTok top searches 2025 — https://today.thefinancialexpress.com.bd/print/tiktok-reveals-countrys-top-searches-of-2025-1768145641</li>
-</ul>
-
-<footer>এই প্ল্যানটি ২৩ নভেম্বর ২০২৬-এর গবেষণা রিপোর্টের ভিত্তিতে তৈরি। সংখ্যাগুলো প্রকাশের তারিখ অনুযায়ী বদলাতে পারে — লঞ্চের আগে চাকরি, রেজাল্ট ও দামের ডেটা আবার যাচাই করে নিতে হবে। কোনো বিভাগই একসাথে লঞ্চ করার পরামর্শ নয়: Phase 1-এর ৫টি বিভাগ ভালোভাবে দাঁড় করালেই বাকিগুলো টিকে থাকার সুযোগ পাবে।</footer>
-</div>
-
-<script>
-var sites=[
- ["google.com",427.27,"সার্চ — সবকিছুর গেটওয়ে"],
- ["youtube.com",219.59,"ভিডিও: নাটক, গান, লাইভ TV"],
- ["facebook.com",126.93,"সোশ্যাল, খবর, F-commerce"],
- ["chatgpt.com",50.25,"AI — পড়া, লেখা, কোডিং"],
- ["whatsapp.com",42.05,"মেসেজিং (ওয়েব)"],
- ["instagram.com",32.94,"ছবি, Reels"],
- ["tiktok.com",12.79,"শর্ট ভিডিও (অ্যাপে অনেক বড়)"],
- ["claude.ai",11.77,"AI চ্যাট (+1,497% YoY)"],
- ["prothomalo.com",6.83,"খবর — শীর্ষ বাংলাদেশি নিউজ সাইট"]
-];
-document.getElementById('chart').innerHTML = sites.map(function(s){
- var w=Math.max(3, Math.round(s[1]/427.27*100));
- return '<div class="bar-row"><strong>'+s[0]+'</strong><div class="bar"><i style="width:'+w+'%"></i></div><span>'+s[1].toFixed(2)+'M<br><small style="color:var(--muted)">'+s[2]+'</small></span></div>';
-}).join('');
-
-var modules=[
- {n:1,p:'p1',t:'চাকরি হাব',d:'সাইটের প্রাণ। প্রতিদিনের সরকারি সার্কুলার, আবেদনের শেষ তারিখ, পরীক্ষার তারিখ ও রেজাল্ট — এক জায়গায়।',items:['সরকারি চাকরির সার্কুলার (দৈনিক আপডেট, ক্যাটাগরি: মন্ত্রণালয়, ব্যাংক, শিক্ষা, স্বাস্থ্য)','প্রাইমারি শিক্ষক নিয়োগ, NGO সার্কুলার, আর্মি/এয়ার ফোর্স/ডিফেন্স নিয়োগ','“সাপ্তাহিক চাকরির খবর” — প্রতি সপ্তাহের সব সার্কুলার এক পেজে','Teletalk Alljobs ও Bdjobs-এর অফিসিয়াল লিংক + আবেদনের ধাপে ধাপে গাইড','পরীক্ষার প্রস্তুতি: মডেল টেস্ট, বিগত প্রশ্ন, সিলেবাস'],why:'প্রমাণ: ৬৪.৪% ব্যবহারকারী সরকারি চাকরি খুঁজেছে (BBS)। পোর্টাল কীওয়ার্ড ইঙ্গিত: “govt job circular” ~17K, “primary teacher recruitment” 34K (Ahrefs স্ক্রিনশট, আগস্ট ২০২৬ — দুর্বল/বাণিজ্যিক উৎস, শুধু ইঙ্গিত)। LinkedIn সদস্য ১৪.০M (২০২৬)।'},
- {n:2,p:'p1',t:'শিক্ষা ও রেজাল্ট',d:'রেজাল্টের দিন বাংলাদেশের সবচেয়ে বড় ট্রাফিকের দিনগুলোর একটি। দ্রুত, হালকা রেজাল্ট পেজই বিশ্বাস তৈরি করবে।',items:['SSC / HSC / সমমান রেজাল্ট — বোর্ড পোর্টালের সরাসরি লিংক + SMS পদ্ধতি (16140)','রেজাল্টের তারিখ, পুনঃনিরীক্ষণ (re-scrutiny) তারিখ ও পদ্ধতি','ভর্তি তথ্য: বিশ্ববিদ্যালয়, মেডিকেল, পলিটেকনিক','স্কলারশিপ ও বিদেশে পড়া: যেমন “How to apply for a German study visa” (২০২৫-এর শীর্ষ ব্যবহারিক খোঁজ)','পড়ার সাহায্য: 10 Minute School-ধাঁচের ফ্রি লেসন লিংক, Wikipedia গাইড'],why:'প্রমাণ: HSC ২০২৬-এ ১,২৭০,৫৮৩ পরীক্ষার্থী, পাস ৫২.১২% (২০২৫-এ ছিল ৫৮.৮৩%); SSC পাস ৬২.২৫% (১০ আগস্ট ২০২৬)। অফিসিয়াল পোর্টাল: educationboardresults.gov.bd। রেজাল্টের দিনের ট্রাফিকের প্রকাশিত সংখ্যা নেই — উদ্ভাবন করা হয়নি।'},
- {n:3,p:'p1',t:'সরকারি সেবা গাইড',d:'মানুষ সেবা খোঁজে, কিন্তু ধাপ বুঝতে পারে না। প্রতিটি সেবায়: কী লাগবে, খরচ কত, কোথায় যেতে হবে, অফিসিয়াল লিংক।',items:['NID সংশোধন, নতুন NID, ভোটার তথ্য','ই-পাসপোর্ট: আবেদন, ফি, স্ট্যাটাস চেক','জন্ম নিবন্ধন ও সংশোধন','ভূমি: খতিয়ান, নামজারি (land mutation)','আয়কর (income tax), ড্রাইভিং লাইসেন্স, ট্রেনের টিকিট','জাতীয় পোর্টাল bangladesh.gov.bd-এর সঠিক পেজে সরাসরি লিংক'],why:'প্রমাণ: Deshiz useful-sites গাইডে (লিংক যাচাই অক্টোবর ২০২৬) এগুলোই “মানুষ আসলে ব্যবহার করে” এমন সরকারি সেবা। ব্যবহারের পরিমাণ প্রকাশিত নয় — খোলা প্রশ্ন হিসেবে চিহ্নিত।'},
- {n:4,p:'p1',t:'দৈনন্দিন দাম ও রেট',d:'প্রতিদিন বদলায় এমন সংখ্যা — মানুষ বারবার ফিরে আসার সবচেয়ে সহজ কারণ।',items:['মোবাইলের দাম: ব্র্যান্ড/মডেল অনুযায়ী বাংলাদেশি দাম','সোনার দাম (ভরি অনুযায়ী)','ডলার / রেমিট্যান্স রেট ও প্রবাসী পাঠানোর গাইড','নিত্যপণ্যের বাজারদর (ট্রেন্ডিং শব্দ “ডিম”, “তেল” প্রমাণ করে চাহিদা)','অফার: Daraz, Star Tech, MobileDokan-এর যাচাইকৃত অফার লিংক'],why:'প্রমাণ: “iphone 13 pro max price in bangladesh” ~41K ভলিউম (এক পোর্টালের Ahrefs স্ক্রিনশট — ইঙ্গিতমাত্র); MobileDokan 5.4M ভিজিট/মাস রিটেইলে #১, Daraz 5.13M, Star Tech 3.73M (Semrush, অক্টোবর ২০২৬)।'},
- {n:5,p:'p1',t:'টাকা ও মোবাইল ব্যাংকিং',d:'bKash/Nagad ছাড়া দৈনন্দিন জীবন চলে না — কিন্তু গাইড বাংলায় কম। চার্জ, লিমিট আর নিরাপত্তা হবে মূল কন্টেন্ট।',items:['bKash / Nagad: ক্যাশ-আউট চার্জ, লিমিট, সেন্ড মানি খরচ — ক্যালকুলেটরসহ','অ্যাকাউন্ট খোলা, PIN রিসেট, ভুল নম্বরে টাকা গেলে করণীয়','প্রতারণা থেকে বাঁচার গাইড (OTP/PIN কেলেঙ্কারি)','ব্যাংক ও রেমিট্যান্স: কোন মাধ্যমে রেট ভালো'],why:'প্রমাণ: bKash Similarweb-এ #৯ ওয়েবসাইট — সর্বোচ্চ স্থানীয় সাইট (ডিসেম্বর ২০২৫)। MFS-এ গড়ে প্রতিদিন ~Tk ৫,৮৮৩ কোটি লেনদেন (Bangladesh Bank / Daily Star); নিবন্ধিত অ্যাকাউন্ট 259.7M, মাসিক সক্রিয় 87.15M (আগস্ট ২০২৬); bKash সক্রিয় ৪.২০ কোটি, Nagad ২.৮২ কোটি। লেনদেনের ধরন: ক্যাশ-আউট ৩২%, ক্যাশ-ইন ৩০%, P2P ২৬%, মার্চেন্ট পেমেন্ট মাত্র ৫%।'},
- {n:6,p:'p2',t:'ক্রিকেট ও খেলা',d:'ম্যাচের দিনে ট্রাফিকের বন্যা — তবে লাইভ ডেটা চালানো কঠিন, তাই Phase 2।',items:['লাইভ স্কোর ও scorecard (ESPNcricinfo / Cricbuzz-ধাঁচের হালকা পেজ)','বাংলাদেশের ম্যাচের সময়সূচি, BPL / Asia Cup / ICC ইভেন্ট ক্যালেন্ডার','ম্যাচ প্রিভিউ, একাদশ, ফলাফল — বাংলায়','ফুটবল: Fortis FC, Bashundhara Kings-সহ স্থানীয় খবর'],why:'প্রমাণ: ৪৯.৮% ব্যবহারকারী খেলার কন্টেন্ট দেখেছে (BBS)। ১২ নভেম্বর ২০২৬-এর #১ ট্রেন্ড “ban u19 vs pak u19” (1,000+); ১৮ নভেম্বরে England–Australia scorecard 10,000+। ২০২৫-এর শীর্ষ: ICC Champions Trophy, Asia Cup, BPL।'},
- {n:7,p:'p2',t:'খবর — আজকের সারসংক্ষেপ',d:'নিজে সংবাদপত্র হওয়ার দরকার নেই; দিনের গুরুত্বপূর্ণ খবর ৫ মিনিটে পড়া যায় এমন সারসংক্ষেপ + মূল উৎসের লিংক।',items:['সকাল/সন্ধ্যার “আজকের ৫ খবর”','রাজনীতি, অর্থনীতি (মূল্যস্ফীতি, রেমিট্যান্স), শিক্ষা বুলেটিন','Prothom Alo, Ittefaq, Kaler Kantho, Jugantor, Daily Star-এর হেডলাইন লিংক'],why:'প্রমাণ: Prothom Alo #১ নিউজ সাইট (Similarweb অক্টোবর ২০২৬-এ দেশে #১০); তবে বেশিরভাগ খবর পড়া হয় Facebook/YouTube দিয়ে, হোমপেজে গিয়ে নয়। দৈনিক ট্রেন্ডিংয়ে খবরই প্রধান (১ ডিসেম্বর ২০২৫-এর স্ন্যাপশট)।'},
- {n:8,p:'p2',t:'AI সাহায্য কেন্দ্র',d:'ChatGPT এখন দেশের #৪ ওয়েবসাইট। ব্যবহার শেখানোই কন্টেন্ট — নিজে AI বানানোর দরকার নেই।',items:['ChatGPT / Gemini / Claude / DeepSeek — কোন কাজে কোনটা, বাংলায় গাইড','পড়াশোনা, CV লেখা, ইমেইল, অনুবাদ — কপি-পেস্ট প্রম্পট লাইব্রেরি','ফ্রি বনাম পেইড: শিক্ষার্থী ও ফ্রিল্যান্সারের জন্য পরামর্শ'],why:'প্রমাণ: ChatGPT 50.25M ভিজিট (+১২৬% YoY), Claude 11.77M (+১,৪৯৭%) — Semrush অক্টোবর ২০২৬। AI-chatbot রেফারালে ChatGPT ৭৪.৯৭%, Gemini ২১.৪৭% (StatCounter, সেপ্টেম্বর ২০২৬)।'},
- {n:9,p:'p2',t:'বিনোদন গাইড',d:'সবচেয়ে বেশি সার্চ হওয়া ক্ষেত্র — তবে কপিরাইট মেনে শুধু তথ্য ও অফিসিয়াল লিংক।',items:['নতুন সিনেমা/নাটক: মুক্তির তারিখ, কোথায় দেখা যাবে (অফিসিয়াল OTT/YouTube)','ঈদের নাটক ও জনপ্রিয় সিরিজের তালিকা','গান ও লাইভ TV-এর অফিসিয়াল চ্যানেল লিংক'],why:'প্রমাণ: ২০২৫-এর শীর্ষ ব্যক্তি-খোঁজ Shakib Khan; সিনেমা Borbad, Tandob, Jongli; সিরিজ Bachelor Point, Bohemian Ghora (Year in Search 2025, সেকেন্ডারি)। YouTube খোঁজে “Jamuna tv Watch Live” 2,550,000 ও “new eid natok 2025” 588,000 (OS Digital World — তারিখ অনির্ভরযোগ্য, সতর্কভাবে ব্যবহার)।'},
- {n:10,p:'p2',t:'দৈনন্দিন টুলস',d:'ছোট ছোট কাজ, প্রতিদিনের ব্যবহার — বুকমার্ক পাওয়ার সেরা উপায়।',items:['বয়স, BMI, শতকরা, EMI ও bKash চার্জ ক্যালকুলেটর','PDF/ছবি টুলস গাইড (Adobe #১৯ ওয়েবসাইট — টুলের চাহিদার প্রমাণ)','“What is my IP address?”-ধাঁচের তাৎক্ষণিক উত্তর পেজ','বাংলা ↔ ইংরেজি অনুবাদ ও টাইপিং সাহায্য'],why:'প্রমাণ: ব্যবহারিক খোঁজের তালিকায় “What is my IP address?” ছিল ২০২৫-এর শীর্ষে; Adobe 6.54M ভিজিট/মাসে #১৯ (Semrush)।'},
- {n:11,p:'p3',t:'শপিং ও F-commerce সাহায্য',d:'কেনাকাটা এখনো ছোট বাজার — তাই শেষ ধাপে। দাম যাচাই ও প্রতারণা-সতর্কতাই মূল্য।',items:['দাম তুলনা: Daraz, Pickaboo, Chaldal, Star Tech','Facebook পেজ থেকে কেনার আগে যাচাই চেকলিস্ট','COD, ডেলিভারি চার্জ ও রিটার্ন গাইড'],why:'প্রমাণ: মাত্র ১১.৬% অনলাইনে কিনেছে (BBS); COD ৮৫–৯০% (অনুমান)। Facebook Commerce লেনদেনের ~৪৫–৫০%, Daraz GMV-র ~৩৫–৪০% — দুটোই Countly-র অনুমান, অফিসিয়াল নয়।'},
- {n:12,p:'p3',t:'টেক ও ফ্রিল্যান্সিং',d:'GitHub শীর্ষ ১৪-তে — ডেভেলপার/ফ্রিল্যান্সার অর্থনীতি বাস্তব ও বাড়ন্ত।',items:['ফ্রিল্যান্সিং শুরু করার গাইড, পেমেন্ট পাওয়ার উপায়','নতুন ফোন/ল্যাপটপ কেনার গাইড ও দাম','সফটওয়্যার/অ্যাপের বাংলা টিউটোরিয়াল'],why:'প্রমাণ: GitHub 8.39M ভিজিট/মাসে #১৪ (+২৬.৪% YoY), Pinterest #১৫, LinkedIn 6.94M — Semrush অক্টোবর ২০২৬।'},
- {n:13,p:'p3',t:'লাইফস্টাইল, খাবার ও ভ্রমণ',d:'TikTok-এ বাড়ন্ত খোঁজের ক্ষেত্র — হালকা কন্টেন্ট, শেয়ার বেশি।',items:['ভ্রমণ: জনপ্রিয় গন্তব্যের খরচ ও গাইড','রেসিপি ও খাবারের ট্রেন্ড','স্থানীয় ঘোরার জায়গা ও ইভেন্ট'],why:'প্রমাণ: TikTok ২০২৫ — ভ্রমণে Dubai ও Jamuna Future Park শীর্ষে; #TravelTok +৬৩%, #FoodTok +৪০%, #BookTok +৪১% YoY। Google ২০২৫-এর গন্তব্য: London, Tokyo, Kuala Lumpur; লাইফস্টাইল ট্রেন্ড: hot honey, matcha, mushroom coffee (সেকেন্ডারি)।'},
- {n:14,p:'p3',t:'কমিউনিটি ও সাহায্য ডেস্ক',d:'সবশেষে — যখন পাঠক তৈরি, তখন প্রশ্ন-উত্তর ও Facebook গ্রুপ সংযোগ।',items:['পাঠকের প্রশ্নের উত্তর (চাকরি/সেবা বিষয়ে)','জরুরি নম্বর ও হেল্পলাইনের যাচাইকৃত তালিকা','ভুল তথ্য জানানোর ফর্ম'],why:'প্রমাণ: Facebook কমিউনিটি ও Messenger-ভিত্তিক অর্ডার/যোগাযোগই দেশের প্রধান ধারা; Messenger পৌঁছ ৩৫.০M (২০২৫)।'}
-];
-function renderModules(f){
- document.getElementById('modules').innerHTML = modules.filter(function(m){return f==='all'||m.p===f;}).map(function(m){
-  return '<article class="module"><div class="module-top"><div style="display:flex;gap:12px"><div class="num">'+m.n+'</div><div><h3>'+m.t+'</h3></div></div><span class="phase '+m.p+'">'+(m.p==='p1'?'PHASE 1':m.p==='p2'?'PHASE 2':'PHASE 3')+'</span></div><p>'+m.d+'</p><ul>'+m.items.map(function(i){return '<li>'+i+'</li>';}).join('')+'</ul><div class="why">'+m.why+'</div></article>';
- }).join('');
-}
-renderModules('all');
-document.querySelectorAll('.chip').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.chip').forEach(function(x){x.classList.remove('active')});b.classList.add('active');renderModules(b.dataset.f);});});
-
-var phases=[
- {t:'Phase 1 — লঞ্চ: বিশ্বাস অর্জন',items:['চাকরি হাব (সার্কুলার + ডেডলাইন ক্যালেন্ডার)','রেজাল্ট পেজ (পরের পরীক্ষার আগেই তৈরি রাখা)','সরকারি সেবার ১০টি গাইড (NID, পাসপোর্ট, জন্ম নিবন্ধন, খতিয়ান, ট্যাক্স, লাইসেন্স, ট্রেন টিকিটসহ)','দৈনন্দিন দাম: মোবাইল + সোনা + ডলার রেট','bKash/Nagad গাইড ও চার্জ ক্যালকুলেটর','Facebook পেজ চালু — প্রতিদিন ২টি পোস্ট (সার্কুলার + ডেডলাইন)'],kpi:'লক্ষ্য: Google থেকে প্রথম অর্গানিক ভিজিটর ও Facebook-এ পুনরাবৃত্ত পাঠক। সাফল্যের মাপ: রেজাল্ট/সার্কুলারের দিনে ফিরে আসা ব্যবহারকারী।'},
- {t:'Phase 2 — বৃদ্ধি: প্রতিদিনের অভ্যাস',items:['ক্রিকেট স্কোর ও ম্যাচ ক্যালেন্ডার','“আজকের ৫ খবর” সারসংক্ষেপ','AI সাহায্য কেন্দ্র ও প্রম্পট লাইব্রেরি','বিনোদন গাইড (সিনেমা/নাটকের মুক্তির তথ্য)','দৈনন্দিন টুলস (ক্যালকুলেটর, PDF গাইড)','YouTube/TikTok-এ ৬০ সেকেন্ডের গাইড ভিডিও — সপ্তাহে ৩টি'],kpi:'লক্ষ্য: ম্যাচের দিন ও ট্রেন্ডিং ইস্যুতে স্পাইক ট্রাফিককে নিয়মিত পাঠকে রূপ দেওয়া।'},
- {t:'Phase 3 — পূর্ণাঙ্গ: সম্প্রসারণ',items:['শপিং দাম-তুলনা ও F-commerce যাচাই গাইড','টেক ও ফ্রিল্যান্সিং বিভাগ','লাইফস্টাইল, খাবার ও ভ্রমণ','কমিউনিটি প্রশ্ন-উত্তর ও হেল্প ডেস্ক','ইমেইল/মেসেঞ্জার অ্যালার্ট: পছন্দের চাকরির ক্যাটাগরিতে নতুন সার্কুলার এলে জানানো'],kpi:'লক্ষ্য: এক-বিষয়ের সাইট থেকে পূর্ণ Daily Help প্ল্যাটফর্ম। কোনো বিভাগই আগের ধাপের ট্রাফিক ছাড়া চালু নয়।'}
-];
-function renderPhase(i){var p=phases[i];document.getElementById('phasePanel').innerHTML='<h3 style="margin-top:0">'+p.t+'</h3><ul style="margin:0 0 12px 18px;padding:0">'+p.items.map(function(x){return '<li style="margin:5px 0">'+x+'</li>';}).join('')+'</ul><p style="margin:0;color:var(--muted)">'+p.kpi+'</p>';}
-renderPhase(0);
-document.querySelectorAll('.tab').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active')});b.classList.add('active');renderPhase(+b.dataset.t);});});
-</script>
-</body>
+      var copyBtn = document.getElementById("copyTreeBtn");
+      copyBtn.addEventListener("click", function () {
+        function done() {
+          var old = copyBtn.textContent;
+          copyBtn.textContent = "কপি হয়েছে ✓";
+          setTimeout(function () { copyBtn.textContent = old; }, 2000);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(TREE_TEXT).then(done, function () { fallback(); });
+        } else { fallback(); }
+        function fallback() {
+          var ta = document.createElement("textarea");
+          ta.value = TREE_TEXT;
+          ta.style.position = "fixed"; ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand("copy"); done(); } catch (e) {}
+          document.body.removeChild(ta);
+        }
+      });
+    </script>
+  </body>
 </html>
