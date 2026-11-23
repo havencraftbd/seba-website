@@ -1,8 +1,0 @@
-{
-  "name": "havencraft-admin",
-  "version": "2.0.0",
-  "type": "module",
-  "private": true,
-  "description": "HavenCraft SMP Staff Admin Dashboard (Static HTML, CSS & JS)",
-  "scripts": {}
-}
